@@ -1,0 +1,19 @@
+<ion-view class="view-backdrop" view-title="Page {{pagenum}}" hotkey="{'right': goToNext,'up': scrollTop,'down': scrollBottom}">
+  <ion-content>
+    <div class="card">
+      <div class="item item-text-wrap" ng-class="{'easy-reading': settings.easyReading}">
+          <div class="book-content" ng-bind-html="trustedHtml"></div>
+      </div>
+      <div class="item tabs tabs-secondary tabs-icon-left">
+        <a class="tab-item" ng-click="goToPrev()">
+          <i class="icon ion-chevron-left button-back-icon"></i>
+          Back
+        </a>
+        <a class="tab-item" ng-click="goToNext()">
+          Next
+          <i class="icon ion-chevron-right button-next-icon"></i>
+        </a>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

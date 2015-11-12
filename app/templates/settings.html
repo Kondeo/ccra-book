@@ -1,0 +1,34 @@
+<ion-view view-title="Application Settings">
+  <ion-content>
+    <ul class="list">
+
+      <li class="item item-toggle" ng-if="platformIOS">
+        Easy Reading Page Color
+        <label class="toggle toggle-assertive">
+          <input type="checkbox" ng-model="settings.easyReading" ng-change="saveSettings()">
+          <div class="track">
+            <div class="handle"></div>
+          </div>
+        </label>
+      </li>
+      <li class="item" ng-if="!platformIOS">
+        <div style="vertical-align: text-bottom">Easy Reading Page Color</div>
+        <div class="onoffswitch">
+          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ng-model="settings.easyReading" ng-change="saveSettings()">
+          <label class="onoffswitch-label" for="myonoffswitch"></label>
+        </div>
+        </div>
+      </li>
+      <li class="item">
+        Your platform is:
+        <d ng-if="platformAndroid">Android</d>
+        <d ng-if="platformIOS">IOS</d>
+        <d ng-if="!platformIOS && !platformAndroid">Web</d>
+      </li>
+      <li class="item" ng-if="!platformIOS && !platformAndroid">
+        Use ctrl+D on the index page to bookmark this app.
+      </li>
+
+    </ul>
+  </ion-content>
+</ion-view>
