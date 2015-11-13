@@ -12,3 +12,5 @@ var Page = new Schema({
     type: String
   },
 });
+
+mongoose.model('Page', Page);
