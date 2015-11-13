@@ -223,7 +223,7 @@ angular.module('starter.controllers', [])
         else
         {
             //Then display the page
-            $scope.pagecontents = data;
+            $scope.pagecontents = data.pageContent;
             $scope.trustedHtml = $sce.trustAsHtml($scope.pagecontents);
 
             //Set our current error to none
