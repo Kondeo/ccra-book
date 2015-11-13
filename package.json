@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "angular-hotkeys": "^1.6.0",
-    "mongoose": "^4.2.5"
+    "angular-hotkeys": "^1.6.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
