@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -16,6 +17,9 @@ var users = require('./routes/users');
 var pages = require('./routes/pages');
 
 var app = express();
+
+//Use cors for cross origin support
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
