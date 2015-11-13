@@ -203,7 +203,7 @@ angular.module('starter.controllers', [])
 .controller('PageCtrl', function($scope, $stateParams, Book, $location, $http, $sce, $state, $ionicHistory, $ionicScrollDelegate) {
     $scope.pagenum = $stateParams.page;
     var cookie = localStorage.getItem("session_token");
-    $http.get('http://dev.kondeo.com/mwwwordpairs/backend/users.php/page/' + $stateParams.page + "/" + cookie).
+    $http.get('http://localhost:3000/pages/' + $stateParams.page).
       success(function(data, status, headers, config) {
         // this callback will be called asynchronously
         // when the response is available
