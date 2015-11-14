@@ -39,6 +39,11 @@ router.get('/:number', function(req, res, next) {
         var attributeStripper = new RegExp(' ' + badAttributes[i] + '="(.*?)"','gi');
         output = output.replace(attributeStripper, '');
       }
+      output = output.replace(/     /g, ' ');
+      output = output.replace(/    /g, ' ');
+      output = output.replace(/   /g, ' ');
+      output = output.replace(/  /g, ' ');
+      output = output.replace(/text-indent:-17.95pt;/g, 'margin-left: 23.95pt;');
       return output;
     }
 });
