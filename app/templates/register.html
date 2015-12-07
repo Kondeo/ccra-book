@@ -8,19 +8,22 @@
           <input type="text" ng-model="registerData.email"
           placeholder="example@example.com"
           autocomplete="off"  autocorrect="off"
-          autocapitalize="none" spellcheck="false">
+          autocapitalize="none" spellcheck="false"
+          required>
         </label>
         <label class="item item-input">
           <span class="input-label">Password</span>
           <input type="password"
           ng-model="registerData.password"
-          placeholder="Secure Password">
+          placeholder="Secure Password"
+          required>
         </label>
         <label class="item item-input">
           <span class="input-label">Confirm Password</span>
           <input type="password"
           ng-model="registerData.confirmPassword"
-          placeholder="Secure Password">
+          placeholder="Secure Password"
+          required>
         </label>
 
         <!-- Credit Card Number -->

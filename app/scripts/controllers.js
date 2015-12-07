@@ -267,9 +267,57 @@ angular.module('starter.controllers', [])
 
 .controller('RegisterCtrl', function($scope, $ionicHistory) {
 
+    //Get our session_token
+    var cookie = localStorage.getItem("session_token");
 
+    //Check if we are logged in,
+    //If we are then fill the subscription information
+    //Needs have the according route
+    if($scope.loggedIn())
+    {
+        $http.get('http://localhost:3000/pages/' + $stateParams.page).
+          success(function(data, status, headers, config) {
+            // this callback will be called asynchronously
+            // when the response is available
+            //Check for any errors
+            if(data.error)
+            {
+                if(data.error.errorid == '12')
+                {
+                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
+
+                    //Set our current error
+                    $scope.errors[0] = 12;
+
+                    $scope.login();
+                }
+            }
+            else
+            {
+                //Then fill the user information
+                $scope.registerData.email = data.email;
+
+
+                //Set our current error to none
+                $scope.errors[0] = -1;
+            }
+          }).
+          error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+
+          }
+    }
+
+    //Function to go back to the previous page
     $scope.goToPrev = function(){
         $ionicHistory.goBack();
     }
+
+
+
+    //Create the user
+
+    //Register the user
 
 });
