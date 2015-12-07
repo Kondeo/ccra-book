@@ -391,7 +391,7 @@ angular.module('starter.controllers', [])
             event.target.value = value;
 
             //Also save the value to the scope
-            $scope.cc.number = value;
+            $scope.registerData.ccNumber = value;
 
         } else if(event.which >= 48 && event.which <= 57){
             var value = event.target.value.replace(/-/g, '');
@@ -483,6 +483,7 @@ angular.module('starter.controllers', [])
      * Validates form CVC. Checks Stripe for validity.
      */
     $scope.validateCVC = function() {
+
         //get the input
         var input1 = document.getElementById("cardCvv");
 
@@ -549,7 +550,7 @@ angular.module('starter.controllers', [])
         $scope.tokenzing = true;
 
         //Create finalized card number
-        var cardNumber = $scope.cc.number;
+        var cardNumber = $scope.registerData.ccNumber;
 
         //Send card info to stripe for tokenization
         Stripe.card.createToken({

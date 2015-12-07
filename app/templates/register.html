@@ -92,7 +92,7 @@
         <label class="item">
           <button class="button button-block button-positive"
           type="submit" ng-if = "!loggedIn()"
-          ng-disabled = "registerForm.$valid && cardValidated"
+          ng-disabled = "!registerForm.$valid && !cardValidated"
           ng-click="registerUser()">Create Subscription</button>
         </label>
 
@@ -100,7 +100,14 @@
         <label class="item">
           <button class="button button-block button-positive"
           type="submit" ng-if = "loggedIn()"
-          ng-disabled = "registerForm.$valid"
+          ng-disabled = "!registerForm.$valid ||
+          registerData.password != registerData.confirmPassword ||
+          (registerData.ccNumber.length > 0 ||
+          registerData.expireM > 0 ||
+          registerData.expireY > 0 ||
+          registerData.cvv > 0 ||
+          registerData.zipCode > 0 &&
+          !cardValidated)"
           ng-click="updateUser()">Update</button>
         </label>
         <label class="item">
