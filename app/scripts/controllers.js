@@ -265,7 +265,9 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('RegisterCtrl', function($scope, $ionicHistory) {
+.controller('RegisterCtrl', function($scope, $ionicHistory, $http) {
+
+    //SET OUR STRIPE KEY HERE
 
     //Get our session_token
     var cookie = localStorage.getItem("session_token");
@@ -275,7 +277,7 @@ angular.module('starter.controllers', [])
     //Needs have the according route
     if($scope.loggedIn())
     {
-        $http.get('http://localhost:3000/pages/' + $stateParams.page).
+        $http.get('http://localhost:3000/pages/').
           success(function(data, status, headers, config) {
             // this callback will be called asynchronously
             // when the response is available
@@ -306,18 +308,348 @@ angular.module('starter.controllers', [])
             // called asynchronously if an error occurs
             // or server returns response with an error status.
 
-          }
+          })
     }
+
+    //Functions for the Form
+
+    $scope.numbersOnly = function(event){
+        if(((event.which < 48 || event.which > 57) && event.which != 46 && event.which != 8) || event.shiftKey){
+            event.preventDefault();
+        }
+    }
+
+    $scope.maxLength = function(event, length){
+        if (event.target.value.length > length && event.which != 46 && event.which != 8) {
+            event.preventDefault();
+            event.target.value = event.target.value.slice(0,length);
+        } else if (event.target.value.length == length && event.which != 46 && event.which != 8){
+            event.preventDefault();
+        }
+    }
+
+    function getCaretPosition(ctrl)
+    {
+        var caretPos = 0;
+        // IE
+        if (document.selection)
+        {
+            ctrl.focus ();
+            var sel = document.selection.createRange();
+            sel.moveStart ('character', -ctrl.value.length);
+            caretPos = sel.text.length;
+        }
+        // Firefox
+        else if (ctrl.selectionStart || ctrl.selectionStart == '0')
+        {
+            caretPos = ctrl.selectionStart;
+        }
+
+        return caretPos;
+    }
+
+    function setCaretPosition(elemId, caretPos) {
+        var elem = document.getElementById(elemId);
+
+        if(elem != null) {
+            if(elem.createTextRange) {
+                var range = elem.createTextRange();
+                range.move('character', caretPos);
+                range.select();
+            }
+            else {
+                if(elem.selectionStart) {
+                    elem.focus();
+                    elem.setSelectionRange(caretPos, caretPos);
+                }
+                else
+                    elem.focus();
+            }
+        }
+    }
+
+    $scope.registerData.ccNumber = "";
+    $scope.formatCC = function(event){
+        var caretPos = getCaretPosition(event.target) == event.target.value.length ? -3 : getCaretPosition(event.target);
+        if(event.which == 46 || event.which == 8){
+            var value = event.target.value.replace(/-/g, '');
+
+            if(value.length > 4){
+                value = [value.slice(0, 4), "-", value.slice(4)].join('');
+
+                if(value.length > 9){
+                    value = [value.slice(0, 9), "-", value.slice(9)].join('');
+
+                    if(value.length > 14){
+                        value = [value.slice(0, 14), "-", value.slice(14)].join('');
+                    }
+                }
+            }
+            event.target.value = value;
+
+            //Also save the value to the scope
+            $scope.cc.number = value;
+
+        } else if(event.which >= 48 && event.which <= 57){
+            var value = event.target.value.replace(/-/g, '');
+
+            if(value.length >= 4){
+                value = [value.slice(0, 4), "-", value.slice(4)].join('');
+
+                if(value.length >= 9){
+                    value = [value.slice(0, 9), "-", value.slice(9)].join('');
+
+                    if(value.length >= 14){
+                        value = [value.slice(0, 14), "-", value.slice(14)].join('');
+                    }
+                }
+            }
+            if(caretPos == 4 || caretPos == 9 || caretPos == 14){
+                caretPos++;
+            }
+            event.target.value = value;
+
+            //Also save the value to the scope
+            $scope.cc.number = value;
+        }
+        if(caretPos >= 0){
+            setCaretPosition(event.target.id, caretPos);
+        }
+        $scope.validateCardNumber(event);
+    }
+
+    //Star the credit card field
+    $scope.ccStar = function () {
+
+        //First get the input field
+        var ccField = document.getElementById("ccNumber");
+
+        //Get the value
+        var ccNum = ccField.value;
+
+        //Loop through and add some stars
+        for(var i = ccNum.length - 6; i >= 0; i--)
+        {
+
+            //Replace the characters that are not dashes
+            if(ccNum.charAt(i) != '-') ccNum = ccNum.substring(0, i) + "*" + ccNum.substring(i + 1);
+        }
+
+        //Set the field value!
+        ccField.value = ccNum
+    }
+
+    //unstar the credit card field
+    $scope.ccUnStar = function () {
+
+        //Simply replace the field value with the actual value
+        document.getElementById("ccNumber").value = $scope.registerData.ccNumber;
+    }
+
+    /**
+     * Validates form CC. Checks Stripe for validity, determines card type and sets card icon.
+     */
+    $scope.validateCardNumber = function(event) {
+        //Concatante the credit card number together
+        var cardNumber = event.target.value.replace(/-/g, '');
+
+        //Check if the credit card number is US valid
+        if(Stripe.card.validateCardNumber(cardNumber) && (cardNumber.length == 13 || cardNumber.length == 15 || cardNumber.length == 16)) {
+            $scope.validCC = true;
+        }
+        else {
+            $scope.validCC = false;
+        }
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates form Date. Checks Stripe for validity.
+     */
+    $scope.validateDate = function() {
+        //Concatante the giftcard number together
+        var input1 = document.getElementById("expireM");
+        var input2 = document.getElementById("expireY");
+
+        $scope.dateValidated = Stripe.card.validateExpiry(input1.value, input2.value);
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates form CVC. Checks Stripe for validity.
+     */
+    $scope.validateCVC = function() {
+        //get the input
+        var input1 = document.getElementById("cardCvv");
+
+        $scope.cvcValidated = Stripe.card.validateCVC(input1.value);
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates form zipcode. Checks for length.
+     */
+    $scope.validateZip = function() {
+        //get the input
+        var input1 = document.getElementById("zipCode");
+
+        //Simply check if there are 5 digits
+        if (input1.value.length > 4) {
+            $scope.zipValidated = true;
+        } else {
+            $scope.zipValidated = false;
+        }
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates email field
+     */
+    $scope.validateEmail = function() {
+        //Fetch email from giftcard form
+        var email = $scope.registerData.email;
+
+        //Regex for all valid emails. To add a TLD, edit the final OR statement.
+        var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|co|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
+        //Test the form email against the regex
+        if (emailRegex.test(email)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Checks if all CC fields have been validated independantly
+     */
+    $scope.validateCard = function() {
+        if ($scope.validCC && $scope.dateValidated && $scope.cvcValidated && $scope.zipValidated) {
+            $scope.cardValidated = true;
+        } else {
+            $scope.cardValidated = false;
+            $scope.cardType = "";
+        }
+    }
+
+
+    /**
+     * Assembles CC info and creates a token with Stripe
+     */
+    $scope.tokenizeInfo = function() {
+        //Disable button while tokenzing the card
+        $scope.tokenzing = true;
+
+        //Create finalized card number
+        var cardNumber = $scope.cc.number;
+
+        //Send card info to stripe for tokenization
+        Stripe.card.createToken({
+            "number": $scope.registerData.ccNumber,
+            "cvc": $scope.registerData.cvv,
+            "exp_month": $scope.registerData.expireM,
+            "exp_year": $scope.registerData.expireY
+        }, function(status, response) {
+            if (response.error) {
+
+                //Display card error message
+                $scope.tokenizeFailure = true;
+            } else {
+                //Get the token to be submitted later, after the second page
+                // response contains id and card, which contains additional card details
+                $scope.stripeToken = response.id;
+            }
+
+            //Force the change to refresh, we need to do this because I
+            //guess response scope is a different scope and has to be
+            //forced or interacted with
+            $scope.$apply();
+        });
+    };
 
     //Function to go back to the previous page
     $scope.goToPrev = function(){
         $ionicHistory.goBack();
     }
 
-
-
     //Create the user
+    $scope.registerUser = function() {
+        $http.post('http://localhost:3000/pages/').
+          success(function(data, status, headers, config) {
+            // this callback will be called asynchronously
+            // when the response is available
+            //Check for any errors
+            if(data.error)
+            {
+                if(data.error.errorid == '12')
+                {
+                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
 
-    //Register the user
+                    //Set our current error
+                    $scope.errors[0] = 12;
+
+                    $scope.login();
+                }
+            }
+            else
+            {
+                //Then fill the user information
+                $scope.registerData.email = data.email;
+
+
+                //Set our current error to none
+                $scope.errors[0] = -1;
+            }
+          }).
+          error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+
+          })
+    }
+
+    //Update the user
+    $scope.updateUser = function() {
+        $http.put('http://localhost:3000/pages/').
+          success(function(data, status, headers, config) {
+            // this callback will be called asynchronously
+            // when the response is available
+            //Check for any errors
+            if(data.error)
+            {
+                if(data.error.errorid == '12')
+                {
+                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
+
+                    //Set our current error
+                    $scope.errors[0] = 12;
+
+                    $scope.login();
+                }
+            }
+            else
+            {
+                //Then fill the user information
+                $scope.registerData.email = data.email;
+
+
+                //Set our current error to none
+                $scope.errors[0] = -1;
+            }
+          }).
+          error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+
+          })
+    }
 
 });

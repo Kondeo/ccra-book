@@ -34,7 +34,7 @@
               id="ccNumber"
               ng-model="registerData.ccNumber"
               placeholder="XXXX-XXXX-XXXX-XXXX"
-              ng-focus="setActiveField('creditcardnumbercontainer');ccUnStar()"
+              ng-focus="ccUnStar()"
               ng-blur = "ccStar()"
               ng-keydown="numbersOnly($event);maxLength($event, 19)"
               ng-keyup="formatCC($event)">
@@ -67,7 +67,7 @@
           <span class="input-label">CVV (Located on Back of Card)</span>
           <input
                 type="number"
-                id="clique_input_cvv"
+                id="cardCvv"
                 ng-keyup = "validateCVC()"
                 ng-keydown="maxLength($event, 3)"
                 placeholder="CVV"
