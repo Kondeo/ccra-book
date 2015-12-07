@@ -2,13 +2,87 @@
 <ion-content>
     <form ng-submit="doLogin()">
       <div class="list">
+
         <label class="item item-input">
-          <span class="input-label">Username</span>
-          <input type="text" ng-model="loginData.username" autocomplete="off"  autocorrect="off" autocapitalize="none" spellcheck="false">
+          <span class="input-label">Email</span>
+          <input type="text" ng-model="registerData.email"
+          placeholder="example@example.com"
+          autocomplete="off"  autocorrect="off"
+          autocapitalize="none" spellcheck="false">
         </label>
         <label class="item item-input">
           <span class="input-label">Password</span>
-          <input type="password" ng-model="loginData.password">
+          <input type="password"
+          ng-model="registerData.password"
+          placeholder="Secure Password">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Confirm Password</span>
+          <input type="password"
+          ng-model="registerData.confirmPassword"
+          placeholder="Secure Password">
+        </label>
+
+        <!-- Credit Card Number -->
+        <label class="item item-input">
+          <span class="input-label">Credit Card Number</span>
+          <input
+              type="tel"
+              id="ccNumber"
+              ng-model="registerData.ccNumber"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              ng-focus="setActiveField('creditcardnumbercontainer');ccUnStar()"
+              ng-blur = "ccStar()"
+              ng-keydown="numbersOnly($event);maxLength($event, 19)"
+              ng-keyup="formatCC($event)">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Experation Month</span>
+          <input
+                type="number"
+                id="expireM"
+                ng-keyup = "validateDate()"
+                ng-keydown="maxLength($event, 2)"
+                placeholder="MM"
+                size="2"
+                pattern="\d*"
+                ng-model="registerData.expireM">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Experation Year</span>
+          <input
+                type="number"
+                id="expireM"
+                ng-keyup = "validateDate()"
+                ng-keydown="maxLength($event, 4)"
+                placeholder="YYYY"
+                size="4"
+                pattern="\d*"
+                ng-model="registerData.expireY">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">CVV (Located on Back of Card)</span>
+          <input
+                type="number"
+                id="clique_input_cvv"
+                ng-keyup = "validateCVC()"
+                ng-keydown="maxLength($event, 3)"
+                placeholder="CVV"
+                size="3"
+                pattern="\d*"
+                ng-model="registerData.cvv">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Zip Code</span>
+          <input
+                type="number"
+                id="zipCode"
+                ng-keyup = "validateZip()"
+                ng-keydown="maxLength($event, 5)"
+                placeholder="55555"
+                size="5"
+                pattern="\d*"
+                ng-model="registerData.zipCode">
         </label>
 
         <!-- Register Subscription for the app -->
