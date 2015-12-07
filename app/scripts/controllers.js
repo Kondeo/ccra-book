@@ -265,9 +265,12 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('RegisterCtrl', function($scope, $ionicHistory, $http) {
+.controller('RegisterCtrl', function($scope, $ionicHistory, $http, $timeout) {
 
     //SET OUR STRIPE KEY HERE
+
+    //Our data from the form
+    $scope.registerData = {};
 
     //Get our session_token
     var cookie = localStorage.getItem("session_token");
@@ -410,7 +413,7 @@ angular.module('starter.controllers', [])
             event.target.value = value;
 
             //Also save the value to the scope
-            $scope.cc.number = value;
+            $scope.registerData.ccNumber = value;
         }
         if(caretPos >= 0){
             setCaretPosition(event.target.id, caretPos);
@@ -469,11 +472,8 @@ angular.module('starter.controllers', [])
      * Validates form Date. Checks Stripe for validity.
      */
     $scope.validateDate = function() {
-        //Concatante the giftcard number together
-        var input1 = document.getElementById("expireM");
-        var input2 = document.getElementById("expireY");
 
-        $scope.dateValidated = Stripe.card.validateExpiry(input1.value, input2.value);
+        $scope.dateValidated = Stripe.card.validateExpiry($scope.registerData.expireM, $scope.registerData.expireY);
 
         //Now see if the card is validated
         $scope.validateCard();

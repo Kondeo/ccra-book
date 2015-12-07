@@ -1,6 +1,6 @@
 <ion-view view-title="Manage Subscription">
 <ion-content>
-    <form ng-submit="doLogin()">
+    <form name = "registerForm" ng-submit="doLogin()">
       <div class="list">
 
         <label class="item item-input">
@@ -92,6 +92,7 @@
         <label class="item">
           <button class="button button-block button-positive"
           type="submit" ng-if = "!loggedIn()"
+          ng-disabled = "registerForm.$valid && cardValidated"
           ng-click="registerUser()">Create Subscription</button>
         </label>
 
@@ -99,6 +100,7 @@
         <label class="item">
           <button class="button button-block button-positive"
           type="submit" ng-if = "loggedIn()"
+          ng-disabled = "registerForm.$valid"
           ng-click="updateUser()">Update</button>
         </label>
         <label class="item">
