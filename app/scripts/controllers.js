@@ -263,4 +263,13 @@ angular.module('starter.controllers', [])
         localStorage.setItem("easyReading", $scope.settings.easyReading);
     }
 
+})
+
+.controller('RegisterCtrl', function($scope, $ionicHistory) {
+
+
+    $scope.goToPrev = function(){
+        $ionicHistory.goBack();
+    }
+
 });

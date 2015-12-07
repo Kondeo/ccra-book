@@ -10,8 +10,23 @@
           <span class="input-label">Password</span>
           <input type="password" ng-model="loginData.password">
         </label>
+
+        <!-- Register Subscription for the app -->
         <label class="item">
-          <button class="button button-block button-positive" type="submit">Log in</button>
+          <button class="button button-block button-positive"
+          type="submit" ng-if = "!loggedIn()"
+          ng-click="registerUser()">Create Subscription</button>
+        </label>
+
+        <!-- Update Information for the user -->
+        <label class="item">
+          <button class="button button-block button-positive"
+          type="submit" ng-if = "loggedIn()"
+          ng-click="updateUser()">Update</button>
+        </label>
+        <label class="item">
+          <button class="button button-block button-stable"
+          ng-click = "goToPrev()">Cancel</button>
         </label>
       </div>
     </form>
