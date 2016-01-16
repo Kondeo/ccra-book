@@ -62,7 +62,8 @@ router.post('/join', function(req, res) {
                             SessionService.generateSession(newUser._id, "user", function(token){
                                 //All good, give the user their token
                                 res.status(201).json({
-                                    token: token
+                                    token: token,
+                                    subscription: subscriptionDate.toDate()
                                 });
                             }, function(err){
                                 res.status(err.status).json(err);
@@ -84,7 +85,7 @@ router.post('/login', function(req, res, next) {
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()
     })
-    .select('password salt')
+    .select('password salt subscription')
     .exec(function(err, user) {
         if (err) {
             res.status(500).json({
@@ -99,14 +100,23 @@ router.post('/login', function(req, res, next) {
             var hash = crypto.pbkdf2Sync(req.body.password, user.salt, 10000, 512);
             //Compare to stored hash
             if (hash === user.password) {
-                SessionService.generateSession(user._id, "user", function(token){
-                    //All good, give the user their token
-                    res.status(200).json({
-                        token: token
+                //Check if subscription has expired
+                if(moment(user.subscription).isBefore(moment())){
+                    SessionService.generateSession(user._id, "user", function(token){
+                        //All good, give the user their token
+                        res.status(200).json({
+                            token: token,
+                            subscription: user.subscription
+                        });
+                    }, function(err){
+                        res.status(err.status).json(err);
                     });
-                }, function(err){
-                    res.status(err.status).json(err);
-                });
+                } else {
+                    res.status(402).json({
+                        msg: "Subscription expired!",
+                        subscription: user.subscription
+                    });
+                }
             } else {
                 res.status(401).json({
                     msg: "Password is incorrect!"
