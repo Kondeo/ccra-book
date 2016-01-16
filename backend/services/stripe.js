@@ -1,4 +1,5 @@
-
+var keys = require('../config/keys.json'),
+    stripe = require("stripe")(keys.stripe.sk);
 
 //Checks if a token exists, and returns the corrosponding accountId
 exports.charge = function(card, amount, success, fail) {
@@ -21,5 +22,5 @@ exports.charge = function(card, amount, success, fail) {
         } else {
             success(charge);
         }
-    }
+    });
 };
