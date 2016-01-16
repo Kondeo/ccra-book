@@ -1,3 +1,5 @@
+
+
 //Checks if a token exists, and returns the corrosponding accountId
 exports.charge = function(card, amount, success, fail) {
     var charge = stripe.charges.create({

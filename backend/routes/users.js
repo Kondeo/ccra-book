@@ -1,5 +1,6 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express'),
+    router = express.Router(),
+    StripeService = require('../services/stripe.js');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -9,7 +10,7 @@ router.get('/', function(req, res, next) {
 router.post('/join', function(req, res) {
     if(!(req.body.cardToken &&
         req.body.amount &&
-        req.body.email &&
+        req.body.email
         )){
         return res.status(FILLMEIN).json({
             msg: "Route requisites not met."
@@ -72,31 +73,6 @@ router.post('/join', function(req, res) {
             }
           });
     }
-    function stripeCharge(cardToken, success, fail){
-        // Get the credit card details submitted by the form
-        var cardToken = req.body.cardToken;
-
-        var stripeError;
-        var charge = stripe.charges.create({
-            amount: req.body.amount, // amount in cents, again
-            currency: "usd",
-            source: cardToken,
-            description: "CCRA Compendium Subscription"
-        }, function(err, charge) {
-            if (err && err.type === 'StripeCardError') {
-                fail({
-                    msg: "Card was declined!"
-                });
-            } else if (err) {
-                console.log("Stripe charge error");
-                console.log(err);
-                fail({
-                    msg: "Charge could not be completed!"
-                });
-            } else {
-                success();
-            }
-        }
 });
 
 router.post('/login', function(req, res, next) {
