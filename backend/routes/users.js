@@ -126,4 +126,74 @@ router.post('/login', function(req, res, next) {
     });
 });
 
+router.post('/renew', function(req, res, next) {
+    //Find a user with the username requested. Select salt and password
+    User.findOne({
+        email: (req.body.email.toLowerCase()).trim()
+    })
+    .select('password salt subscription')
+    .exec(function(err, user) {
+        if (err) {
+            res.status(500).json({
+                msg: "Couldn't search the database for user!"
+            });
+        } else if (!user) {
+            res.status(401).json({
+                msg: "Wrong email!"
+            });
+        } else {
+            //Hash the requested password and salt
+            var hash = crypto.pbkdf2Sync(req.body.password, user.salt, 10000, 512);
+            //Compare to stored hash
+            if (hash === user.password) {
+
+                StripeService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.RENEW, function(charge){
+
+                    var updatedUser = {};
+
+                    var origSub = moment(user.subscription);
+                    var today = moment();
+
+                    var newSub = moment.max(origSub, today).add(1, 'y');
+
+                    updatedUser.subscription = newSub.toDate();
+
+                    var setUser = {
+                        $set: updatedUser
+                    }
+
+                    User.update({
+                        _id: user._id
+                    }, setUser)
+                    .exec(function(err, user) {
+                        if (err) {
+                            console.log({
+                                msg: "Could not update user"
+                            });
+                        }
+                    });
+
+                    SessionService.generateSession(user._id, "user", function(token){
+                        //All good, give the user their token
+                        res.status(200).json({
+                            token: token,
+                            subscription: newSub.toDate()
+                        });
+                    }, function(err){
+                        res.status(err.status).json(err);
+                    });
+                }, function(err){
+                    res.status(412).json({
+                        msg: "Card was declined!"
+                    });
+                });
+            } else {
+                res.status(401).json({
+                    msg: "Password is incorrect!"
+                });
+            }
+        }
+    });
+});
+
 module.exports = router;
