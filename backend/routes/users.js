@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
   res.status(404).send('Route Not Enabled');
 });
 
-router.post('/join', function(req, res) {
+router.post('/register', function(req, res) {
     if(!(req.body.cardToken &&
         req.body.amount &&
         req.body.email &&
