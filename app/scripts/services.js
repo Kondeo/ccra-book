@@ -1,7 +1,7 @@
 angular.module('starter.services', ['ngResource'])
   .factory('Book', ['$resource', function($resource) {
 
-    return $resource( 'http://dev.kondeo.com/mwwwordpairs/backend/' + 'users.php/:Id',
+    return $resource(api_base + 'users.php/:Id',
         { Id: '@Id' }, {
             register: {
                 method: 'POST',
