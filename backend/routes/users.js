@@ -1,6 +1,7 @@
 var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
+    moment = require('moment'),
     CONST = require('../config/constants.json'),
     StripeService = require('../services/stripe.js'),
     SessionService = require('../services/sessions.js'),
@@ -14,7 +15,8 @@ router.get('/', function(req, res, next) {
 router.post('/join', function(req, res) {
     if(!(req.body.cardToken &&
         req.body.amount &&
-        req.body.email)){
+        req.body.email &&
+        req.body.name)){
         return res.status(412).json({
             msg: "Route requisites not met."
         });
@@ -43,10 +45,13 @@ router.post('/join', function(req, res) {
                     //Create a unique hash from the provided password and salt
                     var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
                     //Create a new user with the assembled information
+                    var subscriptionDate = moment().add(1, 'y');
                     var newUser = new User({
+                        name: req.body.name,
                         email: (req.body.email.toLowerCase()).trim(),
                         password: hash,
-                        salt: salt
+                        salt: salt,
+                        subscription: subscriptionDate.toDate()
                     }).save(function(err, newUser) {
                         if (err) {
                           console.log("Error saving user to DB!");
