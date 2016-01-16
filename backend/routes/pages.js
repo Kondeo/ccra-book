@@ -6,14 +6,14 @@ var Page = mongoose.model('Page');
 /* GET page. */
 router.get('/:number', function(req, res, next) {
     Page.findOne({
-        pageNum: parseInt(req.params.number)
+        number: parseInt(req.params.number)
     }).lean().select().exec(function(err, page){
         if(err){
             res.status(500).send("There was an error");
         } if(!page){
             res.status(404).send("Page Not Found!");
         } else {
-            page.pageContent = cleanHTML(page.pageContent);
+            page.pageContent = cleanHTML(page.content);
             res.status(200).json(page);
         }
     });
