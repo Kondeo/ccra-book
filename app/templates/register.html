@@ -1,9 +1,13 @@
-<ion-view view-title="Manage Subscription">
+<ion-view view-title="Subscription">
 <ion-content>
-    <form name = "registerForm" ng-submit="doLogin()">
-      <div class="list">
+    <form name = "registerForm" ng-submit="doLogin()" ng-init="subType = 'new'">
+      <div class="list subTypeSel">
 
-        <label class="item item-input">
+        <div class="item item-divider" ng-if="loggedIn()">
+            Your current subscription is valid until: {{subscription}}
+        </div>
+
+        <label class="item item-input" ng-if="!loggedIn()">
           <span class="input-label">Email</span>
           <input type="text" ng-model="registerData.email"
           placeholder="example@example.com"
@@ -11,14 +15,14 @@
           autocapitalize="none" spellcheck="false"
           required>
         </label>
-        <label class="item item-input">
+        <label class="item item-input" ng-if="!loggedIn()">
           <span class="input-label">Password</span>
           <input type="password"
           ng-model="registerData.password"
           placeholder="Secure Password"
           required>
         </label>
-        <label class="item item-input">
+        <label class="item item-input" ng-if="!loggedIn()">
           <span class="input-label">Confirm Password</span>
           <input type="password"
           ng-model="registerData.confirmPassword"
@@ -94,10 +98,8 @@
           type="submit" ng-if = "!loggedIn()"
           ng-disabled = "!registerForm.$valid && !cardValidated"
           ng-click="registerUser()">Create Subscription</button>
-        </label>
 
         <!-- Update Information for the user -->
-        <label class="item">
           <button class="button button-block button-positive"
           type="submit" ng-if = "loggedIn()"
           ng-disabled = "!registerForm.$valid ||
@@ -108,9 +110,8 @@
           registerData.cvv > 0 ||
           registerData.zipCode > 0 &&
           !cardValidated)"
-          ng-click="updateUser()">Update</button>
-        </label>
-        <label class="item">
+          ng-click="updateUser()">Extend Subscription 1 Year</button>
+
           <button class="button button-block button-stable"
           ng-click = "goToPrev()">Cancel</button>
         </label>
