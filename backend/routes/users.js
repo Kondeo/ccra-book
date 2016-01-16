@@ -1,7 +1,10 @@
 var express = require('express'),
     router = express.Router(),
+    mongoose = require('mongoose'),
     CONST = require('../config/constants.json'),
-    StripeService = require('../services/stripe.js');
+    StripeService = require('../services/stripe.js'),
+    SessionService = require('../services/sessions.js'),
+    User = mongoose.model('User');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -30,47 +33,52 @@ router.post('/join', function(req, res) {
           .select('_id')
           .exec(function(err, user) {
             if (user) {
-              res.status(406).json({
-                msg: "Email taken!"
-              });
+                res.status(406).json({
+                    msg: "Email taken!"
+                });
             } else {
-                SessionService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.NEW);
-              //Create a random salt
-              var salt = crypto.randomBytes(128).toString('base64');
-              //Create a unique hash from the provided password and salt
-              var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
-              //Create a new user with the assembled information
-              var newUser = new User({
-                username: req.body.username.toLowerCase(),
-                password: hash,
-                salt: salt
-              }).save(function(err, newUser) {
-                if (err) {
-                  console.log("Error saving user to DB!");
-                  res.status(500).json({
-                    msg: "Error saving user to DB!"
-                  });
-                } else {
-                  //Create a random token
-                  var token = crypto.randomBytes(48).toString('hex');
-                  //New session!
-                  new Session({
-                    user_id: newUser._id,
-                    token: token
-                  }).save(function(err) {
-                    if (err) {
-                      res.status(500).json({
-                        msg: "Error saving token to DB!"
-                      });
-                    } else {
-                      //All good, give the user their token
-                      res.status(201).json({
-                        token: token
-                      });
-                    }
-                  });
-                }
-              });
+                StripeService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.NEW, function(charge){
+                    //Create a random salt
+                    var salt = crypto.randomBytes(128).toString('base64');
+                    //Create a unique hash from the provided password and salt
+                    var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
+                    //Create a new user with the assembled information
+                    var newUser = new User({
+                        username: req.body.username.toLowerCase(),
+                        password: hash,
+                        salt: salt
+                    }).save(function(err, newUser) {
+                        if (err) {
+                          console.log("Error saving user to DB!");
+                          res.status(500).json({
+                            msg: "Error saving user to DB!"
+                          });
+                        } else {
+                          //Create a random token
+                          var token = crypto.randomBytes(48).toString('hex');
+                          //New session!
+                          new Session({
+                            user_id: newUser._id,
+                            token: token
+                          }).save(function(err) {
+                            if (err) {
+                              res.status(500).json({
+                                msg: "Error saving token to DB!"
+                              });
+                            } else {
+                              //All good, give the user their token
+                              res.status(201).json({
+                                token: token
+                              });
+                            }
+                          });
+                        }
+                    });
+                }, function(err){
+                    res.status(412).json({
+                        msg: "Card was declined!"
+                    });
+                });
             }
           });
     }
