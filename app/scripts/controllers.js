@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, Book) {
+.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
@@ -68,7 +68,7 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
 
-    $scope.loginFinish = Book.login($scope.loginData, function() {
+    $scope.loginFinish = User.login($scope.loginData, function() {
         //Determine response from server
         if (!$scope.loginFinish.result) {
             $scope.showAlert("Alert!", "Sorry, that isn't the correct username and password.");
@@ -147,7 +147,7 @@ angular.module('starter.controllers', [])
   ];
 })
 
-.controller('RegisterCtrl', function($scope, $location, Book) {
+.controller('RegisterCtrl', function($scope, $location, User) {
     // Form data for the register controller
     $scope.registerData = {};
 
@@ -176,7 +176,7 @@ angular.module('starter.controllers', [])
         else
         {
 
-            $scope.registerFinish = Book.register($scope.registerData, function() {
+            $scope.registerFinish = User.register($scope.registerData, function() {
                 //Determine response from server
                 if ($scope.registerFinish.error) {
                     if($scope.registerFinish.error.errorid == '22')
@@ -200,7 +200,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('PageCtrl', function($scope, $stateParams, Book, $location, $http, $sce, $state, $ionicHistory, $ionicScrollDelegate) {
+.controller('PageCtrl', function($scope, $stateParams, User, $location, $http, $sce, $state, $ionicHistory, $ionicScrollDelegate) {
     $scope.pagenum = $stateParams.page;
     var cookie = localStorage.getItem("session_token");
     $http.get(api_base + 'pages/' + $stateParams.page).
