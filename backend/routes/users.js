@@ -1,5 +1,6 @@
 var express = require('express'),
     router = express.Router(),
+    CONST = require('../config/constants.json'),
     StripeService = require('../services/stripe.js');
 
 /* GET users listing. */
@@ -10,9 +11,8 @@ router.get('/', function(req, res, next) {
 router.post('/join', function(req, res) {
     if(!(req.body.cardToken &&
         req.body.amount &&
-        req.body.email
-        )){
-        return res.status(FILLMEIN).json({
+        req.body.email)){
+        return res.status(412).json({
             msg: "Route requisites not met."
         });
     }
@@ -34,6 +34,7 @@ router.post('/join', function(req, res) {
                 msg: "Email taken!"
               });
             } else {
+                SessionService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.NEW);
               //Create a random salt
               var salt = crypto.randomBytes(128).toString('base64');
               //Create a unique hash from the provided password and salt
