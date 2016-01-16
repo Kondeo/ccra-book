@@ -8,9 +8,9 @@ var Page = new Schema({
   nextnumber: {
     type: Number
   },
-  nextnumber: {
+  content: {
     type: String
-  },
+  }
 });
 
 mongoose.model('Page', Page);
