@@ -196,4 +196,26 @@ router.post('/renew', function(req, res, next) {
     });
 });
 
+router.get('/self/:token', function(req, res, next) {
+    SessionService.validateSession(req.params.token, "user", function(accountId) {
+        User.findById(accountId)
+        .select('name email subscription')
+        .exec(function(err, user) {
+            if (err) {
+                res.status(500).json({
+                    msg: "Couldn't search the database for user!"
+                });
+            } else if (!user) {
+                res.status(401).json({
+                    msg: "User not found, user table out of sync with session table!"
+                });
+            } else {
+                res.status(200).json(user);
+            }
+        });
+    }, function(err){
+        res.status(err.status).json(err);
+    });
+});
+
 module.exports = router;
