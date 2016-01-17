@@ -7,7 +7,7 @@
             Your current subscription is valid until: {{subscription}}
         </div>
 
-        <label class="item item-input" ng-if="!loggedIn()">
+        <label class="item item-input">
           <span class="input-label">Email</span>
           <input type="text" ng-model="registerData.email"
           placeholder="example@example.com"
@@ -15,7 +15,7 @@
           autocapitalize="none" spellcheck="false"
           required>
         </label>
-        <label class="item item-input" ng-if="!loggedIn()">
+        <label class="item item-input">
           <span class="input-label">Password</span>
           <input type="password"
           ng-model="registerData.password"

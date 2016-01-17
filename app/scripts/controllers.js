@@ -164,10 +164,10 @@ angular.module('starter.controllers', [])
     $scope.doRegister = function() {
 
         //Check for empty fields
-        if($scope.registerData.email == null ||
-        $scope.registerData.username == null ||
-        $scope.registerData.password == null ||
-        $scope.registerData.confirmPassword == null)
+        if(!($scope.registerData.email &&
+        $scope.registerData.username &&
+        $scope.registerData.password &&
+        $scope.registerData.confirmPassword))
         {
             $scope.showAlert("Alert!", "Please complete all fields!");
         }
