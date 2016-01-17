@@ -98,18 +98,27 @@ angular.module('starter.controllers', [])
     $location.path('app/listing');
   };
 
+  sessionStorage.setItem('key', 'value');
+
   //Function to check if we are logged in
   $scope.loggedIn = function()
   {
     //attempt to grab our cookie
-    var cookie = localStorage.getItem("session_token");
-    if(cookie != "")
-    {
-      return true;
-    }
-    else
-    {
+    var token = localStorage.getItem("session_token");
+    var validated = sessionStorage.getItem("session_validated");
+    if(!token) {
       return false;
+    } else {
+        if(validated){
+            return true;
+        } else {
+            User.get({token: token}, function(){
+                sessionStorage.setItem("session_validated", true);
+                return true;
+            }, function(err){
+                return false;
+            });
+        }
     }
   }
 
