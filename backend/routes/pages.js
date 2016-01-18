@@ -19,7 +19,8 @@ router.get('/query/:terms', function(req, res, next) {
     function doSearch(user){
         Page.search({
             query_string: {
-                query: req.params.terms
+                query: req.params.terms,
+                fuzziness: "AUTO"
             }
         }, function(err, results) {
             if(err){
