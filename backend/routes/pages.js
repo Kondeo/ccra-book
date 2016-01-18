@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var moment = require('moment');
 var Page = mongoose.model('Page');
+var SessionService = require('../services/sessions.js');
+var User = mongoose.model('User');
 
 /* GET page. */
 router.get('/:number', function(req, res, next) {
@@ -23,7 +26,7 @@ router.get('/:number', function(req, res, next) {
                 res.status(401).json({
                     msg: "User not found, user table out of sync with session table!"
                 });
-            } else if(moment(user.subscription).isAfter(moment()) && !user.admin){
+            } else if(moment(user.subscription).isBefore(moment()) && !user.admin){
                 res.status(402).json({
                     msg: "Subscription expired!",
                     subscription: user.subscription
@@ -115,7 +118,7 @@ router.post('/:number', function(req, res, next) {
             msg: "Route requisites not met."
         });
     }
-    
+
     SessionService.validateSession(req.query.token, "user", function(accountId) {
         User.findById(accountId)
         .select('name email subscription')
