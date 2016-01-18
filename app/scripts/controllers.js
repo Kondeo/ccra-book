@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, Book) {
+.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
@@ -68,7 +68,7 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
 
-    $scope.loginFinish = Book.login($scope.loginData, function() {
+    $scope.loginFinish = User.login($scope.loginData, function() {
         //Determine response from server
         if (!$scope.loginFinish.result) {
             $scope.showAlert("Alert!", "Sorry, that isn't the correct username and password.");
@@ -98,18 +98,27 @@ angular.module('starter.controllers', [])
     $location.path('app/listing');
   };
 
+  sessionStorage.setItem('key', 'value');
+
   //Function to check if we are logged in
   $scope.loggedIn = function()
   {
     //attempt to grab our cookie
-    var cookie = localStorage.getItem("session_token");
-    if(cookie != "")
-    {
-      return true;
-    }
-    else
-    {
+    var token = localStorage.getItem("session_token");
+    var validated = sessionStorage.getItem("session_validated");
+    if(!token) {
       return false;
+    } else {
+        if(validated){
+            return true;
+        } else {
+            User.get({token: token}, function(){
+                sessionStorage.setItem("session_validated", true);
+                return true;
+            }, function(err){
+                return false;
+            });
+        }
     }
   }
 
@@ -147,7 +156,7 @@ angular.module('starter.controllers', [])
   ];
 })
 
-.controller('RegisterCtrl', function($scope, $location, Book) {
+.controller('RegisterCtrl', function($scope, $location, User) {
     // Form data for the register controller
     $scope.registerData = {};
 
@@ -155,10 +164,10 @@ angular.module('starter.controllers', [])
     $scope.doRegister = function() {
 
         //Check for empty fields
-        if($scope.registerData.email == null ||
-        $scope.registerData.username == null ||
-        $scope.registerData.password == null ||
-        $scope.registerData.confirmPassword == null)
+        if(!($scope.registerData.email &&
+        $scope.registerData.username &&
+        $scope.registerData.password &&
+        $scope.registerData.confirmPassword))
         {
             $scope.showAlert("Alert!", "Please complete all fields!");
         }
@@ -176,7 +185,7 @@ angular.module('starter.controllers', [])
         else
         {
 
-            $scope.registerFinish = Book.register($scope.registerData, function() {
+            $scope.registerFinish = User.register($scope.registerData, function() {
                 //Determine response from server
                 if ($scope.registerFinish.error) {
                     if($scope.registerFinish.error.errorid == '22')
@@ -200,7 +209,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('PageCtrl', function($scope, $stateParams, Book, $location, $http, $sce, $state, $ionicHistory, $ionicScrollDelegate) {
+.controller('PageCtrl', function($scope, $stateParams, User, $location, $http, $sce, $state, $ionicHistory, $ionicScrollDelegate) {
     $scope.pagenum = $stateParams.page;
     var cookie = localStorage.getItem("session_token");
     $http.get(api_base + 'pages/' + $stateParams.page).
@@ -261,6 +270,396 @@ angular.module('starter.controllers', [])
 
     $scope.saveSettings = function(){
         localStorage.setItem("easyReading", $scope.settings.easyReading);
+    }
+
+})
+
+.controller('RegisterCtrl', function($scope, $ionicHistory, $http, $timeout) {
+
+    //SET OUR STRIPE KEY HERE
+
+    //Our data from the form
+    $scope.registerData = {};
+
+    //Get our session_token
+    var cookie = localStorage.getItem("session_token");
+
+    //Check if we are logged in,
+    //If we are then fill the subscription information
+    //Needs have the according route
+    if($scope.loggedIn())
+    {
+        $http.get('http://localhost:3000/pages/').
+          success(function(data, status, headers, config) {
+            // this callback will be called asynchronously
+            // when the response is available
+            //Check for any errors
+            if(data.error)
+            {
+                if(data.error.errorid == '12')
+                {
+                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
+
+                    //Set our current error
+                    $scope.errors[0] = 12;
+
+                    $scope.login();
+                }
+            }
+            else
+            {
+                //Then fill the user information
+                $scope.registerData.email = data.email;
+
+
+                //Set our current error to none
+                $scope.errors[0] = -1;
+            }
+          }).
+          error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+
+          })
+    }
+
+    //Functions for the Form
+
+    $scope.numbersOnly = function(event){
+        if(((event.which < 48 || event.which > 57) && event.which != 46 && event.which != 8) || event.shiftKey){
+            event.preventDefault();
+        }
+    }
+
+    $scope.maxLength = function(event, length){
+        if (event.target.value.length > length && event.which != 46 && event.which != 8) {
+            event.preventDefault();
+            event.target.value = event.target.value.slice(0,length);
+        } else if (event.target.value.length == length && event.which != 46 && event.which != 8){
+            event.preventDefault();
+        }
+    }
+
+    function getCaretPosition(ctrl)
+    {
+        var caretPos = 0;
+        // IE
+        if (document.selection)
+        {
+            ctrl.focus ();
+            var sel = document.selection.createRange();
+            sel.moveStart ('character', -ctrl.value.length);
+            caretPos = sel.text.length;
+        }
+        // Firefox
+        else if (ctrl.selectionStart || ctrl.selectionStart == '0')
+        {
+            caretPos = ctrl.selectionStart;
+        }
+
+        return caretPos;
+    }
+
+    function setCaretPosition(elemId, caretPos) {
+        var elem = document.getElementById(elemId);
+
+        if(elem != null) {
+            if(elem.createTextRange) {
+                var range = elem.createTextRange();
+                range.move('character', caretPos);
+                range.select();
+            }
+            else {
+                if(elem.selectionStart) {
+                    elem.focus();
+                    elem.setSelectionRange(caretPos, caretPos);
+                }
+                else
+                    elem.focus();
+            }
+        }
+    }
+
+    $scope.registerData.ccNumber = "";
+    $scope.formatCC = function(event){
+        var caretPos = getCaretPosition(event.target) == event.target.value.length ? -3 : getCaretPosition(event.target);
+        if(event.which == 46 || event.which == 8){
+            var value = event.target.value.replace(/-/g, '');
+
+            if(value.length > 4){
+                value = [value.slice(0, 4), "-", value.slice(4)].join('');
+
+                if(value.length > 9){
+                    value = [value.slice(0, 9), "-", value.slice(9)].join('');
+
+                    if(value.length > 14){
+                        value = [value.slice(0, 14), "-", value.slice(14)].join('');
+                    }
+                }
+            }
+            event.target.value = value;
+
+            //Also save the value to the scope
+            $scope.registerData.ccNumber = value;
+
+        } else if(event.which >= 48 && event.which <= 57){
+            var value = event.target.value.replace(/-/g, '');
+
+            if(value.length >= 4){
+                value = [value.slice(0, 4), "-", value.slice(4)].join('');
+
+                if(value.length >= 9){
+                    value = [value.slice(0, 9), "-", value.slice(9)].join('');
+
+                    if(value.length >= 14){
+                        value = [value.slice(0, 14), "-", value.slice(14)].join('');
+                    }
+                }
+            }
+            if(caretPos == 4 || caretPos == 9 || caretPos == 14){
+                caretPos++;
+            }
+            event.target.value = value;
+
+            //Also save the value to the scope
+            $scope.registerData.ccNumber = value;
+        }
+        if(caretPos >= 0){
+            setCaretPosition(event.target.id, caretPos);
+        }
+        $scope.validateCardNumber(event);
+    }
+
+    //Star the credit card field
+    $scope.ccStar = function () {
+
+        //First get the input field
+        var ccField = document.getElementById("ccNumber");
+
+        //Get the value
+        var ccNum = ccField.value;
+
+        //Loop through and add some stars
+        for(var i = ccNum.length - 6; i >= 0; i--)
+        {
+
+            //Replace the characters that are not dashes
+            if(ccNum.charAt(i) != '-') ccNum = ccNum.substring(0, i) + "*" + ccNum.substring(i + 1);
+        }
+
+        //Set the field value!
+        ccField.value = ccNum
+    }
+
+    //unstar the credit card field
+    $scope.ccUnStar = function () {
+
+        //Simply replace the field value with the actual value
+        document.getElementById("ccNumber").value = $scope.registerData.ccNumber;
+    }
+
+    /**
+     * Validates form CC. Checks Stripe for validity, determines card type and sets card icon.
+     */
+    $scope.validateCardNumber = function(event) {
+        //Concatante the credit card number together
+        var cardNumber = event.target.value.replace(/-/g, '');
+
+        //Check if the credit card number is US valid
+        if(Stripe.card.validateCardNumber(cardNumber) && (cardNumber.length == 13 || cardNumber.length == 15 || cardNumber.length == 16)) {
+            $scope.validCC = true;
+        }
+        else {
+            $scope.validCC = false;
+        }
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates form Date. Checks Stripe for validity.
+     */
+    $scope.validateDate = function() {
+
+        $scope.dateValidated = Stripe.card.validateExpiry($scope.registerData.expireM, $scope.registerData.expireY);
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates form CVC. Checks Stripe for validity.
+     */
+    $scope.validateCVC = function() {
+
+        //get the input
+        var input1 = document.getElementById("cardCvv");
+
+        $scope.cvcValidated = Stripe.card.validateCVC(input1.value);
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates form zipcode. Checks for length.
+     */
+    $scope.validateZip = function() {
+        //get the input
+        var input1 = document.getElementById("zipCode");
+
+        //Simply check if there are 5 digits
+        if (input1.value.length > 4) {
+            $scope.zipValidated = true;
+        } else {
+            $scope.zipValidated = false;
+        }
+
+        //Now see if the card is validated
+        $scope.validateCard();
+    }
+
+    /**
+     * Validates email field
+     */
+    $scope.validateEmail = function() {
+        //Fetch email from giftcard form
+        var email = $scope.registerData.email;
+
+        //Regex for all valid emails. To add a TLD, edit the final OR statement.
+        var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|co|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
+        //Test the form email against the regex
+        if (emailRegex.test(email)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Checks if all CC fields have been validated independantly
+     */
+    $scope.validateCard = function() {
+        if ($scope.validCC && $scope.dateValidated && $scope.cvcValidated && $scope.zipValidated) {
+            $scope.cardValidated = true;
+        } else {
+            $scope.cardValidated = false;
+            $scope.cardType = "";
+        }
+    }
+
+
+    /**
+     * Assembles CC info and creates a token with Stripe
+     */
+    $scope.tokenizeInfo = function() {
+        //Disable button while tokenzing the card
+        $scope.tokenzing = true;
+
+        //Create finalized card number
+        var cardNumber = $scope.registerData.ccNumber;
+
+        //Send card info to stripe for tokenization
+        Stripe.card.createToken({
+            "number": $scope.registerData.ccNumber,
+            "cvc": $scope.registerData.cvv,
+            "exp_month": $scope.registerData.expireM,
+            "exp_year": $scope.registerData.expireY
+        }, function(status, response) {
+            if (response.error) {
+
+                //Display card error message
+                $scope.tokenizeFailure = true;
+            } else {
+                //Get the token to be submitted later, after the second page
+                // response contains id and card, which contains additional card details
+                $scope.stripeToken = response.id;
+            }
+
+            //Force the change to refresh, we need to do this because I
+            //guess response scope is a different scope and has to be
+            //forced or interacted with
+            $scope.$apply();
+        });
+    };
+
+    //Function to go back to the previous page
+    $scope.goToPrev = function(){
+        $ionicHistory.goBack();
+    }
+
+    //Create the user
+    $scope.registerUser = function() {
+        $http.post('http://localhost:3000/pages/').
+          success(function(data, status, headers, config) {
+            // this callback will be called asynchronously
+            // when the response is available
+            //Check for any errors
+            if(data.error)
+            {
+                if(data.error.errorid == '12')
+                {
+                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
+
+                    //Set our current error
+                    $scope.errors[0] = 12;
+
+                    $scope.login();
+                }
+            }
+            else
+            {
+                //Then fill the user information
+                $scope.registerData.email = data.email;
+
+
+                //Set our current error to none
+                $scope.errors[0] = -1;
+            }
+          }).
+          error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+
+          })
+    }
+
+    //Update the user
+    $scope.updateUser = function() {
+        $http.put('http://localhost:3000/pages/').
+          success(function(data, status, headers, config) {
+            // this callback will be called asynchronously
+            // when the response is available
+            //Check for any errors
+            if(data.error)
+            {
+                if(data.error.errorid == '12')
+                {
+                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
+
+                    //Set our current error
+                    $scope.errors[0] = 12;
+
+                    $scope.login();
+                }
+            }
+            else
+            {
+                //Then fill the user information
+                $scope.registerData.email = data.email;
+
+
+                //Set our current error to none
+                $scope.errors[0] = -1;
+            }
+          }).
+          error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+
+          })
     }
 
 });

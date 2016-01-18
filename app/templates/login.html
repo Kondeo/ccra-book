@@ -9,7 +9,7 @@
     <form ng-submit="doLogin()">
       <div class="list">
         <label class="item item-input">
-          <span class="input-label">Username</span>
+          <span class="input-label">Email</span>
           <input type="text" ng-model="loginData.username" autocomplete="off"  autocorrect="off" autocapitalize="none" spellcheck="false">
         </label>
         <label class="item item-input">
@@ -21,5 +21,9 @@
         </label>
       </div>
     </form>
+
+    <div class = "register">
+        Or you can <a href="#/app/register" ng-click = "closeLogin()">register for a subcription</a>
+    </div>
   </ion-content>
 </ion-modal-view>

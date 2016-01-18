@@ -1,5 +1,121 @@
-<ion-view view-title="Manage Subscription">
+<ion-view view-title="Subscription">
 <ion-content>
-    MANAGE SUBSCRIPTION WITH STRIPE HERE
+    <form name = "registerForm" ng-submit="doLogin()" ng-init="subType = 'new'">
+      <div class="list subTypeSel">
+
+        <div class="item item-divider" ng-if="loggedIn()">
+            Your current subscription is valid until: {{subscription}}
+        </div>
+
+        <label class="item item-input">
+          <span class="input-label">Email</span>
+          <input type="text" ng-model="registerData.email"
+          placeholder="example@example.com"
+          autocomplete="off"  autocorrect="off"
+          autocapitalize="none" spellcheck="false"
+          required>
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Password</span>
+          <input type="password"
+          ng-model="registerData.password"
+          placeholder="Secure Password"
+          required>
+        </label>
+        <label class="item item-input" ng-if="!loggedIn()">
+          <span class="input-label">Confirm Password</span>
+          <input type="password"
+          ng-model="registerData.confirmPassword"
+          placeholder="Secure Password"
+          required>
+        </label>
+
+        <!-- Credit Card Number -->
+        <label class="item item-input">
+          <span class="input-label">Credit Card Number</span>
+          <input
+              type="tel"
+              id="ccNumber"
+              ng-model="registerData.ccNumber"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              ng-focus="ccUnStar()"
+              ng-blur = "ccStar()"
+              ng-keydown="numbersOnly($event);maxLength($event, 19)"
+              ng-keyup="formatCC($event)">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Experation Month</span>
+          <input
+                type="number"
+                id="expireM"
+                ng-keyup = "validateDate()"
+                ng-keydown="maxLength($event, 2)"
+                placeholder="MM"
+                size="2"
+                pattern="\d*"
+                ng-model="registerData.expireM">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Experation Year</span>
+          <input
+                type="number"
+                id="expireM"
+                ng-keyup = "validateDate()"
+                ng-keydown="maxLength($event, 4)"
+                placeholder="YYYY"
+                size="4"
+                pattern="\d*"
+                ng-model="registerData.expireY">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">CVV (Located on Back of Card)</span>
+          <input
+                type="number"
+                id="cardCvv"
+                ng-keyup = "validateCVC()"
+                ng-keydown="maxLength($event, 3)"
+                placeholder="CVV"
+                size="3"
+                pattern="\d*"
+                ng-model="registerData.cvv">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Zip Code</span>
+          <input
+                type="number"
+                id="zipCode"
+                ng-keyup = "validateZip()"
+                ng-keydown="maxLength($event, 5)"
+                placeholder="55555"
+                size="5"
+                pattern="\d*"
+                ng-model="registerData.zipCode">
+        </label>
+
+        <!-- Register Subscription for the app -->
+        <label class="item">
+          <button class="button button-block button-positive"
+          type="submit" ng-if = "!loggedIn()"
+          ng-disabled = "!registerForm.$valid && !cardValidated"
+          ng-click="registerUser()">Create Subscription</button>
+
+        <!-- Update Information for the user -->
+          <button class="button button-block button-positive"
+          type="submit" ng-if = "loggedIn()"
+          ng-disabled = "!registerForm.$valid ||
+          registerData.password != registerData.confirmPassword ||
+          (registerData.ccNumber.length > 0 ||
+          registerData.expireM > 0 ||
+          registerData.expireY > 0 ||
+          registerData.cvv > 0 ||
+          registerData.zipCode > 0 &&
+          !cardValidated)"
+          ng-click="updateUser()">Extend Subscription 1 Year</button>
+
+          <button class="button button-block button-stable"
+          ng-click = "goToPrev()">Cancel</button>
+        </label>
+      </div>
+    </form>
 </ion-content>
 </ion-view>

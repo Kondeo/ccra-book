@@ -1,7 +1,7 @@
 angular.module('starter.services', ['ngResource'])
-  .factory('Book', ['$resource', function($resource) {
+  .factory('User', ['$resource', function($resource) {
 
-    return $resource(api_base + 'users.php/:Id',
+    return $resource(api_base + 'users/:Id',
         { Id: '@Id' }, {
             register: {
                 method: 'POST',
@@ -13,6 +13,17 @@ angular.module('starter.services', ['ngResource'])
                 method: 'POST',
                 params: { Id: 'login' },
                 isArray: false
+            },
+
+            renew: {
+                method: 'POST',
+                params: { Id: 'renew' },
+                isArray: false
+            },
+
+            get: {
+                method: 'GET',
+                params: { url: api_base + 'users/self/@token' }
             }
 
         } );

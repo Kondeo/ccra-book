@@ -27,14 +27,24 @@
         <ion-item menu-close ng-click="goToPage()">
         Go To Page
         </ion-item>
-        <ion-item menu-close ng-click="login()">
+        <ion-item menu-close ng-click="login()"
+        ng-if = "!loggedIn()">
+        Login
+        </ion-item>
+        <ion-item menu-close ng-click="login()"
+        ng-if = "loggedIn()">
+        Switch Account
+        </ion-item>
+        <ion-item menu-close href="#/app/register"
+        ng-if = "!loggedIn()">
+        Sign Up
+        </ion-item>
+        <ion-item menu-close href="#/app/register"
+        ng-if = "loggedIn()">
         Manage Subscription
         </ion-item>
-        <ion-item menu-close ng-click="login()">
-        Login/Switch Account
-        </ion-item>
         <ion-item menu-close href="#/app/settings">
-        Settings
+        Application Settings
         </ion-item>
       </ion-list>
     </ion-content>

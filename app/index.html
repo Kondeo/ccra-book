@@ -2,7 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' localhost:* 'unsafe-inline' 'unsafe-eval'">
+    <meta http-equiv="Content-Security-Policy"
+    content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self'
+    localhost:* 'unsafe-inline' 'unsafe-eval'
+    http://*.stripe.com https://*.stripe.com">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
 
@@ -18,8 +21,9 @@
     <!-- endbuild -->
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="styles/ionic.app.css" rel="stylesheet">
+        UNCOMMENTED AS BELOW!
     -->
+    <link href="styles/main.css" rel="stylesheet">
 
     <!-- ionic/angularjs js -->
     <!-- build:js scripts/vendor.js -->
@@ -47,6 +51,9 @@
     <script src="scripts/configuration.js"></script>
     <script src="scripts/services.js"></script>
     <!-- endbuild -->
+
+    <!-- Stripe -->
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
   </head>
 
   <body ng-app="starter">
