@@ -108,7 +108,7 @@ router.post('/login', function(req, res, next) {
             //Compare to stored hash
             if (hash == user.password) {
                 //Check if subscription has expired
-                if(moment(user.subscription).isBefore(moment())){
+                if(moment(user.subscription).isAfter(moment())){
                     SessionService.generateSession(user._id, "user", function(token){
                         //All good, give the user their token
                         res.status(200).json({
