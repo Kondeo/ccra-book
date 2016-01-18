@@ -104,8 +104,9 @@ router.post('/login', function(req, res, next) {
         } else {
             //Hash the requested password and salt
             var hash = crypto.pbkdf2Sync(req.body.password, user.salt, 10000, 512);
+            
             //Compare to stored hash
-            if (hash === user.password) {
+            if (hash == user.password) {
                 //Check if subscription has expired
                 if(moment(user.subscription).isBefore(moment())){
                     SessionService.generateSession(user._id, "user", function(token){
