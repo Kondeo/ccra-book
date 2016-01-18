@@ -42,7 +42,7 @@ angular.module('starter.controllers', [])
      template: aText
    });
    alertPopup.then(function(res) {
-     callback();
+     if(callback) callback();
    });
  };
 
@@ -69,21 +69,24 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
 
-    $scope.loginFinish = User.login($scope.loginData, function() {
-        //Determine response from server
-        if (!$scope.loginFinish.result) {
-            $scope.showAlert("Alert!", "Sorry, that isn't the correct username and password.");
-        } else {
-            //Store the token from the server for future use
-            localStorage.setItem("session_token", $scope.loginFinish.result.session_token);
-            $scope.closeLogin();
-            //Reload the page
-            $window.location.reload(true);
-        }
+    User.login($scope.loginData, function(data) {
+
+        //Store the token from the server for future use
+        localStorage.setItem("session_token", data.token);
+
+        //Inform the user
+        //Show an error
+        $scope.showAlert("Login Success!", "The Page will now reload...")
+
+
+        $scope.closeLogin();
+        //Reload the page
+        $window.location.reload(true);
     },
     //Errors
     function(response) {
-        if (response.status == 401) {
+        if (response.status == 401 ||
+        response.status == 412) {
            //Handle 401 error code
 
            //Show an error
@@ -100,7 +103,7 @@ angular.module('starter.controllers', [])
 
            //An unexpected error has occured, log into console
            //Show an error
-           $scope.showAlert("Error", "Unecpected Error. Please try re-opening the app, or try again later!");
+           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
        }
     });
   };
@@ -135,12 +138,55 @@ angular.module('starter.controllers', [])
         if(validated){
             return true;
         } else {
+
+            //Set validated to true until proven false;
+            sessionStorage.setItem("session_validated", true);
+
             User.get({token: token}, function(){
                 sessionStorage.setItem("session_validated", true);
                 return true;
-            }, function(err){
-                return false;
-            });
+            },
+            //Errors from request
+            function(response) {
+
+                //Proven False
+                sessionStorage.setItem("session_validated", false);
+
+                if (response.status == 401) {
+                   //Handle 401 error code
+
+                   //Pull up the login modal
+                   $scope.login();
+
+                   //Delete the token
+                   localStorage.removeItem("session_token");
+
+                   //Show an error
+                   $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!");
+               }
+               else if (response.status == 404) {
+                 // Handle 404 error code
+
+                 //Delete the token
+                 localStorage.removeItem("session_token");
+
+                 //Show an error
+                 $scope.showAlert("No Connection!", "Internet Connection is required to use this app. Please connect to the internet with your device, and restart the app!");
+               }
+               else if (response.status == 500) {
+                 // Handle 500 error code
+
+                 //Show an error
+                 $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+               }
+               else {
+                   //Handle General Error
+
+                   //An unexpected error has occured, log into console
+                   //Show an error
+                   $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
+               }
+           });
         }
     }
   }
@@ -222,7 +268,7 @@ angular.module('starter.controllers', [])
 
            //An unexpected error has occured, log into console
            //Show an error
-           $scope.showAlert("Error", "Unecpected Error. Please try re-opening the app, or try again later!");
+           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
        }
    });
 
@@ -256,7 +302,8 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('RegisterCtrl', function($scope, $ionicHistory, $http, $timeout, Page, User) {
+.controller('RegisterCtrl', function($scope, $ionicHistory, $http,
+    $timeout, Page, User, $state) {
 
     //SET OUR STRIPE KEY HERE
     Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
@@ -267,50 +314,53 @@ angular.module('starter.controllers', [])
     //If our card is validated
     $scope.cardValidated = false;
 
-    //Get our session_token
-    var cookie = localStorage.getItem("session_token");
-
     //Check if we are logged in,
     //If we are then fill the subscription information
-    //Needs have the according route
-    if($scope.loggedIn())
-    {
-        //Validate the cookie, as well as, grab their email
-        var payload = {
-            token: cookie
+    $scope.initPage = function() {
+
+        if($scope.loggedIn())
+        {
+            //Validate the cookie, as well as, grab their email
+            var payload = {
+                token: localStorage.getItem("session_token")
+            };
+
+            User.get(payload, function(data) {
+
+                //Auto fill their email for them
+                $scope.registerData.email = data.email;
+
+                //Also, get their subscription Date
+                $scope.subscription = data.subscription;
+            },
+            //Errors
+            function(response) {
+                if (response.status == 401) {
+                   //Handle 401 error code
+
+                   //Pull up the login modal
+                   $scope.login();
+
+                   //Show an error
+                   $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+               }
+               else if (response.status == 500) {
+                 // Handle 500 error code
+
+                 //Show an error
+                 $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+               }
+               else {
+                   //Handle General Error
+
+                   //An unexpected error has occured, log into console
+                   //Show an error
+                   $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
+               }
+           })
         }
-
-        User.get(payload, function(data) {
-
-            //Auto fill their email for them
-            $scope.registerData.email = data.email;
-        },
-        //Errors
-        function(response) {
-            if (response.status == 401) {
-               //Handle 401 error code
-
-               //Pull up the login modal
-               $scope.login();
-
-               //Show an error
-               $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
-           }
-           else if (response.status == 500) {
-             // Handle 500 error code
-
-             //Show an error
-             $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-           }
-           else {
-               //Handle General Error
-
-               //An unexpected error has occured, log into console
-               //Show an error
-               $scope.showAlert("Error", "Unecpected Error. Please try re-opening the app, or try again later!");
-           }
-       })
     }
+    $scope.initPage();
 
     //Functions for the Form
 
@@ -520,8 +570,14 @@ angular.module('starter.controllers', [])
         var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|co|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
         //Test the form email against the regex
         if (emailRegex.test(email)) {
+
+            //Remove Ng Class
+            $scope.emailErrors = false;
             return true;
         } else {
+
+            //Ngclass red email text
+            $scope.emailErrors = true;
             return false;
         }
     }
@@ -547,44 +603,92 @@ angular.module('starter.controllers', [])
     //Create the user
     $scope.registerUser = function() {
 
-        //Create finalized card number
-        var cardNumber = $scope.registerData.ccNumber;
+        //Check if the passwords matched
+        if($scope.registerData.password != $scope.registerData.confirmPassword) {
 
-        console.log(cardNumber);
+            //Display alert, and ng class
+            $scope.passwordErrors = true;
 
-        //Send card info to stripe for tokenization
-        Stripe.card.createToken({
-            "number": $scope.registerData.ccNumber,
-            "cvc": $scope.registerData.cvv,
-            "exp_month": $scope.registerData.expireM,
-            "exp_year": $scope.registerData.expireY
-        }, function(status, response) {
-            if (response.error) {
+            $scope.showAlert("Password Error", "Please check your password and confirmed password.");
+        }
+        else {
+            //Create finalized card number
+            var cardNumber = $scope.registerData.ccNumber;
 
-                //Display alert
-                $scope.cardErrors = true;
+            //Send card info to stripe for tokenization
+            Stripe.card.createToken({
+                "number": $scope.registerData.ccNumber,
+                "cvc": $scope.registerData.cvv,
+                "exp_month": $scope.registerData.expireM,
+                "exp_year": $scope.registerData.expireY
+            }, function(status, response) {
+                if (response.error) {
 
-                $scope.showAlert("Card Error", "Please check your card information.");
+                    //Display alert
+                    $scope.cardErrors = true;
 
-            } else {
+                    $scope.showAlert("Card Error", "Please check your card information.");
 
-                //Get the token to be submitted later, after the second page
-                // response contains id and card, which contains additional card details
-                $scope.stripeToken = response.id;
+                } else {
 
-                //Create our payload
-                
+                    //Get the token to be submitted later, after the second page
+                    // response contains id and card, which contains additional card details
+                    var stripeToken = response.id;
 
-                //Submitting Now!
+                    //Create our payload
+                    var payload = {
+                        cardToken: stripeToken,
+                        email: $scope.registerData.email,
+                        password: $scope.registerData.password
+                    }
 
-                User.register()
-            }
+                    //Submitting Now!
+                    User.register(payload, function(data) {
 
-            //Force the change to refresh, we need to do this because I
-            //guess response scope is a different scope and has to be
-            //forced or interacted with
-            $scope.$apply();
-        });
+                        //Success!
+                        //save their session
+                        localStorage.setItem("session_token", data.token);
+
+                        //Move them back to the index
+                        $state.go('app.index');
+
+                        //Alert them of success!
+                        $scope.showAlert("Success!", "You have successfully registered! Your account is valid for a year, and can be extended. Enjoy!");
+
+                    },
+                    //Errors
+                    function(response) {
+                        if (response.status == 401) {
+                           //Handle 401 error code
+
+                           //Pull up the login modal
+                           $scope.login();
+
+                           //Show an error
+                           $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+                       }
+                       else if (response.status == 500) {
+                         // Handle 500 error code
+
+                         //Show an error
+                         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later! Your card has not been charged!");
+                       }
+                       else {
+                           //Handle General Error
+
+                           //An unexpected error has occured, log into console
+                           //Show an error
+                           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later! Your card has not been charged!");
+                       }
+                   });
+                }
+
+                //Force the change to refresh, we need to do this because I
+                //guess response scope is a different scope and has to be
+                //forced or interacted with
+                $scope.$apply();
+            });
+        }
     }
 
     //Update the user

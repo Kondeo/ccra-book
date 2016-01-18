@@ -10,14 +10,17 @@
       <div class="list">
         <label class="item item-input">
           <span class="input-label">Email</span>
-          <input type="text" ng-model="loginData.username" autocomplete="off"  autocorrect="off" autocapitalize="none" spellcheck="false">
+          <input type="text" ng-model="loginData.email" autocomplete="off"  autocorrect="off" autocapitalize="none" spellcheck="false">
         </label>
         <label class="item item-input">
           <span class="input-label">Password</span>
           <input type="password" ng-model="loginData.password">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" type="submit">Log in</button>
+          <button class="button button-block button-positive"
+          type="submit"
+          ng-disabled="!loginData.email || !loginData.password">
+          Log in</button>
         </label>
       </div>
     </form>

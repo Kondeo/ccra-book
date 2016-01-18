@@ -1,6 +1,6 @@
 // Ionic Starter App
 
-var api_base = "http://srv1.kondeo.com:3003/";
+var api_base = "http://jnode.ngrok.kondeo.com:8080/";
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
