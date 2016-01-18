@@ -43,7 +43,7 @@ router.get('/query/:terms', function(req, res, next) {
         query_string: {
             query: req.params.terms
         }
-    }, function(results) {
+    }, function(err, results) {
         res.status(200).json(results)
     }, function(err){
         console.log(err);
