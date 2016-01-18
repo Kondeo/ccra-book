@@ -8,48 +8,51 @@ var User = mongoose.model('User');
 
 /* GET page. */
 router.get('/query/:terms', function(req, res, next) {
-    // if(!(req.query.token)){
-    //     return res.status(412).json({
-    //         msg: "Route requisites not met."
-    //     });
-    // }
-    //
-    // SessionService.validateSession(req.query.token, "user", function(accountId) {
-        // User.findById(accountId)
-        // .select('name email subscription')
-        // .exec(function(err, user) {
-        //     if (err) {
-        //         res.status(500).json({
-        //             msg: "Couldn't search the database for user!"
-        //         });
-        //     } else if (!user) {
-        //         res.status(401).json({
-        //             msg: "User not found, user table out of sync with session table!"
-        //         });
-        //     } else if(moment(user.subscription).isBefore(moment()) && !user.admin){
-        //         res.status(402).json({
-        //             msg: "Subscription expired!",
-        //             subscription: user.subscription
-        //         });
-        //     } else {
-        //
-        //     }
-        // });
-    // }, function(err){
-    //     res.status(err.status).json(err);
-    // });
+    if(!(req.query.token)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
 
-    Page.search({
-        query_string: {
-            query: req.params.terms
-        }
-    }, function(err, results) {
-        if(err){
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(results);
-        }
+    SessionService.validateSession(req.query.token, "user", function(accountId) {
+        User.findById(accountId)
+        .select('name email subscription')
+        .exec(function(err, user) {
+            if (err) {
+                res.status(500).json({
+                    msg: "Couldn't search the database for user!"
+                });
+            } else if (!user) {
+                res.status(401).json({
+                    msg: "User not found, user table out of sync with session table!"
+                });
+            } else if(moment(user.subscription).isBefore(moment()) && !user.admin){
+                res.status(402).json({
+                    msg: "Subscription expired!",
+                    subscription: user.subscription
+                });
+            } else {
+                doSearch(user);
+            }
+        });
+    }, function(err){
+        res.status(err.status).json(err);
     });
+
+    function doSearch(user){
+        Page.search({
+            query_string: {
+                query: req.params.terms
+            }
+        }, function(err, results) {
+            if(err){
+                res.status(500).json(err);
+            } else {
+                if(!user.admin) results.subscription = user.subscription;
+                res.status(200).json(results);
+            }
+        });
+    }
 });
 
 /* GET page. */
