@@ -28,6 +28,10 @@ var User = new mongoose.Schema({
     subscription: {
         type: Date,
         default: null
+    },
+    admin: {
+        type: Boolean,
+        default: false
     }
 });
 
