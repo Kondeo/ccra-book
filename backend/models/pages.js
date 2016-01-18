@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var mongoosastic=require("mongoosastic");
 var Schema = mongoose.Schema;
 
 var Page = new Schema({
@@ -9,7 +10,8 @@ var Page = new Schema({
         type: Number
     },
     content: {
-        type: String
+        type: String,
+        es_indexed: true
     },
     cleaned: {
         type: Boolean,
@@ -17,4 +19,16 @@ var Page = new Schema({
     }
 });
 
-mongoose.model('Page', Page);
+Page.plugin(mongoosastic);
+
+var PageM = mongoose.model('Page', Page), stream = PageM.synchronize(), count = 0;
+
+stream.on('data', function(err, doc){
+    count++;
+});
+stream.on('close', function(){
+    console.log('Indexed ' + count + ' documents.');
+});
+stream.on('error', function(err){
+    console.log(err);
+});

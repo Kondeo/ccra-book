@@ -2,6 +2,7 @@ var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
     moment = require('moment'),
+    crypto = require('crypto'),
     CONST = require('../config/constants.json'),
     StripeService = require('../services/stripe.js'),
     SessionService = require('../services/sessions.js'),
@@ -103,10 +104,11 @@ router.post('/login', function(req, res, next) {
         } else {
             //Hash the requested password and salt
             var hash = crypto.pbkdf2Sync(req.body.password, user.salt, 10000, 512);
+
             //Compare to stored hash
-            if (hash === user.password) {
+            if (hash == user.password) {
                 //Check if subscription has expired
-                if(moment(user.subscription).isBefore(moment())){
+                if(moment(user.subscription).isAfter(moment())){
                     SessionService.generateSession(user._id, "user", function(token){
                         //All good, give the user their token
                         res.status(200).json({
@@ -158,7 +160,7 @@ router.post('/renew', function(req, res, next) {
             //Hash the requested password and salt
             var hash = crypto.pbkdf2Sync(req.body.password, user.salt, 10000, 512);
             //Compare to stored hash
-            if (hash === user.password) {
+            if (hash == user.password) {
 
                 StripeService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.RENEW, function(charge){
 
