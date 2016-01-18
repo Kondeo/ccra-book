@@ -1,6 +1,6 @@
 // Ionic Starter App
 
-var api_base = "http://srv1.kondeo.com:3003/";
+var api_base = "http://jnode.ngrok.kondeo.com:8080/";
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
@@ -22,7 +22,7 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
   $stateProvider
 
   .state('app', {
@@ -64,6 +64,7 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
 
   .state('app.register', {
     url: "/register",
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: "templates/register.html",
@@ -83,4 +84,5 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/index');
+
 });

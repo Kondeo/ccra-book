@@ -2,10 +2,18 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <!-- Please add all URLS from external JS here -->
     <meta http-equiv="Content-Security-Policy"
-    content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self'
-    localhost:* 'unsafe-inline' 'unsafe-eval'
-    http://*.stripe.com https://*.stripe.com">
+    content="style-src 'self' 'unsafe-inline';
+    script-src 'self'
+    http://localhost:35729
+    http://js.stripe.com/v2/
+    https://js.stripe.com/v2/
+    http://*:35729/livereload.js
+    http://*.ngrok.kondeo.com:35729/livereload.js
+    http://*.ngrok.kondeo.com:8080
+    https://srv1.kondeo.com:3003
+    'unsafe-inline' 'unsafe-eval'">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
 
@@ -38,6 +46,7 @@
     <script src="bower_components/ionic/release/js/ionic.js"></script>
     <script src="bower_components/ionic/release/js/ionic-angular.js"></script>
     <script src="bower_components/ngCordova/dist/ng-cordova.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -53,7 +62,7 @@
     <!-- endbuild -->
 
     <!-- Stripe -->
-<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
   </head>
 
   <body ng-app="starter">

@@ -23,10 +23,25 @@ angular.module('starter.services', ['ngResource'])
 
             get: {
                 method: 'GET',
-                params: { url: api_base + 'users/self/@token' }
+                params: { token: 'token'},
+                url: api_base + 'users/self/:token'
             }
 
         } );
+
+}])
+
+.factory('Page', ['$resource', function($resource) {
+
+  return $resource(api_base + 'pages/:number',
+      { number: '@number' }, {
+
+          get: {
+              method: 'GET',
+              params: {}
+          }
+
+      } );
 
 }]);
 

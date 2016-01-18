@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "angular-hotkeys": "^1.6.0"
+    "angular-hotkeys": "^1.6.0",
+    "moment": "^2.11.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
@@ -151,7 +152,8 @@
     "org.apache.cordova.console",
     "com.ionic.keyboard",
     "org.apache.cordova.console",
-    "com.ionic.keyboard"
+    "com.ionic.keyboard",
+    "cordova-plugin-whitelist"
   ],
   "cordovaPlatforms": [
     {
