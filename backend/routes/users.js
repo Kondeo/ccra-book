@@ -14,9 +14,8 @@ router.get('/', function(req, res, next) {
 
 router.post('/register', function(req, res) {
     if(!(req.body.cardToken &&
-        req.body.amount &&
         req.body.email &&
-        req.body.name)){
+        req.body.password)){
         return res.status(412).json({
             msg: "Route requisites not met."
         });
@@ -47,7 +46,6 @@ router.post('/register', function(req, res) {
                     //Create a new user with the assembled information
                     var subscriptionDate = moment().add(1, 'y');
                     var newUser = new User({
-                        name: req.body.name,
                         email: (req.body.email.toLowerCase()).trim(),
                         password: hash,
                         salt: salt,
@@ -81,6 +79,13 @@ router.post('/register', function(req, res) {
 });
 
 router.post('/login', function(req, res, next) {
+    if(!(req.body.email &&
+        req.body.password)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
     //Find a user with the username requested. Select salt and password
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()
@@ -127,6 +132,14 @@ router.post('/login', function(req, res, next) {
 });
 
 router.post('/renew', function(req, res, next) {
+    if(!(req.body.cardToken &&
+        req.body.email &&
+        req.body.password)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
     //Find a user with the username requested. Select salt and password
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()

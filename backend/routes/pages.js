@@ -5,6 +5,11 @@ var Page = mongoose.model('Page');
 
 /* GET page. */
 router.get('/:number', function(req, res, next) {
+    if(!(req.query.token)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
 
     SessionService.validateSession(req.query.token, "user", function(accountId) {
         User.findById(accountId)
@@ -49,6 +54,11 @@ router.get('/:number', function(req, res, next) {
 });
 
 router.put('/:number', function(req, res, next) {
+    if(!(req.query.token)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
 
     SessionService.validateSession(req.query.token, "user", function(accountId) {
         User.findById(accountId)
@@ -100,7 +110,12 @@ router.put('/:number', function(req, res, next) {
 });
 
 router.post('/:number', function(req, res, next) {
-
+    if(!(req.query.token)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+    
     SessionService.validateSession(req.query.token, "user", function(accountId) {
         User.findById(accountId)
         .select('name email subscription')
