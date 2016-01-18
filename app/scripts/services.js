@@ -28,6 +28,20 @@ angular.module('starter.services', ['ngResource'])
 
         } );
 
+}])
+
+.factory('Page', ['$resource', function($resource) {
+
+  return $resource(api_base + 'pages/:number',
+      { number: '@number' }, {
+
+          get: {
+              method: 'GET',
+              params: {}
+          }
+
+      } );
+
 }]);
 
 

@@ -22,7 +22,7 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
   $stateProvider
 
   .state('app', {
@@ -83,4 +83,5 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/index');
+
 });

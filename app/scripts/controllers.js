@@ -1,6 +1,7 @@
 angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
+
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
@@ -35,13 +36,13 @@ angular.module('starter.controllers', [])
   });
 
   //Alert popup we shall use instead of alerts
-  $scope.showAlert = function(aTitle, aText) {
+  $scope.showAlert = function(aTitle, aText, callback) {
    var alertPopup = $ionicPopup.alert({
      title: aTitle,
      template: aText
    });
    alertPopup.then(function(res) {
-     //Do nothing here
+     callback();
    });
  };
 
@@ -79,6 +80,28 @@ angular.module('starter.controllers', [])
             //Reload the page
             $window.location.reload(true);
         }
+    },
+    //Errors
+    function(response) {
+        if (response.status == 401) {
+           //Handle 401 error code
+
+           //Show an error
+           $scope.showAlert("Login Failed", "Email or password was incorrect!")
+       }
+       else if (response.status == 500) {
+         // Handle 500 error code
+
+         //Show an error
+         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+       }
+       else {
+           //Handle General Error
+
+           //An unexpected error has occured, log into console
+           //Show an error
+           $scope.showAlert("Error", "Unecpected Error. Please try re-opening the app, or try again later!");
+       }
     });
   };
 
@@ -156,93 +179,52 @@ angular.module('starter.controllers', [])
   ];
 })
 
-.controller('RegisterCtrl', function($scope, $location, User) {
-    // Form data for the register controller
-    $scope.registerData = {};
-
-    // Perform the login action when the user submits the login form
-    $scope.doRegister = function() {
-
-        //Check for empty fields
-        if(!($scope.registerData.email &&
-        $scope.registerData.username &&
-        $scope.registerData.password &&
-        $scope.registerData.confirmPassword))
-        {
-            $scope.showAlert("Alert!", "Please complete all fields!");
-        }
-        //Check for non matching passwords
-        else if($scope.registerData.password != $scope.registerData.confirmPassword)
-        {
-            $scope.showAlert("Alert!", "The passwords do not match!");
-        }
-        //Check email
-        else if($scope.registerData.email.indexOf("@") == -1)
-        {
-            $scope.showAlert("Alert!", "Please enter a valid E-mail Adress!");
-        }
-        //Send to backend
-        else
-        {
-
-            $scope.registerFinish = User.register($scope.registerData, function() {
-                //Determine response from server
-                if ($scope.registerFinish.error) {
-                    if($scope.registerFinish.error.errorid == '22')
-                    {
-                        $scope.showAlert("Alert!", "Sorry, that username already exists.");
-                    }
-                    else if($scope.registerFinish.error.errorid == '23')
-                    {
-                        $scope.showAlert("Alert!", "Sorry, you have not purchased the software.");
-                    }
-                }
-                else
-                {
-                    //Store the token from the server for future use
-                    localStorage.setItem("session_token", $scope.registerFinish.result.session_token);
-                    $location.path("#/");
-                }
-            });
-        }
-    }
-
-})
-
-.controller('PageCtrl', function($scope, $stateParams, User, $location, $http, $sce, $state, $ionicHistory, $ionicScrollDelegate) {
+.controller('PageCtrl', function($scope, $stateParams,
+    Page, $location, $http, $sce, $state,
+    $ionicHistory, $ionicScrollDelegate) {
     $scope.pagenum = $stateParams.page;
     var cookie = localStorage.getItem("session_token");
-    $http.get(api_base + 'pages/' + $stateParams.page).
-      success(function(data, status, headers, config) {
-        // this callback will be called asynchronously
-        // when the response is available
-        //Check for any errors
-        if(data.error)
-        {
-            if(data.error.errorid == '12')
-            {
-                $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
 
-                //Set our current error
-                $scope.errors[0] = 12;
+    var payload = {
+        number: $scope.pagenum,
+        token: cookie
+    };
 
-                $scope.login();
-            }
-        }
-        else
-        {
-            //Then display the page
-            $scope.pagecontents = data.pageContent;
-            $scope.trustedHtml = $sce.trustAsHtml($scope.pagecontents);
+    //Get the page
+    Page.get(payload, function(data) {
 
-            //Set our current error to none
-            $scope.errors[0] = -1;
-        }
-      }).
-      error(function(data, status, headers, config) {
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-    });
+        //Then display the page
+        $scope.pagecontents = data.content;
+        $scope.trustedHtml = $sce.trustAsHtml($scope.pagecontents);
+
+        //Set our current error to none
+        $scope.errors[0] = -1;
+    },
+    //Errors
+    function(response) {
+        if (response.status == 401) {
+           //Handle 401 error code
+
+           //Pull up the login modal
+           $scope.login();
+
+           //Show an error
+           $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+       }
+       else if (response.status == 500) {
+         // Handle 500 error code
+
+         //Show an error
+         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+       }
+       else {
+           //Handle General Error
+
+           //An unexpected error has occured, log into console
+           //Show an error
+           $scope.showAlert("Error", "Unecpected Error. Please try re-opening the app, or try again later!");
+       }
+   });
 
     $scope.goToNext = function(){
         var temp = parseInt($stateParams.page) + 1;
@@ -274,12 +256,16 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('RegisterCtrl', function($scope, $ionicHistory, $http, $timeout) {
+.controller('RegisterCtrl', function($scope, $ionicHistory, $http, $timeout, Page, User) {
 
     //SET OUR STRIPE KEY HERE
+    Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
 
     //Our data from the form
     $scope.registerData = {};
+
+    //If our card is validated
+    $scope.cardValidated = false;
 
     //Get our session_token
     var cookie = localStorage.getItem("session_token");
@@ -289,38 +275,41 @@ angular.module('starter.controllers', [])
     //Needs have the according route
     if($scope.loggedIn())
     {
-        $http.get('http://localhost:3000/pages/').
-          success(function(data, status, headers, config) {
-            // this callback will be called asynchronously
-            // when the response is available
-            //Check for any errors
-            if(data.error)
-            {
-                if(data.error.errorid == '12')
-                {
-                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
+        //Validate the cookie, as well as, grab their email
+        var payload = {
+            token: cookie
+        }
 
-                    //Set our current error
-                    $scope.errors[0] = 12;
+        User.get(payload, function(data) {
 
-                    $scope.login();
-                }
-            }
-            else
-            {
-                //Then fill the user information
-                $scope.registerData.email = data.email;
+            //Auto fill their email for them
+            $scope.registerData.email = data.email;
+        },
+        //Errors
+        function(response) {
+            if (response.status == 401) {
+               //Handle 401 error code
 
+               //Pull up the login modal
+               $scope.login();
 
-                //Set our current error to none
-                $scope.errors[0] = -1;
-            }
-          }).
-          error(function(data, status, headers, config) {
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
+               //Show an error
+               $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+           }
+           else if (response.status == 500) {
+             // Handle 500 error code
 
-          })
+             //Show an error
+             $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+           }
+           else {
+               //Handle General Error
+
+               //An unexpected error has occured, log into console
+               //Show an error
+               $scope.showAlert("Error", "Unecpected Error. Please try re-opening the app, or try again later!");
+           }
+       })
     }
 
     //Functions for the Form
@@ -550,16 +539,18 @@ angular.module('starter.controllers', [])
         }
     }
 
+    //Function to go back to the previous page
+    $scope.goToPrev = function(){
+        $ionicHistory.goBack();
+    }
 
-    /**
-     * Assembles CC info and creates a token with Stripe
-     */
-    $scope.tokenizeInfo = function() {
-        //Disable button while tokenzing the card
-        $scope.tokenzing = true;
+    //Create the user
+    $scope.registerUser = function() {
 
         //Create finalized card number
         var cardNumber = $scope.registerData.ccNumber;
+
+        console.log(cardNumber);
 
         //Send card info to stripe for tokenization
         Stripe.card.createToken({
@@ -570,12 +561,23 @@ angular.module('starter.controllers', [])
         }, function(status, response) {
             if (response.error) {
 
-                //Display card error message
-                $scope.tokenizeFailure = true;
+                //Display alert
+                $scope.cardErrors = true;
+
+                $scope.showAlert("Card Error", "Please check your card information.");
+
             } else {
+
                 //Get the token to be submitted later, after the second page
                 // response contains id and card, which contains additional card details
                 $scope.stripeToken = response.id;
+
+                //Create our payload
+                
+
+                //Submitting Now!
+
+                User.register()
             }
 
             //Force the change to refresh, we need to do this because I
@@ -583,47 +585,6 @@ angular.module('starter.controllers', [])
             //forced or interacted with
             $scope.$apply();
         });
-    };
-
-    //Function to go back to the previous page
-    $scope.goToPrev = function(){
-        $ionicHistory.goBack();
-    }
-
-    //Create the user
-    $scope.registerUser = function() {
-        $http.post('http://localhost:3000/pages/').
-          success(function(data, status, headers, config) {
-            // this callback will be called asynchronously
-            // when the response is available
-            //Check for any errors
-            if(data.error)
-            {
-                if(data.error.errorid == '12')
-                {
-                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
-
-                    //Set our current error
-                    $scope.errors[0] = 12;
-
-                    $scope.login();
-                }
-            }
-            else
-            {
-                //Then fill the user information
-                $scope.registerData.email = data.email;
-
-
-                //Set our current error to none
-                $scope.errors[0] = -1;
-            }
-          }).
-          error(function(data, status, headers, config) {
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
-
-          })
     }
 
     //Update the user
