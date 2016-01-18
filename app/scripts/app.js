@@ -64,6 +64,7 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
 
   .state('app.register', {
     url: "/register",
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: "templates/register.html",

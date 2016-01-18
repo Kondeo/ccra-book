@@ -2,6 +2,8 @@ angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
 
+  //Moment.js
+
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
@@ -331,7 +333,12 @@ angular.module('starter.controllers', [])
                 $scope.registerData.email = data.email;
 
                 //Also, get their subscription Date
-                $scope.subscription = data.subscription;
+                //Julian wants this weird week thingy
+                if(moment().add(6, 'd').isAfter(moment(data.subscription))) {
+                    $scope.subscription = moment(data.subscription).format("dddd")
+                }
+                else $scope.subscription = moment(data.subscription).format("MMM Do, YYYY");
+                $scope.subscriptionDate = data.subscription;
             },
             //Errors
             function(response) {
@@ -649,11 +656,14 @@ angular.module('starter.controllers', [])
                         //save their session
                         localStorage.setItem("session_token", data.token);
 
-                        //Move them back to the index
+                        //Move them back to the index, no history
+                        $ionicHistory.nextViewOptions({
+                            disableBack: true
+                        });
                         $state.go('app.index');
 
                         //Alert them of success!
-                        $scope.showAlert("Success!", "You have successfully registered! Your account is valid for a year, and can be extended. Enjoy!");
+                        $scope.showAlert("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
 
                     },
                     //Errors
@@ -666,6 +676,12 @@ angular.module('starter.controllers', [])
 
                            //Show an error
                            $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+                       }
+                       else if (response.status == 416) {
+                         // Handle 416 error code
+
+                         //Show an error
+                         $scope.showAlert("Email Taken", "Sorry, that email has been taken. Please enter another email!");
                        }
                        else if (response.status == 500) {
                          // Handle 500 error code
@@ -693,38 +709,83 @@ angular.module('starter.controllers', [])
 
     //Update the user
     $scope.updateUser = function() {
-        $http.put('http://localhost:3000/pages/').
-          success(function(data, status, headers, config) {
-            // this callback will be called asynchronously
-            // when the response is available
-            //Check for any errors
-            if(data.error)
-            {
-                if(data.error.errorid == '12')
-                {
-                    $scope.showAlert("Alert!", "Session token is no longer valid, please login!");
 
-                    //Set our current error
-                    $scope.errors[0] = 12;
+        //Create finalized card number
+        var cardNumber = $scope.registerData.ccNumber;
 
-                    $scope.login();
+        //Send card info to stripe for tokenization
+        Stripe.card.createToken({
+            "number": $scope.registerData.ccNumber,
+            "cvc": $scope.registerData.cvv,
+            "exp_month": $scope.registerData.expireM,
+            "exp_year": $scope.registerData.expireY
+        }, function(status, response) {
+            if (response.error) {
+
+                //Display alert
+                $scope.cardErrors = true;
+
+                $scope.showAlert("Card Error", "Please check your card information.");
+
+            } else {
+
+                //Get the token to be submitted later, after the second page
+                // response contains id and card, which contains additional card details
+                var stripeToken = response.id;
+
+                //Create our payload
+                var payload = {
+                    cardToken: stripeToken,
+                    email: $scope.registerData.email,
+                    password: $scope.registerData.password
                 }
+
+                //Submitting Now!
+                User.renew(payload, function(data) {
+
+                    //Success!
+                    //save their session
+                    localStorage.setItem("session_token", data.token);
+
+                    //Move them back to the index, no history
+                    $ionicHistory.nextViewOptions({
+                        disableBack: true
+                    });
+                    $state.go('app.index');
+
+                    //Alert them of success!
+                    $scope.showAlert("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
+
+                },
+                //Errors
+                function(response) {
+                    if (response.status == 401) {
+                       //Handle 401 error code
+
+                       //Show an error
+                       $scope.showAlert("Authentication Error", "Please check your email and password.")
+                   }
+                   else if (response.status == 500) {
+                     // Handle 500 error code
+
+                     //Show an error
+                     $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later! Your card has not been charged!");
+                   }
+                   else {
+                       //Handle General Error
+
+                       //An unexpected error has occured, log into console
+                       //Show an error
+                       $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later! Your card has not been charged!");
+                   }
+               });
             }
-            else
-            {
-                //Then fill the user information
-                $scope.registerData.email = data.email;
 
-
-                //Set our current error to none
-                $scope.errors[0] = -1;
-            }
-          }).
-          error(function(data, status, headers, config) {
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
-
-          })
+            //Force the change to refresh, we need to do this because I
+            //guess response scope is a different scope and has to be
+            //forced or interacted with
+            $scope.$apply();
+        });
     }
 
 });
