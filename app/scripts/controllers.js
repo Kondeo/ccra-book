@@ -1,6 +1,8 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
+.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
+    $ionicPlatform, $timeout, $location,
+    $window, $ionicHistory, User) {
 
   //Moment.js
 
@@ -94,6 +96,19 @@ angular.module('starter.controllers', [])
            //Show an error
            $scope.showAlert("Login Failed", "Email or password was incorrect!")
        }
+       else if(response.status == 402) {
+           //Handle 402 Error
+           //Payment Requried
+
+           //Move them back to the index, no history
+           $ionicHistory.nextViewOptions({
+               disableBack: true
+           });
+           $state.go('app.register');
+
+           //Show alert
+           $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+       }
        else if (response.status == 500) {
          // Handle 500 error code
 
@@ -165,6 +180,22 @@ angular.module('starter.controllers', [])
 
                    //Show an error
                    $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!");
+               }
+               else if(response.status == 402) {
+                   //Handle 402 Error
+                   //Payment Requried
+
+                   //Delete the token
+                   localStorage.removeItem("session_token");
+
+                   //Move them back to the index, no history
+                   $ionicHistory.nextViewOptions({
+                       disableBack: true
+                   });
+                   $state.go('app.register');
+
+                   //Show alert
+                   $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
                }
                else if (response.status == 404) {
                  // Handle 404 error code
@@ -259,6 +290,19 @@ angular.module('starter.controllers', [])
            //Show an error
            $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
        }
+       else if(response.status == 402) {
+           //Handle 402 Error
+           //Payment Requried
+
+           //Move them back to the index, no history
+           $ionicHistory.nextViewOptions({
+               disableBack: true
+           });
+           $state.go('app.register');
+
+           //Show alert
+           $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+       }
        else if (response.status == 500) {
          // Handle 500 error code
 
@@ -350,6 +394,19 @@ angular.module('starter.controllers', [])
 
                    //Show an error
                    $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+               }
+               else if(response.status == 402) {
+                   //Handle 402 Error
+                   //Payment Requried
+
+                   //Move them back to the index, no history
+                   $ionicHistory.nextViewOptions({
+                       disableBack: true
+                   });
+                   $state.go('app.register');
+
+                   //Show alert
+                   $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
                }
                else if (response.status == 500) {
                  // Handle 500 error code
