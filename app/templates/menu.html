@@ -1,3 +1,17 @@
+<!-- Our loading spinner for the app -->
+<div class = "darkOverlay"
+ng-if="loading">
+</div>
+<div class = "loadingContainer"
+ng-if="loading">
+
+    <h2>Loading...</h2>
+
+    <div class = "spinnerAnimation">
+    </div>
+</div>
+
+<!-- Ionic/App Menu -->
 <ion-side-menus enable-menu-with-back-views="true">
   <ion-side-menu-content>
     <ion-nav-bar class="bar-dark">

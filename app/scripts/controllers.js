@@ -2,11 +2,13 @@ angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
 
-  //Moment.js
-
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
+
+  //Loading Spinner initialization
+  //$scope.loading = false;
+  //This will not work, need to make a loading service
 
   $scope.settings = {};
   $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
@@ -322,6 +324,7 @@ angular.module('starter.controllers', [])
 
         if($scope.loggedIn())
         {
+
             //Validate the cookie, as well as, grab their email
             var payload = {
                 token: localStorage.getItem("session_token")
