@@ -7,6 +7,47 @@ var SessionService = require('../services/sessions.js');
 var User = mongoose.model('User');
 
 /* GET page. */
+router.get('/query/:terms', function(req, res, next) {
+    // if(!(req.query.token)){
+    //     return res.status(412).json({
+    //         msg: "Route requisites not met."
+    //     });
+    // }
+    //
+    // SessionService.validateSession(req.query.token, "user", function(accountId) {
+        // User.findById(accountId)
+        // .select('name email subscription')
+        // .exec(function(err, user) {
+        //     if (err) {
+        //         res.status(500).json({
+        //             msg: "Couldn't search the database for user!"
+        //         });
+        //     } else if (!user) {
+        //         res.status(401).json({
+        //             msg: "User not found, user table out of sync with session table!"
+        //         });
+        //     } else if(moment(user.subscription).isBefore(moment()) && !user.admin){
+        //         res.status(402).json({
+        //             msg: "Subscription expired!",
+        //             subscription: user.subscription
+        //         });
+        //     } else {
+        //
+        //     }
+        // });
+    // }, function(err){
+    //     res.status(err.status).json(err);
+    // });
+
+    Page.search({ query: req.params.terms }, function(results) {
+        res.status(200).json(results)
+    }, function(err){
+        console.log(err);
+        res.status(500).send("ISE: " + err);
+    });
+});
+
+/* GET page. */
 router.get('/:number', function(req, res, next) {
     if(!(req.query.token)){
         return res.status(412).json({
