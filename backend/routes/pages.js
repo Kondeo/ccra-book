@@ -6,7 +6,7 @@ var Page = mongoose.model('Page');
 /* GET page. */
 router.get('/:number', function(req, res, next) {
 
-    SessionService.validateSession(req.params.token, "user", function(accountId) {
+    SessionService.validateSession(req.query.token, "user", function(accountId) {
         User.findById(accountId)
         .select('name email subscription')
         .exec(function(err, user) {
