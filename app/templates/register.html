@@ -8,7 +8,9 @@
         </div>
 
         <label class="item item-input">
-          <span class="input-label">Email</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': emailError}">
+          Email</span>
           <input type="text" ng-model="registerData.email"
           placeholder="example@example.com"
           autocomplete="off"  autocorrect="off"
@@ -16,14 +18,18 @@
           required>
         </label>
         <label class="item item-input">
-          <span class="input-label">Password</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': passwordError}">
+          Password</span>
           <input type="password"
           ng-model="registerData.password"
           placeholder="Secure Password"
           required>
         </label>
         <label class="item item-input" ng-if="!loggedIn()">
-          <span class="input-label">Confirm Password</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': passwordError}">
+          Confirm Password</span>
           <input type="password"
           ng-model="registerData.confirmPassword"
           placeholder="Secure Password"
@@ -32,7 +38,9 @@
 
         <!-- Credit Card Number -->
         <label class="item item-input">
-          <span class="input-label">Credit Card Number</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': cardError}">
+          Credit Card Number</span>
           <input
               type="tel"
               id="ccNumber"
@@ -44,7 +52,9 @@
               ng-keyup="formatCC($event)">
         </label>
         <label class="item item-input">
-          <span class="input-label">Experation Month</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': cardError}">
+          Experation Month</span>
           <input
                 type="number"
                 id="expireM"
@@ -56,7 +66,9 @@
                 ng-model="registerData.expireM">
         </label>
         <label class="item item-input">
-          <span class="input-label">Experation Year</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': cardError}">
+          Experation Year</span>
           <input
                 type="number"
                 id="expireM"
@@ -68,7 +80,9 @@
                 ng-model="registerData.expireY">
         </label>
         <label class="item item-input">
-          <span class="input-label">CVV (Located on Back of Card)</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': cardError}">
+          CVV (Located on Back of Card)</span>
           <input
                 type="number"
                 id="cardCvv"
@@ -80,7 +94,9 @@
                 ng-model="registerData.cvv">
         </label>
         <label class="item item-input">
-          <span class="input-label">Zip Code</span>
+          <span class="input-label"
+          ng-class="{'errorFormText': cardError}">
+          Zip Code</span>
           <input
                 type="number"
                 id="zipCode"

@@ -2,3 +2,8 @@
 .item-radio input:checked ~ .item-content {
     background: lightgrey;
 }
+
+//Make a forms text red for whatever part of the form is wrong
+.errorFormText {
+    color: #ef473a !important;
+}
