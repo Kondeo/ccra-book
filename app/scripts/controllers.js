@@ -78,6 +78,9 @@ angular.module('starter.controllers', [])
 
     User.login($scope.loginData, function(data) {
 
+        //Hide red error text, if it was shown
+        $scope.authError = false;
+
         //Stop Loading
         loadingSpinner.stopLoading();
 
@@ -104,7 +107,10 @@ angular.module('starter.controllers', [])
            //Handle 401 error code
 
            //Show an error
-           $scope.showAlert("Login Failed", "Email or password was incorrect!")
+           $scope.showAlert("Login Failed", "Email or password was incorrect!");
+
+           //Show red error text
+           $scope.authError = true;
        }
        else if(response.status == 402) {
            //Handle 402 Error
@@ -681,14 +687,8 @@ angular.module('starter.controllers', [])
         var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|co|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
         //Test the form email against the regex
         if (emailRegex.test(email)) {
-
-            //Remove Ng Class
-            $scope.emailErrors = false;
             return true;
         } else {
-
-            //Ngclass red email text
-            $scope.emailErrors = true;
             return false;
         }
     }
@@ -714,11 +714,16 @@ angular.module('starter.controllers', [])
     //Create the user
     $scope.registerUser = function() {
 
+        //Hide the ng class red error text if show
+        $scope.passwordError = false;
+        $scope.cardError = false;
+        $scope.emailError = false;
+
         //Check if the passwords matched
         if($scope.registerData.password != $scope.registerData.confirmPassword) {
 
             //Display alert, and ng class
-            $scope.passwordErrors = true;
+            $scope.passwordError = true;
 
             $scope.showAlert("Password Error", "Please check your password and confirmed password.");
         }
@@ -739,11 +744,11 @@ angular.module('starter.controllers', [])
             }, function(status, response) {
                 if (response.error) {
 
+                    //Display alert, and show card errors
+                    $scope.cardError = true;
+
                     //Stop loading
                     loadingSpinner.stopLoading();
-
-                    //Display alert
-                    $scope.cardErrors = true;
 
                     $scope.showAlert("Card Error", "Please check your card information.");
 
@@ -800,6 +805,9 @@ angular.module('starter.controllers', [])
                        else if (response.status == 416) {
                          // Handle 416 error code
 
+                         //Ng class red email text
+                         $scope.emailError = true;
+
                          //Show an error
                          $scope.showAlert("Email Taken", "Sorry, that email has been taken. Please enter another email!");
                        }
@@ -830,6 +838,11 @@ angular.module('starter.controllers', [])
     //Update the user
     $scope.updateUser = function() {
 
+        //Hide the ng class red error text if show
+        $scope.passwordError = false;
+        $scope.cardError = false;
+        $scope.emailError = false;
+
         //Start Loading
         loadingSpinner.startLoading();
 
@@ -849,7 +862,7 @@ angular.module('starter.controllers', [])
                 loadingSpinner.stopLoading();
 
                 //Display alert
-                $scope.cardErrors = true;
+                $scope.cardError = true;
 
                 $scope.showAlert("Card Error", "Please check your card information.");
 
@@ -894,6 +907,10 @@ angular.module('starter.controllers', [])
 
                     if (response.status == 401) {
                        //Handle 401 error code
+
+                       //show red ng class text
+                       $scope.emailError = true;
+                       $scope.passwordError = true;
 
                        //Show an error
                        $scope.showAlert("Authentication Error", "Please check your email and password.")
