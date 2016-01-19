@@ -78,14 +78,45 @@ angular.module('starter.controllers', [])
         //Store the token from the server for future use
         localStorage.setItem("session_token", data.token);
 
+        //Store the user subscription notice, if it does not exist
+        if(!localStorage.getItem("subscriptionDate")) {
+            localStorage.setItem("subscriptionDate", {
+                subscription: data.subscription,
+                admin: data.admin,
+                alert: false
+            });
+        }
+
         //Inform the user
-        //Show an error
-        $scope.showAlert("Login Success!", "The Page will now reload...")
+        //Show an alert
+        if(moment().add(6, 'd').isAfter(moment(data.subscription))) {
 
+            //inform user there subscription is ending
+            $scope.showAlert("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+             moment(data.subscription).format("dddd, MMMM Do YYYY") +
+             ". Please visit the menu, and select (Manage Subscription) to extend your subscription. The Page will now reload...", function() {
 
-        $scope.closeLogin();
-        //Reload the page
-        $window.location.reload(true);
+                //Alert Call back
+
+                $scope.closeLogin();
+
+                //Reload the page
+                $window.location.reload(true);
+            });
+        }
+        else {
+
+            //Show normal login alert
+            $scope.showAlert("Login Success!", "The Page will now reload...", function() {
+
+                //Alert Call back
+
+                $scope.closeLogin();
+
+                //Reload the page
+                $window.location.reload(true);
+            });
+        }
     },
     //Errors
     function(response) {
@@ -230,6 +261,28 @@ angular.module('starter.controllers', [])
         if(!$scope.loggedIn() && $location.path() != "/app/register")
         {
             $scope.modal.show();
+        }
+
+        //Also Check if our subscription is ending
+        var subDate = localStorage.getItem("subscriptionDate");
+        if(subDate &&
+            !subDate.admin &&
+            !subDate.alerted &&
+            moment().add(6, 'd').isAfter(moment(subDate.subscription))) {
+
+                //Alert the user their subscription is Ending
+                //inform user there subscription is ending
+                $scope.showAlert("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+                 moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
+                 ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
+
+                 //Set the alerted to true
+                 //Save their subscription Date
+                 localStorage.setItem("subscriptionDate", {
+                     subscription: subDate.subscription,
+                     admin: subDate.admin,
+                     alert: true
+                 });
         }
     };
 
@@ -803,6 +856,13 @@ angular.module('starter.controllers', [])
                     //Success!
                     //save their session
                     localStorage.setItem("session_token", data.token);
+
+                    //Save their subscription Date
+                    localStorage.setItem("subscriptionDate", {
+                        subscription: data.subscription,
+                        admin: data.admin,
+                        alert: false
+                    });
 
                     //Move them back to the index, no history
                     $ionicHistory.nextViewOptions({
