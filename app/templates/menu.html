@@ -1,9 +1,9 @@
 <!-- Our loading spinner for the app -->
 <div class = "darkOverlay"
-ng-if="loading">
+ng-if="loading.isLoading()">
 </div>
 <div class = "loadingContainer"
-ng-if="loading">
+ng-if="loading.isLoading()">
 
     <h2>Loading...</h2>
 

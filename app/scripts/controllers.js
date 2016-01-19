@@ -1,13 +1,14 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform, $timeout, $location, $window, User) {
+.controller('AppCtrl', function($scope, $ionicModal, $ionicPopup, $ionicPlatform,
+    $timeout, $location, $window, User, loadingSpinner) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
 
   //Loading Spinner initialization
-  //$scope.loading = false;
+  $scope.loading = loadingSpinner;
   //This will not work, need to make a loading service
 
   $scope.settings = {};
@@ -219,7 +220,7 @@ angular.module('starter.controllers', [])
   $scope.indexes = [
     { title: 'Index list will be here', page: 1, id: 1, indented: 0},
     { title: 'Index item 2', page: 1, id: 1, indented: 0}
-  ];
+    ];
 })
 
 .controller('ListingCtrl', function($scope) {

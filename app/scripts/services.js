@@ -43,7 +43,33 @@ angular.module('starter.services', ['ngResource'])
 
       } );
 
-}]);
+}])
+.service('loadingSpinner', function() {
+
+    //Boolean if are loading
+    var loading = false;
+
+    return {
+
+        //Needs to be a function,
+        //or else will not update across controllers
+        isLoading: function() {
+            if(loading) return true
+            else return false
+        },
+
+        startLoading: function() {
+            loading = true;
+            console.log(loading);
+            return true;
+        },
+
+        stopLoading: function() {
+            loading = false;
+            return false;
+        }
+    };
+});
 
 
 //Quickly and painlessly gets cookies for controllers
