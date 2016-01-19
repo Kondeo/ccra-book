@@ -24,6 +24,10 @@
     background-color: rgba(48, 48, 48, .45);
 }
 
+.noTouch {
+    pointer-events: none !important;
+}
+
 .loadingContainer {
 
 

@@ -59,12 +59,20 @@ angular.module('starter.services', ['ngResource'])
         },
 
         startLoading: function() {
+
+            //First, make the body non interactable
+            document.body.class = document.body.class + " noTouch";
+
             loading = true;
             console.log(loading);
             return true;
         },
 
         stopLoading: function() {
+
+            //First, make the body interactable again
+            document.body.class = document.body.class.replace(" noTouch", "");
+
             loading = false;
             return false;
         }
