@@ -98,14 +98,16 @@
           type="submit" ng-if = "!loggedIn()"
           ng-disabled = "!registerForm.$valid ||
           registerData.password != registerData.confirmPassword ||
-          !cardValidated"
+          !cardValidated ||
+          loading.isLoading()"
           ng-click="registerUser()">Create Subscription - $10</button>
 
         <!-- Update Information for the user -->
           <button class="button button-block button-positive"
           type="submit" ng-if = "loggedIn()"
           ng-disabled = "!registerForm.$valid ||
-          !cardValidated"
+          !cardValidated ||
+          loading.isLoading()"
           ng-click="updateUser()">Extend Subscription 1 Year - $7</button>
 
           <button class="button button-block button-stable"

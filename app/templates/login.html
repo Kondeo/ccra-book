@@ -19,7 +19,7 @@
         <label class="item">
           <button class="button button-block button-positive"
           type="submit"
-          ng-disabled="!loginData.email || !loginData.password">
+          ng-disabled="!loginData.email || !loginData.password || loading.isLoading()">
           Log in</button>
         </label>
       </div>
@@ -31,7 +31,7 @@
     </div>
 
     <div class = "register"
-    ng-if="!loggedIn()">
+    ng-if="loggedIn()">
         Or you can <a href="#/app/register" ng-click = "closeLogin()">manage your subcription</a>
     </div>
   </ion-content>
