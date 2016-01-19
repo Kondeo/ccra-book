@@ -9,7 +9,6 @@ angular.module('starter.controllers', [])
 
   //Loading Spinner initialization
   $scope.loading = loadingSpinner;
-  //This will not work, need to make a loading service
 
   $scope.settings = {};
   $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
@@ -74,7 +73,13 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
 
+    //Start Loading
+    loadingSpinner.startLoading();
+
     User.login($scope.loginData, function(data) {
+
+        //Stop Loading
+        loadingSpinner.stopLoading();
 
         //Store the token from the server for future use
         localStorage.setItem("session_token", data.token);
@@ -90,6 +95,10 @@ angular.module('starter.controllers', [])
     },
     //Errors
     function(response) {
+
+        //Stop Loading
+        loadingSpinner.stopLoading();
+
         if (response.status == 401 ||
         response.status == 412) {
            //Handle 401 error code
@@ -147,12 +156,22 @@ angular.module('starter.controllers', [])
             //Set validated to true until proven false;
             sessionStorage.setItem("session_validated", true);
 
+            //Start Loading
+            loadingSpinner.startLoading();
+
             User.get({token: token}, function(){
+
+                //Stop Loading
+                loadingSpinner.stopLoading();
+
                 sessionStorage.setItem("session_validated", true);
                 return true;
             },
             //Errors from request
             function(response) {
+
+                //Stop Loading
+                loadingSpinner.stopLoading();
 
                 //Proven False
                 sessionStorage.setItem("session_validated", false);
@@ -232,7 +251,8 @@ angular.module('starter.controllers', [])
 
 .controller('PageCtrl', function($scope, $stateParams,
     Page, $location, $http, $sce, $state,
-    $ionicHistory, $ionicScrollDelegate) {
+    $ionicHistory, $ionicScrollDelegate,
+    loadingSpinner) {
     $scope.pagenum = $stateParams.page;
     var cookie = localStorage.getItem("session_token");
 
@@ -242,7 +262,14 @@ angular.module('starter.controllers', [])
     };
 
     //Get the page
+
+    //Start loading
+    loadingSpinner.startLoading();
+
     Page.get(payload, function(data) {
+
+        //Stop loading
+        loadingSpinner.stopLoading();
 
         //Then display the page
         $scope.pagecontents = data.content;
@@ -253,6 +280,10 @@ angular.module('starter.controllers', [])
     },
     //Errors
     function(response) {
+
+        //Stop loading
+        loadingSpinner.stopLoading();
+
         if (response.status == 401) {
            //Handle 401 error code
 
@@ -308,10 +339,14 @@ angular.module('starter.controllers', [])
 })
 
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
-    $timeout, Page, User, $state) {
+    $timeout, Page, User, $state,
+    loadingSpinner) {
 
     //SET OUR STRIPE KEY HERE
     Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
+
+    //Initialize our loading spinner for the button disabling
+    $scope.loading = loadingSpinner;
 
     //Our data from the form
     $scope.registerData = {};
@@ -326,12 +361,18 @@ angular.module('starter.controllers', [])
         if($scope.loggedIn())
         {
 
+            //Start loading
+            loadingSpinner.startLoading();
+
             //Validate the cookie, as well as, grab their email
             var payload = {
                 token: localStorage.getItem("session_token")
             };
 
             User.get(payload, function(data) {
+
+                //Stop loading
+                loadingSpinner.stopLoading();
 
                 //Auto fill their email for them
                 $scope.registerData.email = data.email;
@@ -346,6 +387,10 @@ angular.module('starter.controllers', [])
             },
             //Errors
             function(response) {
+
+                //Stop loading
+                loadingSpinner.stopLoading();
+
                 if (response.status == 401) {
                    //Handle 401 error code
 
@@ -623,6 +668,10 @@ angular.module('starter.controllers', [])
             $scope.showAlert("Password Error", "Please check your password and confirmed password.");
         }
         else {
+
+            //Start loading
+            loadingSpinner.startLoading();
+
             //Create finalized card number
             var cardNumber = $scope.registerData.ccNumber;
 
@@ -635,12 +684,17 @@ angular.module('starter.controllers', [])
             }, function(status, response) {
                 if (response.error) {
 
+                    //Stop loading
+                    loadingSpinner.stopLoading();
+
                     //Display alert
                     $scope.cardErrors = true;
 
                     $scope.showAlert("Card Error", "Please check your card information.");
 
                 } else {
+
+                    //Dont stop loading here, going to make another backend request
 
                     //Get the token to be submitted later, after the second page
                     // response contains id and card, which contains additional card details
@@ -655,6 +709,9 @@ angular.module('starter.controllers', [])
 
                     //Submitting Now!
                     User.register(payload, function(data) {
+
+                        //Stop loading
+                        loadingSpinner.stopLoading();
 
                         //Success!
                         //save their session
@@ -672,6 +729,10 @@ angular.module('starter.controllers', [])
                     },
                     //Errors
                     function(response) {
+
+                        //Stop loading
+                        loadingSpinner.stopLoading();
+
                         if (response.status == 401) {
                            //Handle 401 error code
 
@@ -714,6 +775,9 @@ angular.module('starter.controllers', [])
     //Update the user
     $scope.updateUser = function() {
 
+        //Start Loading
+        loadingSpinner.startLoading();
+
         //Create finalized card number
         var cardNumber = $scope.registerData.ccNumber;
 
@@ -725,6 +789,9 @@ angular.module('starter.controllers', [])
             "exp_year": $scope.registerData.expireY
         }, function(status, response) {
             if (response.error) {
+
+                //Stop loading
+                loadingSpinner.stopLoading();
 
                 //Display alert
                 $scope.cardErrors = true;
@@ -747,6 +814,9 @@ angular.module('starter.controllers', [])
                 //Submitting Now!
                 User.renew(payload, function(data) {
 
+                    //Stop loading
+                    loadingSpinner.stopLoading();
+
                     //Success!
                     //save their session
                     localStorage.setItem("session_token", data.token);
@@ -763,6 +833,10 @@ angular.module('starter.controllers', [])
                 },
                 //Errors
                 function(response) {
+
+                    //Stop loading
+                    loadingSpinner.stopLoading();
+                    
                     if (response.status == 401) {
                        //Handle 401 error code
 
