@@ -1,14 +1,14 @@
 angular.module('starter.controllers', [])
-
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
     $ionicPlatform, $timeout, $location,
-    $window, $ionicHistory, User) {
-
-  //Moment.js
+    $window, $ionicHistory, User, loadingSpinner) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
+
+  //Loading Spinner initialization
+  $scope.loading = loadingSpinner;
 
   $scope.settings = {};
   $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
@@ -73,7 +73,16 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
 
+    //Start Loading
+    loadingSpinner.startLoading();
+
     User.login($scope.loginData, function(data) {
+
+        //Hide red error text, if it was shown
+        $scope.authError = false;
+
+        //Stop Loading
+        loadingSpinner.stopLoading();
 
         //Store the token from the server for future use
         localStorage.setItem("session_token", data.token);
@@ -119,12 +128,19 @@ angular.module('starter.controllers', [])
     },
     //Errors
     function(response) {
+
+        //Stop Loading
+        loadingSpinner.stopLoading();
+
         if (response.status == 401 ||
         response.status == 412) {
            //Handle 401 error code
 
            //Show an error
-           $scope.showAlert("Login Failed", "Email or password was incorrect!")
+           $scope.showAlert("Login Failed", "Email or password was incorrect!");
+
+           //Show red error text
+           $scope.authError = true;
        }
        else if(response.status == 402) {
            //Handle 402 Error
@@ -189,7 +205,15 @@ angular.module('starter.controllers', [])
             //Set validated to true until proven false;
             sessionStorage.setItem("session_validated", true);
 
+<<<<<<< HEAD
+
+            //Start Loading
+            loadingSpinner.startLoading();
+
             User.get({token: token}, function(response){
+
+                //Stop Loading
+                loadingSpinner.stopLoading();
 
                 //Also Check if our subscription is ending
                 var subDate = localStorage.getItem("subscriptionDate");
@@ -211,10 +235,20 @@ angular.module('starter.controllers', [])
                 }
 
 
+=======
+
+            User.get({token: token}, function(){
+
+                //Stop Loading
+                loadingSpinner.stopLoading();
+>>>>>>> 45e45ce70dcd568fc1454256647a9844c24671d2
                 return true;
             },
             //Errors from request
             function(response) {
+
+                //Stop Loading
+                loadingSpinner.stopLoading();
 
                 //Proven False
                 sessionStorage.setItem("session_validated", false);
@@ -298,7 +332,7 @@ angular.module('starter.controllers', [])
   $scope.indexes = [
     { title: 'Index list will be here', page: 1, id: 1, indented: 0},
     { title: 'Index item 2', page: 1, id: 1, indented: 0}
-  ];
+    ];
 })
 
 .controller('ListingCtrl', function($scope) {
@@ -310,7 +344,10 @@ angular.module('starter.controllers', [])
 
 .controller('PageCtrl', function($scope, $stateParams,
     Page, $location, $http, $sce, $state,
-    $ionicHistory, $ionicScrollDelegate) {
+    $ionicHistory, $ionicScrollDelegate,
+    loadingSpinner) {
+
+    //Get page number and session
     $scope.pagenum = $stateParams.page;
     var cookie = localStorage.getItem("session_token");
 
@@ -320,10 +357,19 @@ angular.module('starter.controllers', [])
     };
 
     //Get the page
+
+    //Start loading
+    loadingSpinner.startLoading();
+
     Page.get(payload, function(data) {
+
+        //Stop loading
+        loadingSpinner.stopLoading();
 
         //Then display the page
         $scope.pagecontents = data.content;
+        $scope.pageNumber = data.number;
+        $scope.pageNextNumber = data.nextnumber;
         $scope.trustedHtml = $sce.trustAsHtml($scope.pagecontents);
 
         //Set our current error to none
@@ -331,6 +377,10 @@ angular.module('starter.controllers', [])
     },
     //Errors
     function(response) {
+
+        //Stop loading
+        loadingSpinner.stopLoading();
+
         if (response.status == 401) {
            //Handle 401 error code
 
@@ -369,11 +419,9 @@ angular.module('starter.controllers', [])
    });
 
     $scope.goToNext = function(){
-        var temp = parseInt($stateParams.page) + 1;
-        console.log(temp)
-        temp = 'app/page/' + temp;
 
-        $location.path(temp);
+        //Go to the next page specified by the backend
+        $state.go('app.single', {"page": $scope.pageNextNumber});
     }
 
     $scope.goToPrev = function(){
@@ -387,6 +435,177 @@ angular.module('starter.controllers', [])
     $scope.scrollTop = function(){
         $ionicScrollDelegate.scrollTop(true);
     }
+
+    $scope.editPage = function () {
+
+        //Simply go to the edit page state
+        //Go back to the page views
+        $ionicHistory.nextViewOptions({
+            disableBack: true
+        });
+        //Second param is state params
+        $state.go('app.edit', {"page": $scope.pageNumber});
+
+    }
+})
+
+.controller('PageEditCtrl', function($scope, $stateParams,
+    Page, $location, $http, $sce, $state,
+    $ionicHistory, $ionicScrollDelegate,
+    loadingSpinner) {
+
+    //Get the page number and cookie
+    $scope.pagenum = $stateParams.page;
+
+    //Initialize the page contents
+    $scope.pagecontents = "";
+
+    $scope.pageInit = function() {
+
+        var cookie = localStorage.getItem("session_token");
+
+        var payload = {
+            number: $scope.pagenum,
+            token: cookie
+        };
+
+        //Start loading
+        loadingSpinner.startLoading();
+
+        Page.get(payload, function(data) {
+
+            //Stop loading
+            loadingSpinner.stopLoading();
+
+            //Then display the page
+            $scope.pagecontents = data.content;
+            $scope.pageNumber = data.number;
+            $scope.pageNextNumber = data.nextnumber;
+
+            //Set our current error to none
+            $scope.errors[0] = -1;
+        },
+        //Errors
+        function(response) {
+
+            //Stop loading
+            loadingSpinner.stopLoading();
+
+            if (response.status == 401) {
+               //Handle 401 error code
+
+               //Pull up the login modal
+               $scope.login();
+
+               //Show an error
+               $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+           }
+           else if(response.status == 402) {
+               //Handle 402 Error
+               //Payment Requried
+
+               //Move them back to the index, no history
+               $ionicHistory.nextViewOptions({
+                   disableBack: true
+               });
+               $state.go('app.register');
+
+               //Show alert
+               $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+           }
+           else if (response.status == 500) {
+             // Handle 500 error code
+
+             //Show an error
+             $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+           }
+           else {
+               //Handle General Error
+
+               //An unexpected error has occured, log into console
+               //Show an error
+               $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
+           }
+       });
+    }
+
+    //Call the page init
+    $scope.pageInit();
+
+   //Function to save the edited page
+   $scope.savePage = function() {
+
+       //Start loading
+       loadingSpinner.startLoading();
+
+       //Grab our sessiontoken
+       var cookie = localStorage.getItem("session_token");
+
+       //Our payload
+       var payload = {
+           token: cookie,
+           content: $scope.pagecontents,
+           number: $scope.pageNumber,
+           nextNumber: $scope.pageNextNumber,
+       }
+
+       Page.update(payload, function(response){
+
+           //Handle succes here
+
+           //Stop loading
+           loadingSpinner.stopLoading();
+
+           //Go back to the page views
+           $ionicHistory.nextViewOptions({
+               disableBack: true
+           });
+           //Second param is state params
+           $state.go('app.single', {"page": $scope.pageNumber});
+
+       }, function(response){
+
+           //Stop loading
+           loadingSpinner.stopLoading();
+
+           //handle errors here
+           if (response.status == 401) {
+              //Handle 401 error code
+
+              //Pull up the login modal
+              $scope.login();
+
+              //Show an error
+              $scope.showAlert("Session Error", "Session Token not found, invalidated, or you are not an administrator, please log in!")
+          }
+          else if(response.status == 402) {
+              //Handle 402 Error
+              //Payment Requried
+
+              //Move them back to the index, no history
+              $ionicHistory.nextViewOptions({
+                  disableBack: true
+              });
+              $state.go('app.register');
+
+              //Show alert
+              $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+          }
+          else if (response.status == 500) {
+            // Handle 500 error code
+
+            //Show an error
+            $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+          }
+          else {
+              //Handle General Error
+
+              //An unexpected error has occured, log into console
+              //Show an error
+              $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
+          }
+       });
+   }
 })
 
 .controller('SettingsCtrl', function($scope, $window) {
@@ -417,10 +636,14 @@ angular.module('starter.controllers', [])
 })
 
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
-    $timeout, Page, User, $state) {
+    $timeout, Page, User, $state,
+    loadingSpinner) {
 
     //SET OUR STRIPE KEY HERE
     Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
+
+    //Initialize our loading spinner for the button disabling
+    $scope.loading = loadingSpinner;
 
     //Our data from the form
     $scope.registerData = {};
@@ -434,12 +657,19 @@ angular.module('starter.controllers', [])
 
         if($scope.loggedIn())
         {
+
+            //Start loading
+            loadingSpinner.startLoading();
+
             //Validate the cookie, as well as, grab their email
             var payload = {
                 token: localStorage.getItem("session_token")
             };
 
             User.get(payload, function(data) {
+
+                //Stop loading
+                loadingSpinner.stopLoading();
 
                 //Auto fill their email for them
                 $scope.registerData.email = data.email;
@@ -454,6 +684,10 @@ angular.module('starter.controllers', [])
             },
             //Errors
             function(response) {
+
+                //Stop loading
+                loadingSpinner.stopLoading();
+
                 if (response.status == 401) {
                    //Handle 401 error code
 
@@ -702,14 +936,8 @@ angular.module('starter.controllers', [])
         var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|co|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
         //Test the form email against the regex
         if (emailRegex.test(email)) {
-
-            //Remove Ng Class
-            $scope.emailErrors = false;
             return true;
         } else {
-
-            //Ngclass red email text
-            $scope.emailErrors = true;
             return false;
         }
     }
@@ -735,15 +963,24 @@ angular.module('starter.controllers', [])
     //Create the user
     $scope.registerUser = function() {
 
+        //Hide the ng class red error text if show
+        $scope.passwordError = false;
+        $scope.cardError = false;
+        $scope.emailError = false;
+
         //Check if the passwords matched
         if($scope.registerData.password != $scope.registerData.confirmPassword) {
 
             //Display alert, and ng class
-            $scope.passwordErrors = true;
+            $scope.passwordError = true;
 
             $scope.showAlert("Password Error", "Please check your password and confirmed password.");
         }
         else {
+
+            //Start loading
+            loadingSpinner.startLoading();
+
             //Create finalized card number
             var cardNumber = $scope.registerData.ccNumber;
 
@@ -756,12 +993,17 @@ angular.module('starter.controllers', [])
             }, function(status, response) {
                 if (response.error) {
 
-                    //Display alert
-                    $scope.cardErrors = true;
+                    //Display alert, and show card errors
+                    $scope.cardError = true;
+
+                    //Stop loading
+                    loadingSpinner.stopLoading();
 
                     $scope.showAlert("Card Error", "Please check your card information.");
 
                 } else {
+
+                    //Dont stop loading here, going to make another backend request
 
                     //Get the token to be submitted later, after the second page
                     // response contains id and card, which contains additional card details
@@ -776,6 +1018,9 @@ angular.module('starter.controllers', [])
 
                     //Submitting Now!
                     User.register(payload, function(data) {
+
+                        //Stop loading
+                        loadingSpinner.stopLoading();
 
                         //Success!
 
@@ -798,6 +1043,10 @@ angular.module('starter.controllers', [])
                     },
                     //Errors
                     function(response) {
+
+                        //Stop loading
+                        loadingSpinner.stopLoading();
+
                         if (response.status == 401) {
                            //Handle 401 error code
 
@@ -809,6 +1058,9 @@ angular.module('starter.controllers', [])
                        }
                        else if (response.status == 416) {
                          // Handle 416 error code
+
+                         //Ng class red email text
+                         $scope.emailError = true;
 
                          //Show an error
                          $scope.showAlert("Email Taken", "Sorry, that email has been taken. Please enter another email!");
@@ -840,6 +1092,14 @@ angular.module('starter.controllers', [])
     //Update the user
     $scope.updateUser = function() {
 
+        //Hide the ng class red error text if show
+        $scope.passwordError = false;
+        $scope.cardError = false;
+        $scope.emailError = false;
+
+        //Start Loading
+        loadingSpinner.startLoading();
+
         //Create finalized card number
         var cardNumber = $scope.registerData.ccNumber;
 
@@ -852,8 +1112,11 @@ angular.module('starter.controllers', [])
         }, function(status, response) {
             if (response.error) {
 
+                //Stop loading
+                loadingSpinner.stopLoading();
+
                 //Display alert
-                $scope.cardErrors = true;
+                $scope.cardError = true;
 
                 $scope.showAlert("Card Error", "Please check your card information.");
 
@@ -872,6 +1135,9 @@ angular.module('starter.controllers', [])
 
                 //Submitting Now!
                 User.renew(payload, function(data) {
+
+                    //Stop loading
+                    loadingSpinner.stopLoading();
 
                     //Success!
                     //save their session
@@ -893,8 +1159,16 @@ angular.module('starter.controllers', [])
                 },
                 //Errors
                 function(response) {
+
+                    //Stop loading
+                    loadingSpinner.stopLoading();
+
                     if (response.status == 401) {
                        //Handle 401 error code
+
+                       //show red ng class text
+                       $scope.emailError = true;
+                       $scope.passwordError = true;
 
                        //Show an error
                        $scope.showAlert("Authentication Error", "Please check your email and password.")
