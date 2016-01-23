@@ -92,7 +92,7 @@ router.post('/login', function(req, res, next) {
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()
     })
-    .select('password salt subscription')
+    .select('password salt subscription admin')
     .exec(function(err, user) {
         if (err) {
             res.status(500).json({
@@ -109,7 +109,7 @@ router.post('/login', function(req, res, next) {
             //Compare to stored hash
             if (hash == user.password) {
                 //Check if subscription has expired
-                if(moment(user.subscription).isAfter(moment())){
+                if(moment(user.subscription).isAfter(moment()) || user.admin){
                     SessionService.generateSession(user._id, "user", function(token){
                         //All good, give the user their token
                         res.status(200).json({
