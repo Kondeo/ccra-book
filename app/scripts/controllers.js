@@ -205,8 +205,6 @@ angular.module('starter.controllers', [])
             //Set validated to true until proven false;
             sessionStorage.setItem("session_validated", true);
 
-<<<<<<< HEAD
-
             //Start Loading
             loadingSpinner.startLoading();
 
@@ -233,15 +231,6 @@ angular.module('starter.controllers', [])
                          localStorage.setItem("subscriptionDate", response.subscription);
                          localStorage.setItem("alerted", true);
                 }
-
-
-=======
-
-            User.get({token: token}, function(){
-
-                //Stop Loading
-                loadingSpinner.stopLoading();
->>>>>>> 45e45ce70dcd568fc1454256647a9844c24671d2
                 return true;
             },
             //Errors from request
