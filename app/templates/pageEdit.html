@@ -1,0 +1,42 @@
+<ion-view class="view-backdrop" view-title="Editing Page {{pagenum}}">
+  <ion-content>
+    <div class="card">
+      <div class="item item-text-wrap" ng-class="{'easy-reading': settings.easyReading}">
+          <textarea name="pageContent"
+          class = "editTextArea"
+          ng-model="pagecontents">
+          </textarea>
+      </div>
+
+
+      <div class="item tabs tabs-secondary tabs-icon-left noBorder">
+        <a class="tab-item">
+            <div class = "editPageNumberText">
+                Current Page: {{pagenum}}
+            </div>
+
+            <!-- no changing current page for now -->
+          <!-- <input type = "text"
+          class = "editPageNumber"
+          ng-model = "pageNumber">
+          </input> -->
+        </a>
+        <a class="tab-item">
+            <div class = "editPageNumberText">
+                Next Page:
+            </div>
+          <input type = "text"
+          class = "editPageNumber"
+          ng-model = "pageNextNumber">
+          </input>
+        </a>
+      </div>
+
+      <button
+      class="button button-full button-positive editPageSave"
+      ng-click="savePage()">
+          Save Page
+      </button>
+    </div>
+  </ion-content>
+</ion-view>

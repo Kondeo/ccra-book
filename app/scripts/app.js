@@ -62,6 +62,17 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
     }
   })
 
+  .state('app.edit', {
+    url: "/page/:page/edit",
+    cache: false,
+    views: {
+      'menuContent': {
+        templateUrl: "templates/pageEdit.html",
+        controller: 'PageEditCtrl'
+      }
+    }
+  })
+
   .state('app.register', {
     url: "/register",
     cache: false,

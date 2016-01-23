@@ -1,11 +1,71 @@
+// Ionic Colors taken from their variables css
+// -------------------------------
+
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #387ef5 !default;
+$calm:                            #11c1f3 !default;
+$balanced:                        #33cd5f !default;
+$energized:                       #ffc900 !default;
+$assertive:                       #ef473a !default;
+$royal:                           #886aea !default;
+$dark:                            #444 !default;
+
 // Your application styles go here
 .item-radio input:checked ~ .item-content {
     background: lightgrey;
 }
 
+
+//Edit page
+.editTextHeader {
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    border: none !important;
+}
+
+.editTextArea {
+    width: 100% !important;
+    height: 450px !important;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid $dark !important;
+    padding: 4px;
+}
+
+.editPageNumber {
+    width: 50px;
+    display: inline !important;
+    background-color: $stable;
+    border: 1px solid $dark !important;
+    text-align: center !important;
+}
+
+.noBorder {
+    border: none !important;
+}
+
+.editPageNumberText {
+    display: inline !important;
+    font-size: 12px !important;
+    vertical-align: middle !important;
+}
+
+.editPageSave {
+    border: none !important;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 25px !important;
+    margin-bottom: 25px !important;
+    width: 80% !important;
+}
+
 //Make a forms text red for whatever part of the form is wrong
 .errorFormText {
-    color: #ef473a !important;
+    color: $assertive !important;
 }
 
 /**

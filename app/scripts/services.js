@@ -39,6 +39,10 @@ angular.module('starter.services', ['ngResource'])
           get: {
               method: 'GET',
               params: {}
+          },
+          update: {
+              method: 'PUT',
+              params: {}
           }
 
       } );
