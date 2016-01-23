@@ -54,10 +54,22 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
 
   .state('app.single', {
     url: "/page/:page",
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: "templates/page.html",
         controller: 'PageCtrl'
+      }
+    }
+  })
+
+  .state('app.edit', {
+    url: "/page/:page/edit",
+    cache: false,
+    views: {
+      'menuContent': {
+        templateUrl: "templates/pageEdit.html",
+        controller: 'PageEditCtrl'
       }
     }
   })
