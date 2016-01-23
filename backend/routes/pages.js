@@ -69,7 +69,7 @@ router.get('/:number', function(req, res, next) {
 });
 
 router.put('/:number', function(req, res, next) {
-    if(!(req.query.token)){
+    if(!(req.body.token)){
         return res.status(412).json({
             msg: "Route requisites not met."
         });
@@ -157,7 +157,8 @@ router.post('/:number', function(req, res, next) {
 });
 
 function validateUser(req, res, success){
-    SessionService.validateSession(req.query.token, "user", function(accountId) {
+    var token = req.query.token || req.body.token;
+    SessionService.validateSession(token, "user", function(accountId) {
         User.findById(accountId)
         .select('name email subscription admin')
         .exec(function(err, user) {
