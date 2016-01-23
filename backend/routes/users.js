@@ -4,6 +4,7 @@ var express = require('express'),
     moment = require('moment'),
     crypto = require('crypto'),
     CONST = require('../config/constants.json'),
+    MailService = require('../services/mailgun.js'),
     StripeService = require('../services/stripe.js'),
     SessionService = require('../services/sessions.js'),
     User = mongoose.model('User');
@@ -232,6 +233,92 @@ router.get('/self/:token', function(req, res, next) {
     }, function(err){
         res.status(err.status).json(err);
     });
+});
+
+/* Update user */
+router.put('/self/:token', function(req, res, next) {
+    var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
+    if (req.body.email && !emailRegex.test(req.body.email)) {
+        res.status(412).json({
+            msg: "Email is not valid!"
+        });
+    } else {
+        SessionService.validateSession(req.params.token, "user", function(accountId) {
+            var updatedUser = {};
+
+            if (req.body.email && typeof req.body.email === 'string') updatedUser.email = req.body.email;
+            if (req.body.password && typeof req.body.password === 'string') {
+                //Create a random salt
+                var salt = crypto.randomBytes(128).toString('base64');
+                //Create a unique hash from the provided password and salt
+                var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
+                updatedUser.password = hash;
+                updatedUser.salt = salt;
+            }
+
+            var setUser = {
+                $set: updatedUser
+            }
+
+            User.update({
+                _id: accountId
+            }, setUser)
+            .exec(function(err, user) {
+                if (err) {
+                    res.status(500).json({
+                        msg: "Could not update user"
+                    });
+                } else {
+                    res.status(200).json(user);
+                }
+            });
+        }, function(err){
+            res.status(err.status).json(err);
+        });
+    }
+});
+
+/* User forgot password */
+router.post('/forgot', function(req, res, next) {
+    //Find a user with the username requested. Select salt and password
+    var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
+    if (!emailRegex.test(req.body.email)) {
+        res.status(412).json({
+            msg: "Email is not valid!"
+        });
+    } else {
+        //Check if a user with that username already exists
+        User.findOne({
+            email: req.body.email.toLowerCase()
+        })
+        .select('_id')
+        .exec(function(err, user) {
+            if (user) {
+                SessionService.generateSession(user._id, "user", function(token){
+                    var messagePlain = 'Hello ' + req.body.email.toLowerCase() + ', You recently requested a password reset for your CCRA Ebook account. If you didn\'t, please ignore this email. Here is your reset link: ' + CONST.SERVER.URL + '/#/forgot/' + token;
+                    var messageHTML = 'Hello ' + req.body.email.toLowerCase() + ',<br><br> You recently requested a password reset for your CCRA Ebook account. If you didn\'t, please ignore this email. <br><br>Here is your reset link: <br> ' + CONST.SERVER.URL + '/#/forgot/' + token;
+                    var subject = "Your CCRA Ebook password reset link";
+                    MailService.sendMail(messageHTML, messagePlain, subject, req.body.email, function(){
+                        console.log("Password reset email sent to " + req.body.email + "!");
+                        res.status(200).json({
+                            msg: "Password reset email sent to " + req.body.email
+                        });
+                    }, function(err){
+                        console.log("Password reset email to " + req.body.email + " failed!");
+                        res.status(500).json({
+                            msg: "Email server error"
+                        });
+                    });
+                }, function(err){
+                    res.status(err.status).json(err);
+                });
+            } else {
+                res.status(404).json({
+                    msg: "Email does not exist!"
+                });
+            }
+        });
+    }
 });
 
 module.exports = router;
