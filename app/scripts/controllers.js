@@ -272,7 +272,7 @@ angular.module('starter.controllers', [])
 
                 //Alert the user their subscription is Ending
                 //inform user there subscription is ending
-                $scope.showAlert("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+                $scope.showAlert("Subscription Notice", "Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
                  moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
                  ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
 
