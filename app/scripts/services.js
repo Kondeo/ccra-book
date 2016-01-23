@@ -68,7 +68,6 @@ angular.module('starter.services', ['ngResource'])
             document.body.class = document.body.class + " noTouch";
 
             loading = true;
-            console.log(loading);
             return true;
         },
 

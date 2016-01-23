@@ -4,7 +4,7 @@
       <div class="item item-text-wrap" ng-class="{'easy-reading': settings.easyReading}">
           <textarea name="pageContent"
           class = "editTextArea"
-          ng-model="pagecontents">
+          ng-model = "$parent.pagecontents">
           </textarea>
       </div>
 
@@ -25,9 +25,9 @@
             <div class = "editPageNumberText">
                 Next Page:
             </div>
-          <input type = "text"
+          <input type = "number"
           class = "editPageNumber"
-          ng-model = "pageNextNumber">
+          ng-model = "$parent.pageNextNumber">
           </input>
         </a>
       </div>

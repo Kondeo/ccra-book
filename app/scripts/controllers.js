@@ -386,73 +386,81 @@ angular.module('starter.controllers', [])
 
     //Get the page number and cookie
     $scope.pagenum = $stateParams.page;
-    var cookie = localStorage.getItem("session_token");
 
-    var payload = {
-        number: $scope.pagenum,
-        token: cookie
-    };
+    //Initialize the page contents
+    $scope.pagecontents = "";
 
-    //Get the page
+    $scope.pageInit = function() {
 
-    //Start loading
-    loadingSpinner.startLoading();
+        var cookie = localStorage.getItem("session_token");
 
-    Page.get(payload, function(data) {
+        var payload = {
+            number: $scope.pagenum,
+            token: cookie
+        };
 
-        //Stop loading
-        loadingSpinner.stopLoading();
+        //Start loading
+        loadingSpinner.startLoading();
 
-        //Then display the page
-        $scope.pagecontents = data.content;
-        $scope.pageNumber = data.number;
-        $scope.pageNextNumber = data.nextnumber;
+        Page.get(payload, function(data) {
 
-        //Set our current error to none
-        $scope.errors[0] = -1;
-    },
-    //Errors
-    function(response) {
+            //Stop loading
+            loadingSpinner.stopLoading();
 
-        //Stop loading
-        loadingSpinner.stopLoading();
+            //Then display the page
+            $scope.pagecontents = data.content;
+            $scope.pageNumber = data.number;
+            $scope.pageNextNumber = data.nextnumber;
 
-        if (response.status == 401) {
-           //Handle 401 error code
+            //Set our current error to none
+            $scope.errors[0] = -1;
+        },
+        //Errors
+        function(response) {
 
-           //Pull up the login modal
-           $scope.login();
+            //Stop loading
+            loadingSpinner.stopLoading();
 
-           //Show an error
-           $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
-       }
-       else if(response.status == 402) {
-           //Handle 402 Error
-           //Payment Requried
+            if (response.status == 401) {
+               //Handle 401 error code
 
-           //Move them back to the index, no history
-           $ionicHistory.nextViewOptions({
-               disableBack: true
-           });
-           $state.go('app.register');
+               //Pull up the login modal
+               $scope.login();
 
-           //Show alert
-           $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
-       }
-       else if (response.status == 500) {
-         // Handle 500 error code
+               //Show an error
+               $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+           }
+           else if(response.status == 402) {
+               //Handle 402 Error
+               //Payment Requried
 
-         //Show an error
-         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-       }
-       else {
-           //Handle General Error
+               //Move them back to the index, no history
+               $ionicHistory.nextViewOptions({
+                   disableBack: true
+               });
+               $state.go('app.register');
 
-           //An unexpected error has occured, log into console
-           //Show an error
-           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
-       }
-   });
+               //Show alert
+               $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+           }
+           else if (response.status == 500) {
+             // Handle 500 error code
+
+             //Show an error
+             $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+           }
+           else {
+               //Handle General Error
+
+               //An unexpected error has occured, log into console
+               //Show an error
+               $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
+           }
+       });
+    }
+
+    //Call the page init
+    $scope.pageInit();
 
    //Function to save the edited page
    $scope.savePage = function() {
@@ -471,8 +479,6 @@ angular.module('starter.controllers', [])
            nextNumber: $scope.pageNextNumber,
        }
 
-       console.log(payload);
-
        Page.update(payload, function(response){
 
            //Handle succes here
@@ -484,7 +490,8 @@ angular.module('starter.controllers', [])
            $ionicHistory.nextViewOptions({
                disableBack: true
            });
-           $state.go('app.single');
+           //Second param is state params
+           $state.go('app.single', {"page": $scope.pageNumber});
 
        }, function(response){
 
