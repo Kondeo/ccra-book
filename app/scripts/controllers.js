@@ -87,14 +87,44 @@ angular.module('starter.controllers', [])
         //Store the token from the server for future use
         localStorage.setItem("session_token", data.token);
 
+        //Set validated to true
+        sessionStorage.setItem("session_validated", true);
+
+        //Store the user subscription notice
+        localStorage.setItem("subscriptionDate", data.subscription);
+
         //Inform the user
-        //Show an error
-        $scope.showAlert("Login Success!", "The Page will now reload...")
+        //Show an alert
+        if(moment().add(6, 'd').isAfter(moment(data.subscription))) {
 
+            //inform user there subscription is ending
+            $scope.showAlert("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+             moment(data.subscription).format("dddd, MMMM Do YYYY") +
+             ". Please visit the menu, and select (Manage Subscription) to extend your subscription. The Page will now reload...", function() {
 
-        $scope.closeLogin();
-        //Reload the page
-        $window.location.reload(true);
+                //They have been alerted
+                sessionStorage.setItem("alerted", true);
+
+                //Alert Call back
+                $scope.closeLogin();
+
+                //Reload the page
+                $window.location.reload(true);
+            });
+        }
+        else {
+
+            //Show normal login alert
+            $scope.showAlert("Login Success!", "The Page will now reload...", function() {
+
+                //Alert Call back
+
+                $scope.closeLogin();
+
+                //Reload the page
+                $window.location.reload(true);
+            });
+        }
     },
     //Errors
     function(response) {
@@ -178,12 +208,29 @@ angular.module('starter.controllers', [])
             //Start Loading
             loadingSpinner.startLoading();
 
-            User.get({token: token}, function(){
+            User.get({token: token}, function(response){
 
                 //Stop Loading
                 loadingSpinner.stopLoading();
 
-                sessionStorage.setItem("session_validated", true);
+                //Also Check if our subscription is ending
+                var subDate = localStorage.getItem("subscriptionDate");
+                var alerted = localStorage.getItem("alerted");
+                if(subDate &&
+                    !alerted &&
+                    moment().add(6, 'd').isAfter(moment(subDate))) {
+
+                        //Alert the user their subscription is Ending
+                        //inform user there subscription is ending
+                        $scope.showAlert("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+                         moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
+                         ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
+
+                         //Set the alerted to true
+                         //Save their subscription Date
+                         localStorage.setItem("subscriptionDate", response.subscription);
+                         localStorage.setItem("alerted", true);
+                }
                 return true;
             },
             //Errors from request
@@ -550,11 +597,29 @@ angular.module('starter.controllers', [])
    }
 })
 
-.controller('SettingsCtrl', function($scope) {
+.controller('SettingsCtrl', function($scope, $window) {
 
 
     $scope.saveSettings = function(){
         localStorage.setItem("easyReading", $scope.settings.easyReading);
+    }
+
+    $scope.logOut = function() {
+
+        //Delete the cookie
+        localStorage.removeItem("session_token");
+
+        //And reload the page
+        //Show normal login alert
+        $scope.showAlert("Logout Success!", "The Page will now reload...", function() {
+
+            //Alert Call back
+
+            $scope.closeLogin();
+
+            //Reload the page
+            $window.location.reload(true);
+        });
     }
 
 })
@@ -947,8 +1012,13 @@ angular.module('starter.controllers', [])
                         loadingSpinner.stopLoading();
 
                         //Success!
+
                         //save their session
                         localStorage.setItem("session_token", data.token);
+
+                        //Save their subscription Date
+                        localStorage.setItem("subscriptionDate", data.subscription);
+                        localStorage.setItem("alerted", false);
 
                         //Move them back to the index, no history
                         $ionicHistory.nextViewOptions({
@@ -1061,6 +1131,10 @@ angular.module('starter.controllers', [])
                     //Success!
                     //save their session
                     localStorage.setItem("session_token", data.token);
+
+                    //Save their subscription Date
+                    localStorage.setItem("subscriptionDate", data.subscription);
+                    localStorage.setItem("alerted", false);
 
                     //Move them back to the index, no history
                     $ionicHistory.nextViewOptions({
