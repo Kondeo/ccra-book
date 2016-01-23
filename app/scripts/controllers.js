@@ -310,6 +310,8 @@ angular.module('starter.controllers', [])
 
         //Then display the page
         $scope.pagecontents = data.content;
+        $scope.pageNumber = data.number;
+        $scope.pageNextNumber = data.nextnumber;
         $scope.trustedHtml = $sce.trustAsHtml($scope.pagecontents);
 
         //Set our current error to none
@@ -359,11 +361,9 @@ angular.module('starter.controllers', [])
    });
 
     $scope.goToNext = function(){
-        var temp = parseInt($stateParams.page) + 1;
-        console.log(temp)
-        temp = 'app/page/' + temp;
 
-        $location.path(temp);
+        //Go to the next page specified by the backend
+        $state.go('app.single', {"page": $scope.pageNextNumber});
     }
 
     $scope.goToPrev = function(){
@@ -376,6 +376,18 @@ angular.module('starter.controllers', [])
 
     $scope.scrollTop = function(){
         $ionicScrollDelegate.scrollTop(true);
+    }
+
+    $scope.editPage = function () {
+
+        //Simply go to the edit page state
+        //Go back to the page views
+        $ionicHistory.nextViewOptions({
+            disableBack: true
+        });
+        //Second param is state params
+        $state.go('app.edit', {"page": $scope.pageNumber});
+
     }
 })
 

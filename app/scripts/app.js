@@ -54,6 +54,7 @@ angular.module('starter', ['ionic', 'config', 'starter.controllers', 'starter.se
 
   .state('app.single', {
     url: "/page/:page",
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: "templates/page.html",
