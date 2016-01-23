@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var moment = require('moment');
+var tidy = require('htmltidy').tidy;
 var Page = mongoose.model('Page');
 var SessionService = require('../services/sessions.js');
 var User = mongoose.model('User');
@@ -52,16 +53,23 @@ router.get('/:number', function(req, res, next) {
             } if(!page){
                 res.status(404).send("Page Not Found!");
             } else {
-                if(!page.cleaned) page.content = cleanHTML(page.content);
                 if(!user.admin) page.subscription = user.subscription;
-                res.status(200).json(page);
+                if(!page.cleaned) {
+                    page.content = cleanHTML(page.content);
+                    tidy(page.content, function(err, html) {
+                        page.content = html;
+                        res.status(200).json(page);
+                    });
+                } else {
+                    res.status(200).json(page);
+                }
             }
         });
     }
 });
 
 router.put('/:number', function(req, res, next) {
-    if(!(req.query.token)){
+    if(!(req.body.token)){
         return res.status(412).json({
             msg: "Route requisites not met."
         });
@@ -149,7 +157,8 @@ router.post('/:number', function(req, res, next) {
 });
 
 function validateUser(req, res, success){
-    SessionService.validateSession(req.query.token, "user", function(accountId) {
+    var token = req.query.token || req.body.token;
+    SessionService.validateSession(token, "user", function(accountId) {
         User.findById(accountId)
         .select('name email subscription admin')
         .exec(function(err, user) {

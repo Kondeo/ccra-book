@@ -1,5 +1,10 @@
 {
     "stripe": {
         "sk": "Stripe Secret Key"
+    },
+    "mailgun": {
+        "apiKey": "",
+        "domain": "kondeo.com",
+        "alias": "support@kondeo.com"
     }
 }
