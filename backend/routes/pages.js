@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var moment = require('moment');
+var tidy = require('htmltidy').tidy;
 var Page = mongoose.model('Page');
 var SessionService = require('../services/sessions.js');
 var User = mongoose.model('User');
@@ -52,9 +53,16 @@ router.get('/:number', function(req, res, next) {
             } if(!page){
                 res.status(404).send("Page Not Found!");
             } else {
-                if(!page.cleaned) page.content = cleanHTML(page.content);
                 if(!user.admin) page.subscription = user.subscription;
-                res.status(200).json(page);
+                if(!page.cleaned) {
+                    page.content = cleanHTML(page.content);
+                    tidy(page.content, function(err, html) {
+                        page.content = html;
+                        res.status(200).json(page);
+                    });
+                } else {
+                    res.status(200).json(page);
+                }
             }
         });
     }
