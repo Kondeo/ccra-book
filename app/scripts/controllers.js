@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
-    $ionicPlatform, $timeout, $location,
+    $ionicPlatform, $timeout, $location, $state,
     $window, $ionicHistory, User, loadingSpinner) {
 
   //Platform detection
@@ -87,6 +87,10 @@ angular.module('starter.controllers', [])
         //Store the token from the server for future use
         localStorage.setItem("session_token", data.token);
 
+        //Store if they are an administrator
+        if(data.admin) localStorage.setItem("admin", true);
+        else localStorage.removeItem("admin");
+
         //Set validated to true
         sessionStorage.setItem("session_validated", true);
 
@@ -95,7 +99,7 @@ angular.module('starter.controllers', [])
 
         //Inform the user
         //Show an alert
-        if(moment().add(6, 'd').isAfter(moment(data.subscription))) {
+        if(!data.admin && moment().add(6, 'd').isAfter(moment(data.subscription))) {
 
             //inform user there subscription is ending
             $scope.showAlert("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
@@ -213,10 +217,16 @@ angular.module('starter.controllers', [])
                 //Stop Loading
                 loadingSpinner.stopLoading();
 
+                //Store if they are an administrator
+                if(respoinse.admin) localStorage.setItem("admin", true);
+                else localStorage.removeItem("admin");
+
                 //Also Check if our subscription is ending
                 var subDate = localStorage.getItem("subscriptionDate");
                 var alerted = localStorage.getItem("alerted");
+                var admin = response.admin;
                 if(subDate &&
+                    !admin &&
                     !alerted &&
                     moment().add(6, 'd').isAfter(moment(subDate))) {
 
@@ -336,8 +346,9 @@ angular.module('starter.controllers', [])
     $ionicHistory, $ionicScrollDelegate,
     loadingSpinner) {
 
-    //Get page number and session
+    //Get page number and session, and admin
     $scope.pagenum = $stateParams.page;
+    $scope.admin = localStorage.getItem("admin");
     var cookie = localStorage.getItem("session_token");
 
     var payload = {
@@ -439,7 +450,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PageEditCtrl', function($scope, $stateParams,
-    Page, $location, $http, $sce, $state,
+    Page, $location, $state,
     $ionicHistory, $ionicScrollDelegate,
     loadingSpinner) {
 
@@ -450,6 +461,9 @@ angular.module('starter.controllers', [])
     $scope.pagecontents = "";
 
     $scope.pageInit = function() {
+
+        //If we are not an admin go back
+        if(!localStorage.getItem("admin")) $ionicHistory.goBack();
 
         var cookie = localStorage.getItem("session_token");
 
@@ -609,6 +623,9 @@ angular.module('starter.controllers', [])
         //Delete the cookie
         localStorage.removeItem("session_token");
 
+        //Remove admin
+        localStorage.removeItem("admin");
+
         //And reload the page
         //Show normal login alert
         $scope.showAlert("Logout Success!", "The Page will now reload...", function() {
@@ -643,6 +660,19 @@ angular.module('starter.controllers', [])
     //Check if we are logged in,
     //If we are then fill the subscription information
     $scope.initPage = function() {
+
+        if(localStorage.getItem("admin")) {
+
+            //inform them of their admin powers
+            $scope.showAlert("Admin Super Powers!", "Administrators and editors do not need to renew their subscription. I'll send you back to the home page", function() {
+
+                //Send them back to the homepage
+                $ionicHistory.nextViewOptions({
+                    disableBack: true
+                });
+                $state.go('app.index');
+            });
+        }
 
         if($scope.loggedIn())
         {
@@ -1016,6 +1046,9 @@ angular.module('starter.controllers', [])
                         //save their session
                         localStorage.setItem("session_token", data.token);
 
+                        //Save them as non administrator
+                        localStorage.removeItem("admin");
+
                         //Save their subscription Date
                         localStorage.setItem("subscriptionDate", data.subscription);
                         localStorage.setItem("alerted", false);
@@ -1131,6 +1164,9 @@ angular.module('starter.controllers', [])
                     //Success!
                     //save their session
                     localStorage.setItem("session_token", data.token);
+
+                    //Save them as non administrator
+                    localStorage.removeItem("admin");
 
                     //Save their subscription Date
                     localStorage.setItem("subscriptionDate", data.subscription);
