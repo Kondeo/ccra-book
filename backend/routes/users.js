@@ -113,7 +113,8 @@ router.post('/login', function(req, res, next) {
                         //All good, give the user their token
                         res.status(200).json({
                             token: token,
-                            subscription: user.subscription
+                            subscription: user.subscription,
+                            admin: user.admin
                         });
                     }, function(err){
                         res.status(err.status).json(err);
