@@ -392,11 +392,29 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('SettingsCtrl', function($scope) {
+.controller('SettingsCtrl', function($scope, $window) {
 
 
     $scope.saveSettings = function(){
         localStorage.setItem("easyReading", $scope.settings.easyReading);
+    }
+
+    $scope.logOut = function() {
+
+        //Delete the cookie
+        localStorage.removeItem("session_token");
+
+        //And reload the page
+        //Show normal login alert
+        $scope.showAlert("Logout Success!", "The Page will now reload...", function() {
+
+            //Alert Call back
+
+            $scope.closeLogin();
+
+            //Reload the page
+            $window.location.reload(true);
+        });
     }
 
 })
