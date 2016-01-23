@@ -2,5 +2,8 @@
     "SUBSCRIPTION_PRICE": {
         "NEW": 1000,
         "RENEW": 700
+    },
+    "SERVER": {
+        "URL": "https://dev.kondeo.com"
     }
 }
