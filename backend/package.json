@@ -13,6 +13,7 @@
     "express": "~4.13.0",
     "htmltidy": "0.0.6",
     "jade": "~1.11.0",
+    "mailgun": "^0.5.0",
     "moment": "^2.11.1",
     "mongodb": "^2.0.48",
     "mongoosastic": "^3.6.0",
