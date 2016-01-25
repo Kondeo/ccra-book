@@ -68,4 +68,21 @@
   <body ng-app="starter">
     <ion-nav-view></ion-nav-view>
   </body>
+
+
+  <!-- Our loading spinner for the app -->
+  <div ng-controller = "SpinnerCtrl">
+      <div class = "darkOverlay"
+      ng-if="loading.isLoading()">
+      </div>
+      <div class = "loadingContainer"
+      ng-if="loading.isLoading()">
+
+          <h2>Loading...</h2>
+
+          <div class = "spinnerAnimation">
+          </div>
+      </div>
+  </div>
+
 </html>
