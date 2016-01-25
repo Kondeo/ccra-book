@@ -48,6 +48,21 @@ angular.module('starter.services', ['ngResource'])
       } );
 
 }])
+
+.factory('Price', ['$resource', function($resource) {
+
+  return $resource(api_base + 'prices',
+      { }, {
+
+          get: {
+              method: 'GET',
+              params: {}
+          }
+      } );
+
+}])
+
+
 .service('loadingSpinner', function() {
 
     //Boolean if are loading
