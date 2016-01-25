@@ -216,7 +216,7 @@ router.post('/renew', function(req, res, next) {
 router.get('/self/:token', function(req, res, next) {
     SessionService.validateSession(req.params.token, "user", function(accountId) {
         User.findById(accountId)
-        .select('name email subscription')
+        .select('name email subscription admin')
         .exec(function(err, user) {
             if (err) {
                 res.status(500).json({
