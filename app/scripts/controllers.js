@@ -7,9 +7,6 @@ angular.module('starter.controllers', [])
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
 
-  //Loading Spinner initialization
-  $scope.loading = loadingSpinner;
-
   $scope.settings = {};
   $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
 
@@ -324,6 +321,13 @@ angular.module('starter.controllers', [])
             $scope.init();
         }, 1000);
     });
+
+})
+
+.controller('SpinnerCtrl', function($scope, loadingSpinner) {
+
+  //Initialize our loading spinner
+  $scope.loading = loadingSpinner;
 
 })
 
