@@ -647,7 +647,7 @@ angular.module('starter.controllers', [])
 
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
     $timeout, Page, User, $state,
-    loadingSpinner) {
+    loadingSpinner, Price) {
 
     //SET OUR STRIPE KEY HERE
     Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
@@ -748,6 +748,85 @@ angular.module('starter.controllers', [])
                }
            })
         }
+
+        //Lastly, get the price
+        $scope.price;
+        $scope.priceText = "Getting Prices...";
+
+        var payload = {
+
+        };
+
+        //Start loading
+        loadingSpinner.startLoading();
+
+        Price.get(payload, function(response) {
+
+            //Stop loading
+            loadingSpinner.stopLoading();
+
+            //Check if we should get the price of a new user
+            //or extension
+            if($scope.loggedIn()) {
+
+                //Set the price
+                $scope.price = response.RENEW;
+
+                //Set the text
+                $scope.priceText = "Extend Subscription for 1 Year - $" + ($scope.price / 100);
+            }
+            else {
+
+                //Set the price
+                $scope.price = response.NEW;
+
+                //Set the text
+                $scope.priceText = "Create Subscription - $" + ($scope.price / 100);
+            }
+        },
+        //errors
+        function(response) {
+
+            //Stop loading
+            loadingSpinner.stopLoading();
+
+            if (response.status == 401) {
+               //Handle 401 error code
+
+               //Pull up the login modal
+               $scope.login();
+
+               //Show an error
+               $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
+           }
+           else if(response.status == 402) {
+               //Handle 402 Error
+               //Payment Requried
+
+               //Move them back to the index, no history
+               $ionicHistory.nextViewOptions({
+                   disableBack: true
+               });
+               $state.go('app.register');
+
+               //Show alert
+               $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+           }
+           else if (response.status == 500) {
+             // Handle 500 error code
+
+             //Show an error
+             $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
+           }
+           else {
+               //Handle General Error
+
+               //An unexpected error has occured, log into console
+               //Show an error
+               $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
+           }
+        })
+
     }
     $scope.initPage();
 
