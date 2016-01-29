@@ -1,7 +1,8 @@
 angular.module('starter.controllers', [])
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
     $ionicPlatform, $timeout, $location, $state,
-    $window, $ionicHistory, User, loadingSpinner) {
+    $window, $ionicHistory, User, loadingSpinner,
+    ionicAlert) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
@@ -175,11 +176,14 @@ angular.module('starter.controllers', [])
   // Perform the find page
   $scope.goToPageNum = function() {
     //Go to the desired url
-    $scope.temp = 'app/page/' + $scope.page.number;
-    $location.path($scope.temp);
+    if($scope.page.number) {
+        $scope.temp = 'app/page/' + $scope.page.number;
+        $location.path($scope.temp);
 
-    //Now close the modal
-    $scope.gotomodal.hide();
+        //Now close the modal
+        $scope.gotomodal.hide();
+    }
+    else ionicAlert.show("Invalid Page", "Sorry the page is invalid, or does not exist...");
   };
 
   // go to the listing
