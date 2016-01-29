@@ -317,11 +317,24 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('IndexCtrl', function($scope) {
+.controller('IndexCtrl', function($scope, Page) {
   $scope.indexes = [
     { title: 'Index list will be here', page: 1, id: 1, indented: 0},
     { title: 'Index item 2', page: 1, id: 1, indented: 0}
     ];
+
+    $scope.searchResults = [];
+
+    var cookie = localStorage.getItem("session_token");
+
+    $scope.search = function(query){
+        Page.query({
+            query: query,
+            token: cookie
+        }, function(response){
+            $scope.searchResults = response.hits.hits;
+        });
+    }
 })
 
 .controller('ListingCtrl', function($scope) {
