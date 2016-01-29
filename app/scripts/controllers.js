@@ -331,7 +331,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('IndexCtrl', function($scope) {
+.controller('IndexCtrl', function($scope, $location, Page) {
   $scope.indexes = [
     { title: 'Index list will be here', page: 1, id: 1, indented: 0},
     { title: 'Index item 2', page: 1, id: 1, indented: 0}
