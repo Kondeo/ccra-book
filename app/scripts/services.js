@@ -43,6 +43,11 @@ angular.module('starter.services', ['ngResource'])
           update: {
               method: 'PUT',
               params: {}
+          },
+          query: {
+              method: 'GET',
+              params: { query: 'query' },
+              url: api_base + 'pages/query/:query'
           }
 
       } );
