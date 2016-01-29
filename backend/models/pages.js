@@ -4,7 +4,8 @@ var Schema = mongoose.Schema;
 
 var Page = new Schema({
     number: {
-        type: Number
+        type: Number,
+        es_indexed: true
     },
     nextnumber: {
         type: Number
