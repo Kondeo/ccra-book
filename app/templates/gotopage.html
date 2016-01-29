@@ -13,7 +13,13 @@
           <input type="number" ng-model="page.number" min = "1" max = "406">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" type="submit">Go</button>
+          <button
+          class="button button-block button-positive"
+          type="submit"
+          ng-disabled="!page.number ||
+          page.number < 1 ||
+          page.number > 406">
+          Go</button>
         </label>
       </div>
     </form>
