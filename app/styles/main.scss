@@ -83,7 +83,7 @@ $dark:                            #444 !default;
     position: absolute;
     height: 101%;
     width: 100%;
-    z-index: 4;
+    z-index: 13 !important;
 
     //Ionic dark alpha
     background-color: rgba(48, 48, 48, .45);
@@ -99,7 +99,7 @@ $dark:                            #444 !default;
     position: fixed;
     top: calc(33%);
     left: calc(50% - 45%);
-    z-index: 5;
+    z-index: 14 !important;
 
     //Ionic stable alpha
     background-color: rgba(248, 248, 248, .85);
