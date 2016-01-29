@@ -1,12 +1,8 @@
 <ion-view class="view-backdrop" view-title="Editing Page {{pagenum}}">
   <ion-content>
     <div class="card">
-      <div class="item item-text-wrap" ng-class="{'easy-reading': settings.easyReading}">
-          <textarea name="pageContent"
-          class = "editTextArea"
-          ng-model = "$parent.pagecontents">
-          </textarea>
-      </div>
+      
+      <text-angular ng-model="$parent.pagecontents"></text-angular>
 
 
       <div class="item tabs tabs-secondary tabs-icon-left noBorder">

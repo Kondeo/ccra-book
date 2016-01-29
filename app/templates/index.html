@@ -17,13 +17,19 @@
         <div ng-if="!query" class="center" style="text-align:center">
 
             Please type in a search above.
-            Or, go to <a href="app/page/23">Page 23</a>.
+            Or, go to <a href="#/app/page/23">Page 23</a>.
 
         </div>
         <div ng-if="query && !searched" class="center" style="text-align:center">
 
             Please tap "search" to execute your query.
 
+        </div>
+
+        <div class="card" ng-if="searched">
+          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)">
+              Page {{result._source.number}}: {{result._source.content}}
+          </div>
         </div>
     </ion-list>
   </ion-content>
