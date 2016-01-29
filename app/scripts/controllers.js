@@ -215,7 +215,7 @@ angular.module('starter.controllers', [])
                 loadingSpinner.stopLoading();
 
                 //Store if they are an administrator
-                if(respoinse.admin) localStorage.setItem("admin", true);
+                if(response.admin) localStorage.setItem("admin", true);
                 else localStorage.removeItem("admin");
 
                 //Also Check if our subscription is ending
