@@ -332,8 +332,17 @@ angular.module('starter.controllers', [])
             query: query,
             token: cookie
         }, function(response){
+            for(var i=0;i<response.hits.hits.length;i++){
+                response.hits.hits[i]._source.content = strip(response.hits.hits[i]._source.content);
+            }
             $scope.searchResults = response.hits.hits;
         });
+    }
+
+    function strip(html){
+       var tmp = document.createElement("DIV");
+       tmp.innerHTML = html;
+       return tmp.textContent || tmp.innerText || "";
     }
 })
 
