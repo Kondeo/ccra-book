@@ -1,14 +1,30 @@
 <ion-view view-title="Index">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="index in indexes" href="#/app/page/{{index.page}}">
-        <!-- Display sub chapters using indentation -->
-        <div>{{index.title}}</div>
-      </ion-item>
-      <ion-item href="#/app/listing">
-        <!-- Display sub chapters using indentation -->
-        <div>Search (searchicon)</div>
-      </ion-item>
+        <div class="list">
+
+          <div class="item item-input-inset">
+            <label class="item-input-wrapper">
+              <input type="text" placeholder="Enter a search term..." ng-model="query">
+            </label>
+            <button class="button button-small" ng-click="searched = true; search(query)">
+              Search
+            </button>
+          </div>
+
+        </div>
+
+        <div ng-if="!query" class="center" style="text-align:center">
+
+            Please type in a search above.
+            Or, go to <a href="app/page/23">Page 23</a>.
+
+        </div>
+        <div ng-if="query && !searched" class="center" style="text-align:center">
+
+            Please tap "search" to execute your query.
+
+        </div>
     </ion-list>
   </ion-content>
 </ion-view>
