@@ -106,15 +106,14 @@ angular.module('starter')
         else {
 
             //Show normal login alert
-            Notifications.show("Login Success!", "The Page will now reload...", function() {
+            Notifications.show("Login Success!", "The Page will now reload...");
 
-                //Alert Call back
+            //Alert Call back
 
-                $scope.closeLogin();
+            $scope.closeLogin();
 
-                //Reload the page
-                $window.location.reload(true);
-            });
+            //Reload the page
+            $window.location.reload(true);
         }
     },
     //Errors
