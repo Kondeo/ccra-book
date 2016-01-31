@@ -1,7 +1,8 @@
 angular.module('starter.controllers', [])
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
     $ionicPlatform, $timeout, $location, $state,
-    $window, $ionicHistory, User, loadingSpinner) {
+    $window, $ionicHistory, User, loadingSpinner,
+    ionicAlert) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
@@ -175,11 +176,14 @@ angular.module('starter.controllers', [])
   // Perform the find page
   $scope.goToPageNum = function() {
     //Go to the desired url
-    $scope.temp = 'app/page/' + $scope.page.number;
-    $location.path($scope.temp);
+    if($scope.page.number) {
+        $scope.temp = 'app/page/' + $scope.page.number;
+        $location.path($scope.temp);
 
-    //Now close the modal
-    $scope.gotomodal.hide();
+        //Now close the modal
+        $scope.gotomodal.hide();
+    }
+    else ionicAlert.show("Invalid Page", "Sorry the page is invalid, or does not exist...");
   };
 
   // go to the listing
@@ -215,7 +219,7 @@ angular.module('starter.controllers', [])
                 loadingSpinner.stopLoading();
 
                 //Store if they are an administrator
-                if(respoinse.admin) localStorage.setItem("admin", true);
+                if(response.admin) localStorage.setItem("admin", true);
                 else localStorage.removeItem("admin");
 
                 //Also Check if our subscription is ending
@@ -331,11 +335,38 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('IndexCtrl', function($scope) {
+.controller('IndexCtrl', function($scope, $location, Page) {
   $scope.indexes = [
     { title: 'Index list will be here', page: 1, id: 1, indented: 0},
     { title: 'Index item 2', page: 1, id: 1, indented: 0}
     ];
+
+    $scope.searchResults = [];
+
+    var cookie = localStorage.getItem("session_token");
+
+    $scope.goTo = function(page){
+        $scope.temp = 'app/page/' + page;
+        $location.path($scope.temp);
+    }
+
+    $scope.search = function(query){
+        Page.query({
+            query: query,
+            token: cookie
+        }, function(response){
+            for(var i=0;i<response.hits.hits.length;i++){
+                response.hits.hits[i]._source.content = strip(response.hits.hits[i]._source.content).substring(0, 200) + "...";
+            }
+            $scope.searchResults = response.hits.hits;
+        });
+    }
+
+    function strip(html){
+       var tmp = document.createElement("DIV");
+       tmp.innerHTML = html;
+       return tmp.textContent || tmp.innerText || "";
+    }
 })
 
 .controller('ListingCtrl', function($scope) {
