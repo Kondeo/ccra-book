@@ -1,5 +1,5 @@
 angular.module('starter')
-.controller('SettingsCtrl', function($scope, $window) {
+.controller('SettingsCtrl', function($scope, $window, Notifications) {
 
 
     $scope.saveSettings = function(){

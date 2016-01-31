@@ -54,7 +54,8 @@ angular.module('starter')
                         status = response.status;
 
                         //Create the alert
-                        showAlert(handlers[i].title, handlers[i].text, handlers[i].callback())
+                        if(handlers[i].callback) showAlert(handlers[i].title, handlers[i].text, handlers[i].callback());
+                        else showAlert(handlers[i].title, handlers[i].text);
                     }
                 }
             }
@@ -85,7 +86,7 @@ angular.module('starter')
                    //Show alert
                    Notifications.show("Subscription Ended", "Please extend your subscription to continue using this app.");
                }
-               else if (error.status == 404) {
+               else if (response.status == 404) {
                  //404 error
 
                  //Delete the token
@@ -94,7 +95,7 @@ angular.module('starter')
                  //Show alert
                  showAlert("No Connection", "Internet Connection is required to use this app. Please connect to the internet with your device, and restart the app.");
                }
-               else if (error.status == 500) {
+               else if (response.status == 500) {
                  //500 error
 
                  //Show alert
@@ -105,7 +106,7 @@ angular.module('starter')
 
                    //An unexpected error has occured
                    //Show alert
-                   showAlert("Error Status: " + error.status, "Unexpected Error. Please re-open the app, or try again later!");
+                   showAlert("Error Status: " + response.status, "Unexpected Error. Please re-open the app, or try again later!");
                }
             }
         }

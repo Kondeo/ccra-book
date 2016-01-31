@@ -126,7 +126,7 @@ angular.module('starter')
                 status: 401,
                 title: "Login Failed",
                 text: "Email or password was incorrect!",
-                callback: {
+                callback: function() {
                     //Show red error text
                     $scope.authError = true;
                 }
@@ -135,7 +135,7 @@ angular.module('starter')
                 status: 412,
                 title: "Login Failed",
                 text: "Email or password was incorrect!",
-                callback: {
+                callback: function() {
                     //Show red error text
                     $scope.authError = true;
                 }

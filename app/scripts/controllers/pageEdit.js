@@ -88,7 +88,7 @@ angular.module('starter')
                    status: 401,
                    title: "Session Error",
                    text: "Session Token not found, invalidated, or you are not an administrator, please log in!",
-                   callback: {
+                   callback: function() {
 
                        //Pull up the login modal
                        $scope.login();

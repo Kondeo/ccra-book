@@ -438,10 +438,20 @@ angular.module('starter')
                                 status: 416,
                                 title: "Email Taken",
                                 text: "Sorry, that email has been taken. Please enter another email!",
-                                callback: {
+                                callback: function() {
 
                                     //Ng class red email text
                                     $scope.emailError = true;
+                                }
+                            },
+                            {
+                                status: 402,
+                                title: "Card was declined",
+                                text: "Please check your card information.",
+                                callback: function() {
+
+                                    //Display alert, and show card errors
+                                    $scope.cardError = true;
                                 }
                             }
                         ]
@@ -537,14 +547,24 @@ angular.module('starter')
                             status: 401,
                             title: "Authentication Error",
                             text: "Please check your email and password.",
-                            callback: {
+                            callback: function() {
 
                                 //show red ng class text
                                 $scope.emailError = true;
                                 $scope.passwordError = true;
                             }
+                        },
+                        {
+                            status: 402,
+                            title: "Card was declined",
+                            text: "Please check your card information.",
+                            callback: function() {
+
+                                //Display alert, and show card errors
+                                $scope.cardError = true;
+                            }
                         }
-                    ]
+                    ];
 
                     //Send to our notification handler
                     Notifications.error(response, handlers);
