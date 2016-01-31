@@ -1,5 +1,5 @@
 angular.module('starter')
-.service('ionicAlert', function($ionicPopup, $ionicModal,
+.service('Notifications', function($ionicPopup, $ionicModal,
     loadingSpinner, $ionicHistory, $state) {
 
     //Show an alert to the user
@@ -83,7 +83,7 @@ angular.module('starter')
                    $state.go('app.register');
 
                    //Show alert
-                   $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+                   Notifications.show("Subscription Ended", "Please extend your subscription to continue using this app.");
                }
                else if (error.status == 404) {
                  //404 error

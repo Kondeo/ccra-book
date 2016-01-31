@@ -1,7 +1,8 @@
 angular.module('starter')
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
     $timeout, Page, User, $state,
-    loadingSpinner, Price) {
+    loadingSpinner, Price,
+    Notifications) {
 
     //SET OUR STRIPE KEY HERE
     Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
@@ -22,7 +23,7 @@ angular.module('starter')
         if(localStorage.getItem("admin")) {
 
             //inform them of their admin powers
-            $scope.showAlert("Admin Super Powers!", "Administrators and editors do not need to renew their subscription. I'll send you back to the home page", function() {
+            Notifications.show("Admin Super Powers!", "Administrators and editors do not need to renew their subscription. I'll send you back to the home page", function() {
 
                 //Send them back to the homepage
                 $ionicHistory.nextViewOptions({
@@ -62,44 +63,8 @@ angular.module('starter')
             //Errors
             function(response) {
 
-                //Stop loading
-                loadingSpinner.stopLoading();
-
-                if (response.status == 401) {
-                   //Handle 401 error code
-
-                   //Pull up the login modal
-                   $scope.login();
-
-                   //Show an error
-                   $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
-               }
-               else if(response.status == 402) {
-                   //Handle 402 Error
-                   //Payment Requried
-
-                   //Move them back to the index, no history
-                   $ionicHistory.nextViewOptions({
-                       disableBack: true
-                   });
-                   $state.go('app.register');
-
-                   //Show alert
-                   $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
-               }
-               else if (response.status == 500) {
-                 // Handle 500 error code
-
-                 //Show an error
-                 $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-               }
-               else {
-                   //Handle General Error
-
-                   //An unexpected error has occured, log into console
-                   //Show an error
-                   $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
-               }
+                //Handle the error with Notifications
+                Notifications.error(response);
            })
         }
 
@@ -141,44 +106,8 @@ angular.module('starter')
         //errors
         function(response) {
 
-            //Stop loading
-            loadingSpinner.stopLoading();
-
-            if (response.status == 401) {
-               //Handle 401 error code
-
-               //Pull up the login modal
-               $scope.login();
-
-               //Show an error
-               $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
-           }
-           else if(response.status == 402) {
-               //Handle 402 Error
-               //Payment Requried
-
-               //Move them back to the index, no history
-               $ionicHistory.nextViewOptions({
-                   disableBack: true
-               });
-               $state.go('app.register');
-
-               //Show alert
-               $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
-           }
-           else if (response.status == 500) {
-             // Handle 500 error code
-
-             //Show an error
-             $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-           }
-           else {
-               //Handle General Error
-
-               //An unexpected error has occured, log into console
-               //Show an error
-               $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
-           }
+            //Handle the Notiifications
+            Notiifications.error(response);
         })
 
     }
@@ -430,7 +359,7 @@ angular.module('starter')
             //Display alert, and ng class
             $scope.passwordError = true;
 
-            $scope.showAlert("Password Error", "Please check your password and confirmed password.");
+            Notifications.show("Password Error", "Please check your password and confirmed password.");
         }
         else {
 
@@ -455,7 +384,7 @@ angular.module('starter')
                     //Stop loading
                     loadingSpinner.stopLoading();
 
-                    $scope.showAlert("Card Error", "Please check your card information.");
+                    Notifications.show("Card Error", "Please check your card information.");
 
                 } else {
 
@@ -497,46 +426,28 @@ angular.module('starter')
                         $state.go('app.index');
 
                         //Alert them of success!
-                        $scope.showAlert("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
+                        Notifications.show("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
 
                     },
                     //Errors
                     function(response) {
 
-                        //Stop loading
-                        loadingSpinner.stopLoading();
+                        //Our custom Error Handler
+                        var handlers = [
+                            {
+                                status: 416,
+                                title: "Email Taken",
+                                text: "Sorry, that email has been taken. Please enter another email!",
+                                callback: {
 
-                        if (response.status == 401) {
-                           //Handle 401 error code
+                                    //Ng class red email text
+                                    $scope.emailError = true;
+                                }
+                            }
+                        ]
 
-                           //Pull up the login modal
-                           $scope.login();
-
-                           //Show an error
-                           $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
-                       }
-                       else if (response.status == 416) {
-                         // Handle 416 error code
-
-                         //Ng class red email text
-                         $scope.emailError = true;
-
-                         //Show an error
-                         $scope.showAlert("Email Taken", "Sorry, that email has been taken. Please enter another email!");
-                       }
-                       else if (response.status == 500) {
-                         // Handle 500 error code
-
-                         //Show an error
-                         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later! Your card has not been charged!");
-                       }
-                       else {
-                           //Handle General Error
-
-                           //An unexpected error has occured, log into console
-                           //Show an error
-                           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later! Your card has not been charged!");
-                       }
+                        //Send to the notification handler
+                        Notifications.error(response, handlers);
                    });
                 }
 
@@ -571,13 +482,11 @@ angular.module('starter')
         }, function(status, response) {
             if (response.error) {
 
-                //Stop loading
-                loadingSpinner.stopLoading();
+                //Show an error for the card
+                Notifications.show("Card Error", "Please check your card information.");
 
                 //Display alert
                 $scope.cardError = true;
-
-                $scope.showAlert("Card Error", "Please check your card information.");
 
             } else {
 
@@ -616,38 +525,29 @@ angular.module('starter')
                     $state.go('app.index');
 
                     //Alert them of success!
-                    $scope.showAlert("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
+                    Notifications.show("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
 
                 },
                 //Errors
                 function(response) {
 
-                    //Stop loading
-                    loadingSpinner.stopLoading();
+                    //Our handler for our notifications
+                    var handlers = [
+                        {
+                            status: 401,
+                            title: "Authentication Error",
+                            text: "Please check your email and password.",
+                            callback: {
 
-                    if (response.status == 401) {
-                       //Handle 401 error code
+                                //show red ng class text
+                                $scope.emailError = true;
+                                $scope.passwordError = true;
+                            }
+                        }
+                    ]
 
-                       //show red ng class text
-                       $scope.emailError = true;
-                       $scope.passwordError = true;
-
-                       //Show an error
-                       $scope.showAlert("Authentication Error", "Please check your email and password.")
-                   }
-                   else if (response.status == 500) {
-                     // Handle 500 error code
-
-                     //Show an error
-                     $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later! Your card has not been charged!");
-                   }
-                   else {
-                       //Handle General Error
-
-                       //An unexpected error has occured, log into console
-                       //Show an error
-                       $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later! Your card has not been charged!");
-                   }
+                    //Send to our notification handler
+                    Notifications.error(response, handlers);
                });
             }
 

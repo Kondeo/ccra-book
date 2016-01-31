@@ -16,7 +16,7 @@ angular.module('starter')
 
         //And reload the page
         //Show normal login alert
-        $scope.showAlert("Logout Success!", "The Page will now reload...", function() {
+        Notifications.show("Logout Success!", "The Page will now reload...", function() {
 
             //Alert Call back
 

@@ -2,7 +2,7 @@ angular.module('starter')
 .controller('PageCtrl', function($scope, $stateParams,
     Page, $location, $http, $sce, $state,
     $ionicHistory, $ionicScrollDelegate,
-    loadingSpinner) {
+    loadingSpinner, Notifications) {
 
     //Get page number and session, and admin
     $scope.pagenum = $stateParams.page;
@@ -36,44 +36,8 @@ angular.module('starter')
     //Errors
     function(response) {
 
-        //Stop loading
-        loadingSpinner.stopLoading();
-
-        if (response.status == 401) {
-           //Handle 401 error code
-
-           //Pull up the login modal
-           $scope.login();
-
-           //Show an error
-           $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!")
-       }
-       else if(response.status == 402) {
-           //Handle 402 Error
-           //Payment Requried
-
-           //Move them back to the index, no history
-           $ionicHistory.nextViewOptions({
-               disableBack: true
-           });
-           $state.go('app.register');
-
-           //Show alert
-           $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
-       }
-       else if (response.status == 500) {
-         // Handle 500 error code
-
-         //Show an error
-         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-       }
-       else {
-           //Handle General Error
-
-           //An unexpected error has occured, log into console
-           //Show an error
-           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
-       }
+        //Handle the error with notifications
+        Notifications.show(response);
    });
 
     $scope.goToNext = function(){

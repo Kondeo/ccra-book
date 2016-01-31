@@ -2,7 +2,7 @@ angular.module('starter')
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
     $ionicPlatform, $timeout, $location, $state,
     $window, $ionicHistory, User, loadingSpinner,
-    ionicAlert) {
+    Notifications) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
@@ -37,17 +37,6 @@ angular.module('starter')
     $scope.gotomodal = modal;
   });
 
-  //Alert popup we shall use instead of alerts
-  $scope.showAlert = function(aTitle, aText, callback) {
-   var alertPopup = $ionicPopup.alert({
-     title: aTitle,
-     template: aText
-   });
-   alertPopup.then(function(res) {
-     if(callback) callback();
-   });
- };
-
   // Open the login modal
   $scope.login = function() {
     $scope.modal.show();
@@ -79,9 +68,6 @@ angular.module('starter')
         //Hide red error text, if it was shown
         $scope.authError = false;
 
-        //Stop Loading
-        loadingSpinner.stopLoading();
-
         //Store the token from the server for future use
         localStorage.setItem("session_token", data.token);
 
@@ -95,12 +81,15 @@ angular.module('starter')
         //Store the user subscription notice
         localStorage.setItem("subscriptionDate", data.subscription);
 
+        //Stop Loading
+        loadingSpinner.stopLoading();
+
         //Inform the user
         //Show an alert
         if(!data.admin && moment().add(6, 'd').isAfter(moment(data.subscription))) {
 
             //inform user there subscription is ending
-            $scope.showAlert("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+            Notifications.show("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
              moment(data.subscription).format("dddd, MMMM Do YYYY") +
              ". Please visit the menu, and select (Manage Subscription) to extend your subscription. The Page will now reload...", function() {
 
@@ -117,7 +106,7 @@ angular.module('starter')
         else {
 
             //Show normal login alert
-            $scope.showAlert("Login Success!", "The Page will now reload...", function() {
+            Notifications.show("Login Success!", "The Page will now reload...", function() {
 
                 //Alert Call back
 
@@ -131,45 +120,29 @@ angular.module('starter')
     //Errors
     function(response) {
 
-        //Stop Loading
-        loadingSpinner.stopLoading();
+        //Create our handlers for errors
+        var handlers = [
+            {
+                status: 401,
+                title: "Login Failed",
+                text: "Email or password was incorrect!",
+                callback: {
+                    //Show red error text
+                    $scope.authError = true;
+                }
+            },
+            {
+                status: 412,
+                title: "Login Failed",
+                text: "Email or password was incorrect!",
+                callback: {
+                    //Show red error text
+                    $scope.authError = true;
+                }
+            },
+        ];
 
-        if (response.status == 401 ||
-        response.status == 412) {
-           //Handle 401 error code
-
-           //Show an error
-           $scope.showAlert("Login Failed", "Email or password was incorrect!");
-
-           //Show red error text
-           $scope.authError = true;
-       }
-       else if(response.status == 402) {
-           //Handle 402 Error
-           //Payment Requried
-
-           //Move them back to the index, no history
-           $ionicHistory.nextViewOptions({
-               disableBack: true
-           });
-           $state.go('app.register');
-
-           //Show alert
-           $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
-       }
-       else if (response.status == 500) {
-         // Handle 500 error code
-
-         //Show an error
-         $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-       }
-       else {
-           //Handle General Error
-
-           //An unexpected error has occured, log into console
-           //Show an error
-           $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
-       }
+        Notifications.error(response, handlers);
     });
   };
 
@@ -233,7 +206,7 @@ angular.module('starter')
 
                         //Alert the user their subscription is Ending
                         //inform user there subscription is ending
-                        $scope.showAlert("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+                        Notifications.show("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
                          moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
                          ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
 
@@ -247,62 +220,8 @@ angular.module('starter')
             //Errors from request
             function(response) {
 
-                //Stop Loading
-                loadingSpinner.stopLoading();
-
-                //Proven False
-                sessionStorage.setItem("session_validated", false);
-
-                if (response.status == 401) {
-                   //Handle 401 error code
-
-                   //Pull up the login modal
-                   $scope.login();
-
-                   //Delete the token
-                   localStorage.removeItem("session_token");
-
-                   //Show an error
-                   $scope.showAlert("Session Error", "Session Token not found or invalidated, please log in!");
-               }
-               else if(response.status == 402) {
-                   //Handle 402 Error
-                   //Payment Requried
-
-                   //Delete the token
-                   localStorage.removeItem("session_token");
-
-                   //Move them back to the index, no history
-                   $ionicHistory.nextViewOptions({
-                       disableBack: true
-                   });
-                   $state.go('app.register');
-
-                   //Show alert
-                   $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
-               }
-               else if (response.status == 404) {
-                 // Handle 404 error code
-
-                 //Delete the token
-                 localStorage.removeItem("session_token");
-
-                 //Show an error
-                 $scope.showAlert("No Connection!", "Internet Connection is required to use this app. Please connect to the internet with your device, and restart the app!");
-               }
-               else if (response.status == 500) {
-                 // Handle 500 error code
-
-                 //Show an error
-                 $scope.showAlert("Server Error", "Either your connection is bad, or the server is having problems. Please try re-opening the app, or try again later!");
-               }
-               else {
-                   //Handle General Error
-
-                   //An unexpected error has occured, log into console
-                   //Show an error
-                   $scope.showAlert("Error: " + response.status, "Unexpected Error. Please try re-opening the app, or try again later!");
-               }
+                //Handle the error with Notifications
+                Notifications.error(response);
            });
         }
     }
@@ -323,7 +242,7 @@ angular.module('starter')
         $timeout( function()
         {
             $scope.init();
-        }, 1000);
+        }, 100);
     });
 
 });
