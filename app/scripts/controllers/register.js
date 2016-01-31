@@ -435,7 +435,7 @@ angular.module('starter')
                         //Our custom Error Handler
                         var handlers = [
                             {
-                                status: 416,
+                                status: 406,
                                 title: "Email Taken",
                                 text: "Sorry, that email has been taken. Please enter another email!",
                                 callback: function() {
