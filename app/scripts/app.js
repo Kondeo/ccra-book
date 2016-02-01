@@ -1,6 +1,6 @@
 // Ionic Starter App
 
-var api_base = "http://srv3.kondeo.com:3003/";
+var api_base = "http://ccra1.kondeo.com:3003/";
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
@@ -10,8 +10,7 @@ angular.module('starter',
 ['ionic',
 'config',
 'ngResource',
-'cfp.hotkeys',
-'textAngular'])
+'cfp.hotkeys'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
