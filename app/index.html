@@ -13,6 +13,7 @@
     http://*.ngrok.kondeo.com:35729/livereload.js
     http://*.ngrok.kondeo.com:8080
     https://srv1.kondeo.com:3003
+    https://srv3.kondeo.com:3003
     'unsafe-inline' 'unsafe-eval'">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
@@ -67,9 +68,20 @@
     <!-- your app's js -->
     <!-- build:js scripts/scripts.js -->
     <script src="scripts/app.js"></script>
-    <script src="scripts/controllers.js"></script>
     <script src="scripts/configuration.js"></script>
-    <script src="scripts/services.js"></script>
+    <script src="scripts/controllers/index.js"></script>
+    <script src="scripts/controllers/listing.js"></script>
+    <script src="scripts/controllers/menu.js"></script>
+    <script src="scripts/controllers/pageEdit.js"></script>
+    <script src="scripts/controllers/pageView.js"></script>
+    <script src="scripts/controllers/register.js"></script>
+    <script src="scripts/controllers/settings.js"></script>
+    <script src="scripts/controllers/spinner.js"></script>
+    <script src="scripts/services/notifications.js"></script>
+    <script src="scripts/services/loadingSpinner.js"></script>
+    <script src="scripts/services/page.js"></script>
+    <script src="scripts/services/price.js"></script>
+    <script src="scripts/services/user.js"></script>
     <!-- endbuild -->
 
     <!-- Stripe -->

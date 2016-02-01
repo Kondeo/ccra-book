@@ -1,108 +1,5 @@
-angular.module('starter.services', ['ngResource'])
-  .factory('User', ['$resource', function($resource) {
-
-    return $resource(api_base + 'users/:Id',
-        { Id: '@Id' }, {
-            register: {
-                method: 'POST',
-                params: { Id: 'register' },
-                isArray: false
-            },
-
-            login: {
-                method: 'POST',
-                params: { Id: 'login' },
-                isArray: false
-            },
-
-            renew: {
-                method: 'POST',
-                params: { Id: 'renew' },
-                isArray: false
-            },
-
-            get: {
-                method: 'GET',
-                params: { token: 'token'},
-                url: api_base + 'users/self/:token'
-            }
-
-        } );
-
-}])
-
-.factory('Page', ['$resource', function($resource) {
-
-  return $resource(api_base + 'pages/:number',
-      { number: '@number' }, {
-
-          get: {
-              method: 'GET',
-              params: {}
-          },
-          update: {
-              method: 'PUT',
-              params: {}
-          },
-          query: {
-              method: 'GET',
-              params: { query: 'query' },
-              url: api_base + 'pages/query/:query'
-          }
-
-      } );
-
-}])
-
-.factory('Price', ['$resource', function($resource) {
-
-  return $resource(api_base + 'prices',
-      { }, {
-
-          get: {
-              method: 'GET',
-              params: {}
-          }
-      } );
-
-}])
-
-
-.service('loadingSpinner', function() {
-
-    //Boolean if are loading
-    var loading = false;
-
-    return {
-
-        //Needs to be a function,
-        //or else will not update across controllers
-        isLoading: function() {
-            if(loading) return true
-            else return false
-        },
-
-        startLoading: function() {
-
-            //First, make the body non interactable
-            document.body.class = document.body.class + " noTouch";
-
-            loading = true;
-            return true;
-        },
-
-        stopLoading: function() {
-
-            //First, make the body interactable again
-            document.body.class = document.body.class.replace(" noTouch", "");
-
-            loading = false;
-            return false;
-        }
-    };
-})
-
-.service('ionicAlert', function($ionicPopup, $ionicModal,
+angular.module('starter')
+.service('Notifications', function($ionicPopup, $ionicModal,
     loadingSpinner, $ionicHistory, $state) {
 
     //Show an alert to the user
@@ -157,7 +54,8 @@ angular.module('starter.services', ['ngResource'])
                         status = response.status;
 
                         //Create the alert
-                        showAlert(handlers[i].title, handlers[i].text, handlers[i].callback())
+                        if(handlers[i].callback) showAlert(handlers[i].title, handlers[i].text, handlers[i].callback());
+                        else showAlert(handlers[i].title, handlers[i].text);
                     }
                 }
             }
@@ -186,9 +84,9 @@ angular.module('starter.services', ['ngResource'])
                    $state.go('app.register');
 
                    //Show alert
-                   $scope.showAlert("Subscription Ended", "Please extend your subscription to continue using this app.");
+                   Notifications.show("Subscription Ended", "Please extend your subscription to continue using this app.");
                }
-               else if (error.status == 404) {
+               else if (response.status == 404) {
                  //404 error
 
                  //Delete the token
@@ -197,7 +95,7 @@ angular.module('starter.services', ['ngResource'])
                  //Show alert
                  showAlert("No Connection", "Internet Connection is required to use this app. Please connect to the internet with your device, and restart the app.");
                }
-               else if (error.status == 500) {
+               else if (response.status == 500) {
                  //500 error
 
                  //Show alert
@@ -208,23 +106,10 @@ angular.module('starter.services', ['ngResource'])
 
                    //An unexpected error has occured
                    //Show alert
-                   showAlert("Error Status: " + error.status, "Unexpected Error. Please re-open the app, or try again later!");
+                   showAlert("Error Status: " + response.status, "Unexpected Error. Please re-open the app, or try again later!");
                }
             }
         }
 
     };
 });
-
-
-//Quickly and painlessly gets cookies for controllers
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
-    }
-    return "";
-}

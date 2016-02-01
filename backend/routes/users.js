@@ -71,7 +71,7 @@ router.post('/register', function(req, res) {
                         }
                     });
                 }, function(err){
-                    res.status(412).json({
+                    res.status(402).json({
                         msg: "Card was declined!"
                     });
                 });

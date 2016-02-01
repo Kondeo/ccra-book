@@ -6,7 +6,15 @@
       </ion-nav-back-button>
 
       <ion-nav-buttons side="left">
-        <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+        <button
+        ng-if="loggedIn()"
+        class="button button-icon button-clear ion-navicon" menu-toggle="left">
+        </button>
+        <button
+        ng-if="!loggedIn()"
+        ng-click="login()"
+        class="button button-icon button-clear">
+        Log In
         </button>
       </ion-nav-buttons>
     </ion-nav-bar>
