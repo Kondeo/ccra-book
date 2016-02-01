@@ -100,4 +100,9 @@ angular.module('starter')
            Notifications.error(response, handlers);
        });
    }
+
+   $scope.tinymceOptions = {
+    plugins : 'advlist autolink autoresize link image lists charmap print preview',
+    theme : 'modern'
+  };
 });

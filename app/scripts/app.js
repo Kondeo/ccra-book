@@ -10,7 +10,8 @@ angular.module('starter',
 ['ionic',
 'config',
 'ngResource',
-'cfp.hotkeys'])
+'cfp.hotkeys',
+'ui.tinymce'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
