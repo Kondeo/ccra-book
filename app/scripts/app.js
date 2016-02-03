@@ -11,7 +11,7 @@ angular.module('starter',
 'config',
 'ngResource',
 'cfp.hotkeys',
-'textAngular'])
+'ui.tinymce'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
