@@ -7,6 +7,16 @@
   </ion-header-bar>
   <ion-content>
     <form ng-submit="doLogin()">
+
+        <!-- Placing two fake auth fields to
+        stop chrome autofill -->
+        <input type="text" name="fname"
+        id="firstname" x-autocompletetype="given-name"
+        autocomplete="false" style = "display:none">
+        <input type="password" name="password"
+        id="password" autocomplete="false"
+        style = "display:none">
+
       <div class="list">
         <label class="item item-input">
           <span class="input-label"

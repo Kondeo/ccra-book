@@ -297,7 +297,7 @@ angular.module('starter')
      */
     $scope.validateZip = function() {
         //get the input
-        var input1 = document.getElementById("zipCode");
+        var input1 = document.getElementById("userZip");
 
         //Simply check if there are 5 digits
         if (input1.value.length > 4) {
