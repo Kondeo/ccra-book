@@ -1,16 +1,19 @@
-<ion-view view-title="Index">
+<ion-view
+view-title="Index"
+class = "fixedSearch">
+
+    <div class="item item-input-inset">
+      <label class="item-input-wrapper">
+        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query">
+      </label>
+      <button class="button button-small" ng-click="searched = true; search(query)">
+        Search
+      </button>
+    </div>
+
   <ion-content>
     <ion-list>
         <div class="list">
-
-          <div class="item item-input-inset">
-            <label class="item-input-wrapper">
-              <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query">
-            </label>
-            <button class="button button-small" ng-click="searched = true; search(query)">
-              Search
-            </button>
-          </div>
 
         </div>
 

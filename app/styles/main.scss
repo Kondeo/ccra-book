@@ -79,6 +79,12 @@ $dark:                            #444 !default;
     vertical-align: middle;
 }
 
+.fixedSearch {
+    //Ionic header bar is defined exactly
+    //as 44px, so place a margin on our view
+    margin-top: 44px;
+}
+
 /**
 ***********************
   LOADING SPINNER
