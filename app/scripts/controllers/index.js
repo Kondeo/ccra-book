@@ -2,7 +2,7 @@ angular.module('starter')
 .controller('IndexCtrl', function($scope,
     $location, Page,
     Notifications) {
-        
+
   $scope.indexes = [
     { title: 'Index list will be here', page: 1, id: 1, indented: 0},
     { title: 'Index item 2', page: 1, id: 1, indented: 0}
@@ -28,10 +28,30 @@ angular.module('starter')
         Page.query(payload, function(response) {
 
             //Non-Commented Julian Code
-            for(var i=0;i<response.hits.hits.length;i++){
-                response.hits.hits[i]._source.content = strip(response.hits.hits[i]._source.content).substring(0, 200) + "...";
+
+            var results = response.hits.hits;
+            for(var i=0;i<results.length;i++){
+                results[i].highlight.content[0] = remove_tags(results[i].highlight.content[0]);
+                var startTag = "<mark>";
+                var endTag = "</mark>";
+                var startIndexes = getIndicesOf(start, results[i].highlight.content[0], false);
+                var endIndexes = getIndicesOf(end, results[i].highlight.content[0], false);
+                if(startIndexes.length != endIndexes.length){
+                    console.log("INDEX PROBLEM. DOCUMENT ERROR.");
+                    break;
+                }
+                for(var j=0;j<startIndexes.length;j++){
+                    var start = startIndexes[j] + startTag.length;
+                    var end = results[i].highlight.content[0].indexOf(endTag);
+
+                }
+
+
+                var chunk = results[i].highlight.content[0].substring(start - 75, end + 75);
+                results[i].highlight.content[0] = "..." + chunk + "...";
             }
-            $scope.searchResults = response.hits.hits;
+            $scope.searchResults = results;
+            results = null;
         },
         //Errors
         function(response) {
@@ -56,4 +76,47 @@ angular.module('starter')
        tmp.innerHTML = html;
        return tmp.textContent || tmp.innerText || "";
     }
+
+    function stripHTML(my_string){
+      charArr   = my_string.split('');
+      resultArr = [];
+      htmlZone  = 0;
+      quoteZone = 0;
+      for( x=0; x < charArr.length; x++ ){
+       switch( charArr[x] + htmlZone + quoteZone ){
+         case "<00" : htmlZone  = 1;break;
+         case ">10" : htmlZone  = 0;resultArr.push(' ');break;
+         case '"10' : quoteZone = 1;break;
+         case "'10" : quoteZone = 2;break;
+         case '"11' :
+         case "'12" : quoteZone = 0;break;
+         default    : if(!htmlZone){ resultArr.push(charArr[x]) }
+       }
+      }
+      return resultArr.join('')
+    }
+
+    function remove_tags(html) {
+     var html = html.replace(/<mark>/g,"||mark||");
+     var html = html.replace(/<\/mark>/g,"||/mark||");
+     var tmp = document.createElement("DIV");
+     tmp.innerHTML = html;
+     html = tmp.textContent||tmp.innerText;
+     html = html.replace(/\|\|\/mark\|\|/g,"</mark>");
+     return html.replace(/\|\|mark\|\|/g,"<mark>");
+   }
+
+   function getIndicesOf(searchStr, str, caseSensitive) {
+      var startIndex = 0, searchStrLen = searchStr.length;
+      var index, indices = [];
+      if (!caseSensitive) {
+          str = str.toLowerCase();
+          searchStr = searchStr.toLowerCase();
+      }
+      while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+          indices.push(index);
+          startIndex = index + searchStrLen;
+      }
+      return indices;
+  }
 })

@@ -27,8 +27,8 @@
         </div>
 
         <div class="card" ng-if="searched">
-          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)">
-              Page {{result._source.number}}: {{result._source.content}}
+          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]">
+              
           </div>
         </div>
     </ion-list>
