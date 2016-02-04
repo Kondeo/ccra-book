@@ -12,18 +12,20 @@ class = "fixedSearch">
     </div>
 
   <ion-content>
-    <ion-list>
+    <ion-list
+    class = "serachList">
         <div class="list">
 
         </div>
 
-        <div ng-if="!query" class="center" style="text-align:center">
+        <div ng-if="!query"
+        class="center noSearch">
 
             Please type in a search above.
             Or, go to <a href="#/app/page/23">Page 23</a>.
 
         </div>
-        <div ng-if="query && !searched" class="center" style="text-align:center">
+        <div ng-if="query && !searched" class="center noSearch">
 
             Please tap "search" to execute your query.
 
