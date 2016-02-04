@@ -1,12 +1,6 @@
 angular.module('starter')
 .controller('IndexCtrl', function($scope,
-    $location, Page,
-    Notifications) {
-        
-  $scope.indexes = [
-    { title: 'Index list will be here', page: 1, id: 1, indented: 0},
-    { title: 'Index item 2', page: 1, id: 1, indented: 0}
-    ];
+    $location, Page, loadingSpinner, Notifications) {
 
     $scope.searchResults = [];
 
@@ -25,13 +19,44 @@ angular.module('starter')
             token: cookie
         };
 
+        loadingSpinner.startLoading();
+
         Page.query(payload, function(response) {
 
+            //Stop loading
+            loadingSpinner.stopLoading();
+
             //Non-Commented Julian Code
-            for(var i=0;i<response.hits.hits.length;i++){
-                response.hits.hits[i]._source.content = strip(response.hits.hits[i]._source.content).substring(0, 200) + "...";
+
+            var results = response.hits.hits;
+            for(var i=0;i<results.length;i++){
+                results[i].highlight.content[0] = remove_tags(results[i].highlight.content[0]);
+                var startTag = "<mark>";
+                var endTag = "</mark>";
+                var startIndexes = getIndicesOf(startTag, results[i].highlight.content[0], false);
+                var endIndexes = getIndicesOf(endTag, results[i].highlight.content[0], false);
+
+                if(startIndexes.length != endIndexes.length){
+                    console.log("INDEX PROBLEM. DOCUMENT ERROR.");
+                    break;
+                }
+
+                //This holds the paragraph
+                var bigFind = "";
+                for(var j=0;j<startIndexes.length;j++){
+                    var start = startIndexes[j] - 75;
+                    var relatives = findRelatives(j, 75, endIndexes, startIndexes, endIndexes[j], 0);
+                    j = j + relatives.skip;
+                    var end = relatives.end;
+                    var chunk = results[i].highlight.content[0].substring(start, end);
+                    bigFind += "..." + chunk + "...";
+                    if(j+1 != startIndexes.length) bigFind += "<br />";
+                }
+
+                results[i].highlight.content[0] = bigFind;
             }
-            $scope.searchResults = response.hits.hits;
+            $scope.searchResults = results;
+            results = null;
         },
         //Errors
         function(response) {
@@ -51,9 +76,35 @@ angular.module('starter')
         });
     }
 
-    function strip(html){
-       var tmp = document.createElement("DIV");
-       tmp.innerHTML = html;
-       return tmp.textContent || tmp.innerText || "";
-    }
+    function remove_tags(html) {
+     var html = html.replace(/<mark>/g,"||mark||");
+     var html = html.replace(/<\/mark>/g,"||/mark||");
+     var tmp = document.createElement("DIV");
+     tmp.innerHTML = html;
+     html = tmp.textContent||tmp.innerText;
+     html = html.replace(/\|\|\/mark\|\|/g,"</mark>");
+     return html.replace(/\|\|mark\|\|/g,"<mark>");
+   }
+
+   function getIndicesOf(searchStr, str, caseSensitive) {
+      var startIndex = 0, searchStrLen = searchStr.length;
+      var index, indices = [];
+      if (!caseSensitive) {
+          str = str.toLowerCase();
+          searchStr = searchStr.toLowerCase();
+      }
+      while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+          indices.push(index);
+          startIndex = index + searchStrLen;
+      }
+      return indices;
+  }
+  function findRelatives(j, width, endIndexes, startIndexes, endIndex, skip){
+      endIndex += width;
+      if(endIndexes[j] + width > startIndexes[j+1] && j+1 < startIndexes.length){
+        return findRelatives(j+1, width, endIndexes, startIndexes, endIndexes[j+1], skip + 1);
+      } else {
+        return { "end": endIndex, "skip": skip };
+      }
+  }
 })
