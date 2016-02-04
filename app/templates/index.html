@@ -1,26 +1,31 @@
-<ion-view view-title="Index">
-  <ion-content>
-    <ion-list>
-        <div class="list">
+<ion-view
+view-title="Index"
+class = "fixedSearch">
 
-          <div class="item item-input-inset">
-            <label class="item-input-wrapper">
-              <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query">
-            </label>
-            <button class="button button-small" ng-click="searched = true; search(query)">
-              Search
-            </button>
-          </div>
+    <div class="item item-input-inset">
+      <label class="item-input-wrapper">
+        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query">
+      </label>
+      <button class="button button-small" ng-click="searched = true; search(query)">
+        Search
+      </button>
+    </div>
+
+  <ion-content>
+    <ion-list
+    class = "serachList">
+        <div class="list">
 
         </div>
 
-        <div ng-if="!query" class="center" style="text-align:center">
+        <div ng-if="!query"
+        class="center noSearch">
 
             Please type in a search above.
             Or, go to <a href="#/app/page/23">the beginning</a>.
 
         </div>
-        <div ng-if="query && !searched" class="center" style="text-align:center">
+        <div ng-if="query && !searched" class="center noSearch">
 
             Please tap "search" to execute your query.
 
