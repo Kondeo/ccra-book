@@ -42,12 +42,22 @@ angular.module('starter')
                 }
                 for(var j=0;j<startIndexes.length;j++){
                     var start = startIndexes[j] + startTag.length;
-                    var end = results[i].highlight.content[0].indexOf(endTag);
+                    var end = endIndexes[j];
+                    if(endIndexes[j] + 75 > startIndexes[j+1]){
 
+                    }
+                    var chunk = results[i].highlight.content[0].substring(start - 75, end + 75);
                 }
 
+                function findRelatives(j, width, endIndexes, startIndexes, endIndex){
+                    endIndex += 
+                    if(endIndexes[j] + 75 > startIndexes[j+1] && j+1 < startIndexes.length){
+                      findRelatives(j+1, width, endIndexes, startIndexes);
+                    } else {
+                      return chunks;
+                    }
+                }
 
-                var chunk = results[i].highlight.content[0].substring(start - 75, end + 75);
                 results[i].highlight.content[0] = "..." + chunk + "...";
             }
             $scope.searchResults = results;
