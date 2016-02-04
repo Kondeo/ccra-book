@@ -25,11 +25,14 @@
             Please tap "search" to execute your query.
 
         </div>
+        <div ng-if="query && searched && searchResults.length < 1" class="center" style="text-align:center">
 
-        <div class="card" ng-if="searched">
-          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]">
-              
-          </div>
+            Your query returned no results. Please try with a more general term.
+
+        </div>
+
+        <div class="card" ng-if="searched && searchResults.length > 0">
+          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
         </div>
     </ion-list>
   </ion-content>
