@@ -86,7 +86,7 @@ angular.module('starter')
 
         //Inform the user
         //Show an alert
-        if(!data.admin && moment().add(6, 'd').isAfter(moment(data.subscription))) {
+        if(!data.admin && moment().add(1, 'M').isAfter(moment(data.subscription))) {
 
             //inform user there subscription is ending
             Notifications.show("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
@@ -94,7 +94,7 @@ angular.module('starter')
              ". Please visit the menu, and select (Manage Subscription) to extend your subscription. The Page will now reload...", function() {
 
                 //They have been alerted
-                sessionStorage.setItem("alerted", true);
+                sessionStorage.setItem("monthAlerted", true);
 
                 //Alert Call back
                 $scope.closeLogin();
