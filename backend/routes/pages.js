@@ -18,11 +18,21 @@ router.get('/query/:terms', function(req, res, next) {
     validateUser(req, res, doSearch);
 
     function doSearch(user){
-        Page.search({
-            query_string: {
+        Page.esClient.search({
+          "body": {
+            "query": {
+              "query_string": {
                 query: req.params.terms + "~",
-                fuzziness: "AUTO"
+                fuzziness: "AUTO",
+                "default_field" : "content"
+              }
+            },
+            "highlight" : {
+              "fields" : {
+                "content" : {}
+              }
             }
+          }
         }, function(err, results) {
             if(err){
                 res.status(500).json(err);
