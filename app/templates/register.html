@@ -1,6 +1,39 @@
 <ion-view view-title="Subscription">
 <ion-content>
     <form name = "registerForm" ng-init="subType = 'new'">
+
+        <!-- Placing two fake auth fields to
+        stop chrome autofill -->
+        <input type="text" name="fname"
+        id="firstname" x-autocompletetype="given-name"
+        autocomplete="false" style = "display:none">
+
+        <input type="password" name="password"
+        id="password" autocomplete="false"
+        style = "display:none">
+
+        <!-- fake cc fields-->
+        <input type="tel" name="ccNumber"
+        id="ccNumber" x-autocompletetype="given-name"
+        autocomplete="false" style = "display:none">
+
+        <input type="number" name="expireM"
+        id="expireM" autocomplete="false"
+        style = "display:none">
+
+        <input type="number" name="expireY"
+        id="expireM" autocomplete="false"
+        style = "display:none">
+
+        <input type="number" name="cardCVV"
+        id="cardCVV" autocomplete="false"
+        style = "display:none">
+
+        <input type="number" name="zipCode"
+        id="userZip" autocomplete="false"
+        style = "display:none">
+
+
       <div class="list subTypeSel">
 
         <div class="item item-divider" ng-if="loggedIn()">
@@ -116,7 +149,7 @@
           Zip Code</span>
           <input
                 type="number"
-                id="zipCode"
+                id="userZip"
                 name="zipCode"
                 ng-keyup = "validateZip()"
                 ng-keydown="maxLength($event, 5)"
