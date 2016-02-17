@@ -417,7 +417,8 @@ angular.module('starter')
 
                         //Save their subscription Date
                         localStorage.setItem("subscriptionDate", data.subscription);
-                        localStorage.setItem("alerted", false);
+                        sessionStorage.setItem("weekAlerted", false);
+                        sessionStorage.setItem("monthAlerted", false);
 
                         //Move them back to the index, no history
                         $ionicHistory.nextViewOptions({
@@ -526,7 +527,8 @@ angular.module('starter')
 
                     //Save their subscription Date
                     localStorage.setItem("subscriptionDate", data.subscription);
-                    localStorage.setItem("alerted", false);
+                    sessionStorage.setItem("weekAlerted", false);
+                    sessionStorage.setItem("monthAlerted", false);
 
                     //Move them back to the index, no history
                     $ionicHistory.nextViewOptions({

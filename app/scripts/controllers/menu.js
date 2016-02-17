@@ -86,7 +86,7 @@ angular.module('starter')
 
         //Inform the user
         //Show an alert
-        if(!data.admin && moment().add(6, 'd').isAfter(moment(data.subscription))) {
+        if(!data.admin && moment().add(1, 'M').isAfter(moment(data.subscription))) {
 
             //inform user there subscription is ending
             Notifications.show("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
@@ -94,7 +94,12 @@ angular.module('starter')
              ". Please visit the menu, and select (Manage Subscription) to extend your subscription. The Page will now reload...", function() {
 
                 //They have been alerted
-                sessionStorage.setItem("alerted", true);
+                //Flip the variable depending if we are withing weeks
+                if(!weekAlerted &&
+                moment().add(6, 'd').isAfter(moment(subDate))) {
+                     sessionStorage.setItem("weekAlerted", true);
+                }
+                else sessionStorage.setItem("monthAlerted", true);
 
                 //Alert Call back
                 $scope.closeLogin();
@@ -199,12 +204,16 @@ angular.module('starter')
 
                 //Also Check if our subscription is ending
                 var subDate = localStorage.getItem("subscriptionDate");
-                var alerted = localStorage.getItem("alerted");
+                var monthAlerted = localStorage.getItem("monthAlerted");
+                var weekAlerted = localStorage.getItem("weekAlerted");
                 var admin = response.admin;
                 if(subDate &&
-                    !admin &&
-                    !alerted &&
-                    moment().add(6, 'd').isAfter(moment(subDate))) {
+                    !admin)
+
+                    if((!monthAlerted &&
+                    moment().add(1, 'M').isAfter(moment(subDate))) ||
+                    (!weekAlerted &&
+                    moment().add(6, 'd').isAfter(moment(subDate)))) {
 
                         //Alert the user their subscription is Ending
                         //inform user there subscription is ending
@@ -215,7 +224,13 @@ angular.module('starter')
                          //Set the alerted to true
                          //Save their subscription Date
                          localStorage.setItem("subscriptionDate", response.subscription);
-                         localStorage.setItem("alerted", true);
+
+                         //Check if need to flip month or week
+                         if(!monthAlerted &&
+                         moment().add(1, 'M').isAfter(moment(subDate))) {
+                             localStorage.setItem("monthAlerted", true);
+                         }
+                         else localStorage.setItem("weekAlerted", true);
                 }
                 return true;
             },
