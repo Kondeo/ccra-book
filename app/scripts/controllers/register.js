@@ -2,10 +2,10 @@ angular.module('starter')
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
     $timeout, Page, User, $state,
     loadingSpinner, Price,
-    Notifications) {
+    Notifications, CONST) {
 
     //SET OUR STRIPE KEY HERE
-    Stripe.setPublishableKey('pk_test_u1eALgznI2RRoPFEN8e1q9s9');
+    Stripe.setPublishableKey(CONST.stripePK);
 
     //Initialize our loading spinner for the button disabling
     $scope.loading = loadingSpinner;
@@ -106,8 +106,8 @@ angular.module('starter')
         //errors
         function(response) {
 
-            //Handle the Notiifications
-            Notiifications.error(response);
+            //Handle the Notifications
+            Notifications.error(response);
         })
 
     }

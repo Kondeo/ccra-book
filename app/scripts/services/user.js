@@ -1,7 +1,7 @@
 angular.module('starter')
-  .factory('User', ['$resource', function($resource) {
+  .factory('User', ['$resource', 'CONST', function($resource, CONST) {
 
-    return $resource(api_base + 'users/:Id',
+    return $resource(CONST.apiBase + 'users/:Id',
         { Id: '@Id' }, {
             register: {
                 method: 'POST',
@@ -24,7 +24,7 @@ angular.module('starter')
             get: {
                 method: 'GET',
                 params: { token: 'token'},
-                url: api_base + 'users/self/:token'
+                url: CONST.apiBase + 'users/self/:token'
             }
 
         } );
