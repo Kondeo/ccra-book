@@ -2,7 +2,7 @@ angular.module('starter')
 .controller('PageEditCtrl', function($scope, $stateParams,
     Page, $location, $state,
     $ionicHistory, $ionicScrollDelegate,
-    loadingSpinner, Notifications) {
+    loadingSpinner, Notifications, $timeout) {
 
     //Get the page number and cookie
     $scope.pagenum = $stateParams.page;
@@ -50,7 +50,7 @@ angular.module('starter')
     $scope.pageInit();
 
    //Function to save the edited page
-   $scope.savePage = function() {
+   $scope.savePage = function(action) {
 
        //Start loading
        loadingSpinner.startLoading();
@@ -68,18 +68,30 @@ angular.module('starter')
 
        Page.update(payload, function(response){
 
-           //Handle succes here
+          //Handle succes here
 
-           //Stop loading
-           loadingSpinner.stopLoading();
+          //Stop loading
+          loadingSpinner.stopLoading();
 
-           //Go back to the page views
-           $ionicHistory.nextViewOptions({
-               disableBack: true
-           });
-           //Second param is state params
-           $state.go('app.single', {"page": $scope.pageNumber});
-
+          switch(action){
+            case "none":
+              document.getElementById("savePageBtn").className += " ion-checkmark-round";
+              $timeout(function(){
+              document.getElementById("savePageBtn").classList.remove("ion-checkmark-round");
+              }, 3000);
+              break;
+            case "next":
+              $state.go('app.edit', {"page": parseInt($scope.pageNumber)+1});
+              break;
+            case "close":
+              //Go back to the page views
+              $ionicHistory.nextViewOptions({
+              disableBack: true
+              });
+              //Second param is state params
+              $state.go('app.single', {"page": $scope.pageNumber});
+              break;
+          }
        }, function(response){
 
            //Create our custom error handlers
