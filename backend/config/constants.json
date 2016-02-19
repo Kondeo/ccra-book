@@ -1,9 +1,19 @@
 {
-    "SUBSCRIPTION_PRICE": {
-        "NEW": 1000,
-        "RENEW": 700
+  "SUBSCRIPTION_PRICE": {
+    "NEW": 1000,
+    "RENEW": 700
+  },
+  "SERVER": {
+    "URL": "https://dev.kondeo.com"
+  },
+  "CLIENT": {
+    "IOS": {
+      "SUB": false,
+      "ONLINE_ONLY_NOTICE": false
     },
-    "SERVER": {
-        "URL": "https://dev.kondeo.com"
+    "ANDROID": {
+      "SUB": true,
+      "ONLINE_ONLY_NOTICE": false
     }
+  }
 }
