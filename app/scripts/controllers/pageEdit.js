@@ -102,8 +102,9 @@ angular.module('starter')
    }
 
    $scope.tinymceOptions = {
-    plugins : 'advlist autolink autoresize link image lists charmap print preview',
+    plugins : 'advlist autolink link image lists charmap print preview',
     selector: 'textarea',
+    height: 350,
     browser_spellcheck: true,
     theme : 'modern'
   };
