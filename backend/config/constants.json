@@ -1,7 +1,8 @@
 {
   "VERSION": {
-    "NUMBER": 1,
-    "LAST_COMPATIBLE": 1
+    "NUMBER": 1000,
+    "DEPRICATED": 999,
+    "LAST_COMPATIBLE": 998
   },
   "SUBSCRIPTION_PRICE": {
     "NEW": 1000,
