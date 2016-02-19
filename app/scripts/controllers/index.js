@@ -13,6 +13,8 @@ angular.module('starter')
 
     $scope.search = function(query){
 
+        $scope.searched = true;
+
         //Create our payload
         var payload = {
             query: query,
