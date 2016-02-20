@@ -37,7 +37,7 @@ angular.module('starter')
     function(response) {
 
         //Handle the error with notifications
-        Notifications.show(response);
+        Notifications.error(response);
    });
 
     $scope.goToNext = function(){
