@@ -1,7 +1,7 @@
 angular.module('starter')
-.factory('Price', ['$resource', function($resource) {
+.factory('Price', ['$resource', 'CONST', function($resource, CONST) {
 
-  return $resource(api_base + 'prices',
+  return $resource(CONST.apiBase + 'prices',
       { }, {
 
           get: {

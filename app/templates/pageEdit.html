@@ -27,11 +27,30 @@
         </a>
       </div>
 
-      <button
-      class="button button-full button-positive editPageSave"
-      ng-click="savePage()">
-          Save Page
-      </button>
+      <div class="row">
+        <div class="col">
+          <button
+          class="button button-block button-positive editPageSave"
+          ng-click="savePage('close')">
+              Save and Close Editor
+          </button>
+        </div>
+        <div class="col">
+          <button
+          id="savePageBtn"
+          class="button button-block button-positive editPageSave"
+          ng-click="savePage('none')">
+              Save Page
+          </button>
+        </div>
+        <div class="col">
+          <button
+          class="button button-block button-positive editPageSave"
+          ng-click="savePage('next')">
+              Save and Go To Next
+          </button>
+        </div>
+      </div>
     </div>
   </ion-content>
 </ion-view>

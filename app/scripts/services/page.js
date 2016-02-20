@@ -1,7 +1,7 @@
 angular.module('starter')
-.factory('Page', ['$resource', function($resource) {
+.factory('Page', ['$resource', 'CONST', function($resource, CONST) {
 
-  return $resource(api_base + 'pages/:number',
+  return $resource(CONST.apiBase + 'pages/:number',
       { number: '@number' }, {
 
           get: {
@@ -15,7 +15,7 @@ angular.module('starter')
           query: {
               method: 'GET',
               params: { query: 'query' },
-              url: api_base + 'pages/query/:query'
+              url: CONST.apiBase + 'pages/query/:query'
           }
 
       } );
