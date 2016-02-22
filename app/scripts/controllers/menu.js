@@ -11,14 +11,15 @@ angular.module('starter')
   $scope.settings = {};
   $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
 
-  // Form data for the login modal
-  $scope.loginData = {};
-
   //Form data for the go to page
   $scope.page = {};
 
   //Variable to catch our current errors
   $scope.errors = {};
+
+  //Adding out login service to scope
+  //To be call in ng html
+  $scope.loginModal = LoginModal;
 
   // Create the go to page modal that we will use later
   $ionicModal.fromTemplateUrl('templates/modals/gotopage.html', {
@@ -137,11 +138,6 @@ angular.module('starter')
             LoginModal.show();
         }
     };
-
-    //Some handlers for the loginModal
-    //Adding out login service to scope
-    //To be call in ng html
-    $scope.loginModal = LoginModal;
 
     //Load function on page load
     $ionicPlatform.ready(function(){

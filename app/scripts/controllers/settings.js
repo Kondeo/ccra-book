@@ -1,5 +1,6 @@
 angular.module('starter')
-.controller('SettingsCtrl', function($scope, $window, Notifications) {
+.controller('SettingsCtrl', function($scope, $window,
+    Notifications, LoginModal) {
 
 
     $scope.saveSettings = function(){
@@ -20,7 +21,7 @@ angular.module('starter')
 
             //Alert Call back
 
-            $scope.closeLogin();
+            LoginModal.hide();
 
             //Reload the page
             $window.location.reload(true);

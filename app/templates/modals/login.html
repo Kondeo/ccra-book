@@ -2,12 +2,18 @@
   <ion-header-bar>
     <h1 class="title">Login</h1>
     <div class="buttons">
-      <button class="button button-clear" ng-if="loggedIn() && errors[0] != 12" ng-click="closeLogin()">Close</button>
+      <button class="button button-clear"
+      ng-if="loggedIn() && errors[0] != 12"
+      ng-click="loginModal.hide()">
+      Close
+      </button>
     </div>
   </ion-header-bar>
   <ion-content>
+
     <form
-    ng-submit="loginModal(loginData)">
+    ng-controller = "LoginCtrl"
+    ng-submit="doLogin()">
 
         <!-- Placing two fake auth fields to
         stop chrome autofill -->
@@ -21,13 +27,13 @@
       <div class="list">
         <label class="item item-input">
           <span class="input-label"
-          ng-class="{'errorFormText': loginModal.authError()}">
+          ng-class="{'errorFormText': authError}">
           Email</span>
           <input type="text" ng-model="loginData.email" autocomplete="off"  autocorrect="off" autocapitalize="none" spellcheck="false">
         </label>
         <label class="item item-input">
           <span class="input-label"
-          ng-class="{'errorFormText': loginModal.authError()}">
+          ng-class="{'errorFormText': authError}">
           Password</span>
           <input type="password" ng-model="loginData.password">
         </label>

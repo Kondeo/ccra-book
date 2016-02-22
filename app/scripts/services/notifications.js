@@ -1,6 +1,7 @@
 angular.module('starter')
 .service('Notifications', function($ionicPopup, $ionicModal,
-    loadingSpinner, $ionicHistory, $state) {
+    loadingSpinner, $ionicHistory, $state,
+    LoginModal) {
 
     //Show an alert to the user
     function showAlert(alertTitle, alertText, callback) {
