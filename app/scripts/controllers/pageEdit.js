@@ -2,7 +2,8 @@ angular.module('starter')
 .controller('PageEditCtrl', function($scope, $stateParams,
     Page, $location, $state,
     $ionicHistory, $ionicScrollDelegate,
-    loadingSpinner, Notifications, $timeout) {
+    loadingSpinner, Notifications, $timeout,
+    LoginModal) {
 
     //Get the page number and cookie
     $scope.pagenum = $stateParams.page;
@@ -103,7 +104,7 @@ angular.module('starter')
                    callback: function() {
 
                        //Pull up the login modal
-                       $scope.login();
+                       LoginModal.show();
                    }
                }
            ]
