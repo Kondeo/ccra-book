@@ -153,7 +153,11 @@
     "com.ionic.keyboard",
     "org.apache.cordova.console",
     "com.ionic.keyboard",
-    "cordova-plugin-whitelist"
+    "cordova-plugin-whitelist",
+    {
+      "locator": "https://github.com/whiteoctober/cordova-plugin-app-version.git",
+      "id": "cordova-plugin-app-version"
+    }
   ],
   "cordovaPlatforms": [
     {

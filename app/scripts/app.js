@@ -8,23 +8,13 @@ angular.module('starter',
 'config',
 'ngResource',
 'cfp.hotkeys',
+'ngCordova',
 'ui.tinymce'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
-  });
-})
+.config(function($stateProvider,
+    $urlRouterProvider, $httpProvider) {
 
-.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+  //Add our states to the state provider
   $stateProvider
 
   .state('app', {
@@ -102,18 +92,31 @@ angular.module('starter',
 
   //Our http interceptor
   //Going to pass our version to our backend
-  $httpProvider.interceptors.push(function($q, CONST) {
+  $httpProvider.interceptors.push(function($q, CONST,
+  $cordovaAppVersion, $ionicPlatform) {
 
       return {
 
        'request': function(config) {
 
-           console.log(config);
-
-           if(config.url.indexOf(CONST.apiBase) > -1) {
+           //Check if we are on a device (WebView is true on a device), and then if
+           //We are making a backend request
+           if(ionic.Platform.isWebView() &&
+           config.url.indexOf(CONST.apiBase) > -1) {
 
                //Add the version number to the request
-               //config.params.version =
+               //Wrapping in ionic platform ready as it is stated by docs
+               $ionicPlatform.ready(function() {
+
+                   $cordovaAppVersion.getAppVersion().then(function(version) {
+
+                       //Add the version to the params
+                       config.params.version = version;
+
+                       //Now send the request
+                       return config;
+                   });
+               });
            }
            else {
 
@@ -125,5 +128,21 @@ angular.module('starter',
       };
 
     });
+
+})
+
+.run(function($ionicPlatform) {
+
+  $ionicPlatform.ready(function() {
+    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    // for form inputs)
+    if (window.cordova && window.cordova.plugins.Keyboard) {
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    }
+    if (window.StatusBar) {
+      // org.apache.cordova.statusbar required
+      StatusBar.styleDefault();
+    }
+  });
 
 });
