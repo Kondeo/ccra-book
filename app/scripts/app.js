@@ -134,8 +134,6 @@ angular.module('starter',
                    }
                }
 
-               console.log(JSON.stringify(config));
-
                //Now send the request
                return config;
            }
