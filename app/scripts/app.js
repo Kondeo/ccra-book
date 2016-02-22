@@ -99,6 +99,8 @@ angular.module('starter',
 
        'request': function(config) {
 
+           console.log(config);
+
            //Check if we are on a device (WebView is true on a device), and then if
            //We are making a backend request
            if(ionic.Platform.isWebView() &&
@@ -111,7 +113,14 @@ angular.module('starter',
                    $cordovaAppVersion.getAppVersion().then(function(version) {
 
                        //Add the version to the params
-                       config.params.version = version;
+                       if(config.params) config.params.version = version;
+                       else {
+                           config.params = {
+                               version: version
+                           };
+                       }
+
+                       console.log(config);
 
                        //Now send the request
                        return config;

@@ -157,12 +157,29 @@
     {
       "locator": "https://github.com/whiteoctober/cordova-plugin-app-version.git",
       "id": "cordova-plugin-app-version"
-    }
+    },
+    "com.ionic.keyboard",
+    "com.ionic.keyboard",
+    "com.ionic.keyboard",
+    "com.ionic.keyboard",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device",
+    "org.apache.cordova.console",
+    "org.apache.cordova.console"
   ],
   "cordovaPlatforms": [
-    {
-      "platform": "android",
-      "locator": "browser"
-    }
+    "android"
   ]
 }
