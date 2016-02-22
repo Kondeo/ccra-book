@@ -99,4 +99,23 @@ angular.module('starter',
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/index');
 
+
+  //Our http interceptor
+  //Going to pass our version to our backend
+  $httpProvider.interceptors.push(function($q) {
+
+      return {
+
+       'request': function(config) {
+
+           console.log(config);
+
+           //Send the request
+           return config;
+        }
+
+      };
+
+    });
+
 });
