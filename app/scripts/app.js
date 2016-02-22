@@ -92,8 +92,7 @@ angular.module('starter',
 
   //Our http interceptor
   //Going to pass our version to our backend
-  $httpProvider.interceptors.push(function($q, CONST,
-  $ionicPlatform) {
+  $httpProvider.interceptors.push(function($q, CONST) {
 
       //First we need to get the app version
       var appVersion = CONST.version;
