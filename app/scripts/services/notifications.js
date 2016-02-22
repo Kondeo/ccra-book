@@ -72,6 +72,8 @@ angular.module('starter')
 
                    //Show an alert
                    showAlert("Session Error", "Session not found or invalidated, please log in.");
+
+                   //Show the login modal
                }
                else if(response.status == 402) {
                    //402 Error
