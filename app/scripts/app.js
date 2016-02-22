@@ -93,32 +93,20 @@ angular.module('starter',
   //Our http interceptor
   //Going to pass our version to our backend
   $httpProvider.interceptors.push(function($q, CONST,
-  $cordovaAppVersion, $ionicPlatform) {
+  $ionicPlatform) {
 
       //First we need to get the app version
-      //if we are webview
-      //Default is version 0.1.0, since it's the initial version
       var appVersion = CONST.version;
-      if(ionic.Platform.isWebView()) {
-
-          //Grab the version number from cordova
-          //Wrapping in ionic platform ready as it is stated by docs
-          $ionicPlatform.ready(function() {
-              $cordovaAppVersion.getAppVersion().then(function(version) {
-
-                  //Set the version
-                  appVersion = version;
-              });
-          });
-      }
 
 
       return {
 
        'request': function(config) {
 
-           //Check if we are on a device (WebView is true on a device), and then if
-           //We are making a backend request
+           //Need to check we are making aget or post request
+           //Since that is what this will support, since they
+           //Require seperate fields,
+           //And if We are making a backend request
            if((config.method == "GET" ||
            config.method == "POST") &&
            config.url.indexOf(CONST.apiBase) > -1) {
@@ -147,7 +135,7 @@ angular.module('starter',
                    }
                }
 
-               console.log(config);
+               console.log(JSON.stringify(config));
 
                //Now send the request
                return config;
