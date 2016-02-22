@@ -20,10 +20,6 @@ angular.module('starter')
   //Variable to catch our current errors
   $scope.errors = {};
 
-  //Adding out login service to scope
-  //To be call in ng html
-  $scope.loginModal = LoginModal;
-
   // Create the go to page modal that we will use later
   $ionicModal.fromTemplateUrl('templates/modals/gotopage.html', {
     id: 2,
@@ -141,6 +137,11 @@ angular.module('starter')
             LoginModal.show();
         }
     };
+
+    //Some handlers for the loginModal
+    //Adding out login service to scope
+    //To be call in ng html
+    $scope.loginModal = LoginModal;
 
     //Load function on page load
     $ionicPlatform.ready(function(){

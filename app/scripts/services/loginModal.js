@@ -1,7 +1,7 @@
 angular.module('starter')
 .service('LoginModal', function($ionicPopup, $ionicModal,
     loadingSpinner, $ionicHistory, $state,
-    Notifications, User, $timeout) {
+    Notifications, User, $timeout, $window) {
 
         //Our login modal
         var loginModal;

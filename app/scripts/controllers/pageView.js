@@ -36,8 +36,27 @@ angular.module('starter')
     //Errors
     function(response) {
 
-        //Handle the error with notifications
-        Notifications.error(response);
+        //Var handlers, handle 412 as a login because it means the session_token
+        //there is not session_token
+        if(!localStorage.getItem("session_token") ||
+        localStorage.getItem("session_token") == "") {
+
+            var handlers = [
+                {
+                    status: 412,
+                    title: "Session Error!",
+                    text: "Session not found or invalidated, please log in.",
+                }
+            ];
+
+            //Handle the error with notifications
+            Notifications.error(response, handlers);
+        }
+        else {
+
+            //Handle the error with notifications
+            Notifications.error(response);
+        }
    });
 
     $scope.goToNext = function(){
