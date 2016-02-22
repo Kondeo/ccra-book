@@ -2,7 +2,8 @@ angular.module('starter')
 .controller('PageCtrl', function($scope, $stateParams,
     Page, $location, $http, $sce, $state,
     $ionicHistory, $ionicScrollDelegate,
-    loadingSpinner, Notifications) {
+    loadingSpinner, Notifications,
+    LoginModal) {
 
     //Get page number and session, and admin
     $scope.pagenum = $stateParams.page;
@@ -46,6 +47,11 @@ angular.module('starter')
                     status: 412,
                     title: "Session Error!",
                     text: "Session not found or invalidated, please log in.",
+                    callback: function() {
+
+                        //Pull up the login modal
+                        LoginModal.show();
+                    }
                 }
             ];
 

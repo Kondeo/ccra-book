@@ -48,12 +48,12 @@
 
     <div class = "register"
     ng-if="!loggedIn()">
-        Or you can <a href="#/app/register" ng-click = "closeLogin()">register for a subcription</a>
+        Or you can <a href="#/app/register" ng-click = "loginModal.hide()">register for a subcription</a>
     </div>
 
     <div class = "register"
     ng-if="loggedIn()">
-        Or you can <a href="#/app/register" ng-click = "closeLogin()">manage your subcription</a>
+        Or you can <a href="#/app/register" ng-click = "loginModal.hide()">manage your subcription</a>
     </div>
   </ion-content>
 </ion-modal-view>

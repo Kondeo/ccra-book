@@ -20,7 +20,6 @@ angular.module('starter')
         Notifications.show("Logout Success!", "The Page will now reload...", function() {
 
             //Alert Call back
-
             LoginModal.hide();
 
             //Reload the page
