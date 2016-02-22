@@ -95,37 +95,63 @@ angular.module('starter',
   $httpProvider.interceptors.push(function($q, CONST,
   $cordovaAppVersion, $ionicPlatform) {
 
+      //First we need to get the app version
+      //if we are webview
+      //Default is version 0.1.0, since it's the initial version
+      var appVersion = "0.1.0";
+      if(ionic.Platform.isWebView()) {
+
+          //Grab the version number from cordova
+          //Wrapping in ionic platform ready as it is stated by docs
+          $ionicPlatform.ready(function() {
+              $cordovaAppVersion.getAppVersion().then(function(version) {
+
+                  //Set the version
+                  appVersion = version;
+              });
+          });
+      }
+
+
       return {
 
        'request': function(config) {
 
-           console.log(config);
-
            //Check if we are on a device (WebView is true on a device), and then if
            //We are making a backend request
            if(ionic.Platform.isWebView() &&
+           (config.method == "GET" ||
+           config.method == "POST") &&
            config.url.indexOf(CONST.apiBase) > -1) {
 
-               //Add the version number to the request
-               //Wrapping in ionic platform ready as it is stated by docs
-               $ionicPlatform.ready(function() {
+               //Add the version to the params
+               //Need to add it to different objects depending
+               //if it is a get or post request
+               if(config.method == "GET") {
 
-                   $cordovaAppVersion.getAppVersion().then(function(version) {
+                   //Add it to the params
+                   if(config.params) config.params.version = appVersion;
+                   else {
+                       config.params = {
+                           version: appVersion
+                       };
+                   }
+               }
+               else {
 
-                       //Add the version to the params
-                       if(config.params) config.params.version = version;
-                       else {
-                           config.params = {
-                               version: version
-                           };
-                       }
+                   //Add it to the request data
+                   if(config.data) config.data.version = appVersion;
+                   else {
+                       config.data = {
+                           version: appVersion
+                       };
+                   }
+               }
 
-                       console.log(config);
+               console.log(JSON.stringify(config));
 
-                       //Now send the request
-                       return config;
-                   });
-               });
+               //Now send the request
+               return config;
            }
            else {
 
