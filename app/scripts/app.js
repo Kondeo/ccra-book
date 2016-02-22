@@ -98,7 +98,7 @@ angular.module('starter',
       //First we need to get the app version
       //if we are webview
       //Default is version 0.1.0, since it's the initial version
-      var appVersion = "0.1.0";
+      var appVersion = CONST.version;
       if(ionic.Platform.isWebView()) {
 
           //Grab the version number from cordova
@@ -119,8 +119,7 @@ angular.module('starter',
 
            //Check if we are on a device (WebView is true on a device), and then if
            //We are making a backend request
-           if(ionic.Platform.isWebView() &&
-           (config.method == "GET" ||
+           if((config.method == "GET" ||
            config.method == "POST") &&
            config.url.indexOf(CONST.apiBase) > -1) {
 
@@ -148,7 +147,7 @@ angular.module('starter',
                    }
                }
 
-               console.log(JSON.stringify(config));
+               console.log(config);
 
                //Now send the request
                return config;
