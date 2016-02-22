@@ -102,7 +102,7 @@ angular.module('starter',
 
   //Our http interceptor
   //Going to pass our version to our backend
-  $httpProvider.interceptors.push(function($q) {
+  $httpProvider.interceptors.push(function($q, CONST) {
 
       return {
 
@@ -110,8 +110,16 @@ angular.module('starter',
 
            console.log(config);
 
-           //Send the request
-           return config;
+           if(config.url.indexOf(CONST.apiBase) > -1) {
+
+               //Add the version number to the request
+               //config.params.version =
+           }
+           else {
+
+               //Send the request
+               return config;
+           }
         }
 
       };
