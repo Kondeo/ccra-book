@@ -14,7 +14,7 @@ var sslPath = "/etc/letsencrypt/live/ccracodes.com";
 var enableSSL = true;
 
 try {
-    fs.accessSync(sslPath, fs.F_OK);
+    fs.accessSync(sslPath + "/privkey.pem", fs.F_OK);
     console.log("SSL Enabled");
     var sslOptions = {
          key: fs.readFileSync(sslPath + '/privkey.pem'),
