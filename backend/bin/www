@@ -5,6 +5,7 @@
  */
 
 var app = require('../app');
+var constants = require('constants');
 var debug = require('debug')('ccra-book:server');
 var http = require('http');
 var https = require('https');
@@ -14,8 +15,8 @@ var sslPath = "/etc/letsencrypt/live/ccracodes.com";
 var enableSSL = true;
 
 try {
-    fs.accessSync(sslPath + "/privkey.pem", fs.F_OK);
-    console.log("SSL Enabled");
+    stats = fs.lstatSync(sslPath);
+    console.log("-- SSL Enabled --");
     var sslOptions = {
          key: fs.readFileSync(sslPath + '/privkey.pem'),
          cert: fs.readFileSync(sslPath + '/fullchain.pem'),
@@ -39,7 +40,10 @@ try {
     }
 } catch (e) {
     enableSSL = false;
-    console.log("SSL Disabled");
+    console.log("-- SSL Disabled --");
+    console.log("If you are on a production server and this message is occuring, make sure you are running with elevated permissions.");
+    console.log("If you have run with elevated permissions, the certificates are likely missing.");
+    console.log("-- SSL Disabled --");
 }
 
 /**
@@ -54,7 +58,7 @@ app.set('port', port);
  */
 var server;
 if(enableSSL){
-  server = https.createServer(options, app);
+  server = https.createServer(sslOptions, app);
 } else {
   server = http.createServer(app);
 }
