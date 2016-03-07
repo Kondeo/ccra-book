@@ -50,7 +50,7 @@ module.exports = function (grunt) {
       production: {
         constants: {
           CONST: {
-            "apiBase": "http://ccra1.kondeo.com:3000/",
+            "apiBase": "https://ccra1.kondeo.com:3000/",
             "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE"
           }
         }
