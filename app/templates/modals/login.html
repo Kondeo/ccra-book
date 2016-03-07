@@ -1,12 +1,19 @@
-<ion-modal-view>
+<ion-modal-view ng-controller="AppCtrl">
   <ion-header-bar>
     <h1 class="title">Login</h1>
     <div class="buttons">
-      <button class="button button-clear" ng-if="loggedIn() && errors[0] != 12" ng-click="closeLogin()">Close</button>
+      <button class="button button-clear"
+      ng-if="loggedIn() && errors[0] != 12"
+      ng-click="loginModal.hide()">
+      Close
+      </button>
     </div>
   </ion-header-bar>
   <ion-content>
-    <form ng-submit="doLogin()">
+
+    <form
+    ng-controller = "LoginCtrl"
+    ng-submit="doLogin()">
 
         <!-- Placing two fake auth fields to
         stop chrome autofill -->
@@ -41,12 +48,12 @@
 
     <div class = "register"
     ng-if="!loggedIn()">
-        Or you can <a href="#/app/register" ng-click = "closeLogin()">register for a subcription</a>
+        Or you can <a href="#/app/register" ng-click = "loginModal.hide()">register for a subcription</a>
     </div>
 
     <div class = "register"
     ng-if="loggedIn()">
-        Or you can <a href="#/app/register" ng-click = "closeLogin()">manage your subcription</a>
+        Or you can <a href="#/app/register" ng-click = "loginModal.hide()">manage your subcription</a>
     </div>
   </ion-content>
 </ion-modal-view>

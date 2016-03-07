@@ -296,11 +296,10 @@ angular.module('starter')
      * Validates form zipcode. Checks for length.
      */
     $scope.validateZip = function() {
-        //get the input
-        var input1 = document.getElementById("userZip");
 
         //Simply check if there are 5 digits
-        if (input1.value.length > 4) {
+        var zipText = $scope.registerData.zipCode + "";
+        if (zipText.length > 4) {
             $scope.zipValidated = true;
         } else {
             $scope.zipValidated = false;

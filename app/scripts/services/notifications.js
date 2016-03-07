@@ -1,6 +1,7 @@
 angular.module('starter')
 .service('Notifications', function($ionicPopup, $ionicModal,
-    loadingSpinner, $ionicHistory, $state) {
+    loadingSpinner, $ionicHistory, $state,
+    LoginModal) {
 
     //Show an alert to the user
     function showAlert(alertTitle, alertText, callback) {
@@ -72,6 +73,9 @@ angular.module('starter')
 
                    //Show an alert
                    showAlert("Session Error", "Session not found or invalidated, please log in.");
+
+                   //Show the login Modal
+                   LoginModal.show();
                }
                else if(response.status == 402) {
                    //402 Error
