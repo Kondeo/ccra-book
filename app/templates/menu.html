@@ -12,7 +12,7 @@
         </button>
         <button
         ng-if="!loggedIn()"
-        ng-click="login()"
+        ng-click="loginModal.show()"
         class="button button-icon button-clear">
         Log In
         </button>
@@ -33,11 +33,11 @@
         <!-- <ion-item menu-close ng-click="goToPage()">
         <img src="images/icon_page_num.png" class="menuIcon">Go To Page
         </ion-item> -->
-        <ion-item menu-close ng-click="login()"
+        <ion-item menu-close ng-click="loginModal.show()"
         ng-if = "!loggedIn()">
         <img src="images/icon_auth.png" class="menuIcon">Login
         </ion-item>
-        <ion-item menu-close ng-click="login()"
+        <ion-item menu-close ng-click="loginModal.show()"
         ng-if = "loggedIn()">
         <img src="images/icon_auth.png" class="menuIcon">Switch Account
         </ion-item>
