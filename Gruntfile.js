@@ -63,8 +63,8 @@ module.exports = function (grunt) {
       default: {
         constants: {
           CONST: {
-            "apiBase": "http://srv1.kondeo.com:3003/",
-            "stripePK": "pk_test_u1eALgznI2RRoPFEN8e1q9s9",
+            "apiBase": "https://ccra1.kondeo.com:3000/",
+            "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE",
             "version": "<%= pkg.version %>"
           }
         }
