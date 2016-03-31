@@ -43,9 +43,21 @@ angular.module('starter')
                     break;
                 }
 
+                var skippedWords = [
+                  "if",
+                  "of",
+                  "and",
+                  "or",
+                  "as",
+                  "am",
+                  "be",
+                  "on"
+                ]
+
                 //This holds the paragraph
                 var bigFind = "";
                 for(var j=0;j<startIndexes.length;j++){
+                    if(skippedWords.indexOf(results[i].highlight.content[0].substring(startIndexes[j] + 6, endIndexes[j])) >= 0) {console.log("asdf"); continue};
                     var start = startIndexes[j] - 75;
                     var relatives = findRelatives(j, 75, endIndexes, startIndexes, endIndexes[j], 0);
                     j = j + relatives.skip;
