@@ -6,7 +6,7 @@
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.6.0",
     "angular-resource": "1.2.16",
     "angular-route": "1.2.16",
-    "ionic": "v1.2.3",
+    "ionic": "v1.2.4",
     "ngCordova": "v0.1.14-alpha",
     "moment": "~2.11.1",
     "angular-ui-tinymce": "latest"
