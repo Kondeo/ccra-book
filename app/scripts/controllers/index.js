@@ -6,6 +6,12 @@ angular.module('starter')
 
     var cookie = localStorage.getItem("session_token");
 
+    $scope.hideTutorial = localStorage.getItem("hideTutorial");
+
+    $scope.hideTutorial = function(){
+      localStorage.setItem("hideTutorial", true);
+    }
+
     $scope.goTo = function(page){
         $scope.temp = 'app/page/' + page;
         $location.path($scope.temp);
