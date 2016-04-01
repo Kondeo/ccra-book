@@ -22,7 +22,7 @@ router.get('/query/:terms', function(req, res, next) {
         Page.esClient.search({
           "body": {
             "from" : start,
-            "size" : 30,
+            "size" : 20,
             "query": {
               "query_string": {
                 query: req.params.terms + "~",
