@@ -2,6 +2,7 @@
 view-title="Index"
 class = "view-backdrop">
 
+  <!-- Hovering search bar, pops out only when scrolled down -->
   <div class="item item-input-inset fixedSearch" ng-hide="!navHovering">
     <label class="item-input-wrapper">
       <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
@@ -12,6 +13,7 @@ class = "view-backdrop">
   </div>
 
   <ion-content on-scroll="searchHover()">
+    <!-- Inline search bar, shows all the time, but is hidden once scrolling begins -->
     <div class="item item-input-inset">
       <label class="item-input-wrapper">
         <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="$parent.query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
@@ -20,6 +22,8 @@ class = "view-backdrop">
         Search
       </button>
     </div>
+
+    <!-- Search result list -->
     <ion-list
     class = "serachList">
         <div class="list">

@@ -11,22 +11,29 @@ angular.module('starter')
         $location.path($scope.temp);
     }
 
+    //Called every time user scrolls
+    //Evaluates whether searchbar should pop out
     $scope.searchHover = function(){
+      //Get current position of scrolling window from Ionic
       var scrollPos = $ionicScrollDelegate.getScrollPosition().top;
       if(scrollPos > 44){
         $scope.navHovering = true;
       } else {
         $scope.navHovering = false;
       }
+      //Onscroll directive does not call scope apply, so we must call it ourselves
       $scope.$apply();
     }
 
+    //Called upon searchbar submission
     $scope.search = function(query, $event){
-
+        //Blur focus on search field. This is used for enter key events.
+        //This parameter is optional, thus the 'if'
         if($event) $event.target.blur();
 
         $scope.searched = true;
 
+        //Quit the search if too short, so as to not execute large and useless queries
         if(query.length <= 3) return;
 
         //Create our payload
@@ -113,6 +120,7 @@ angular.module('starter')
       //Replace back <strong> tags
       html = html.replace(/\|\|\/strong\|\|/g,"</strong>");
       html = html.replace(/\|\|strong\|\|/g,"<strong>");
+      //Words we do not want to highlight
       var skippedWords = [
         "if",
         "of",
@@ -124,6 +132,7 @@ angular.module('starter')
         "on",
         "a"
       ]
+      //Go through the skipped words, and remove highlighting on all
       for(var i=0;i<skippedWords.length;i++){
         var re = new RegExp("<mark>" + skippedWords[i] + "</mark>","g");
         html = html.replace(re, skippedWords[i]);
