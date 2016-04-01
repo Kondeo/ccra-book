@@ -83,6 +83,9 @@ $dark:                            #444 !default;
     //Ionic header bar is defined exactly
     //as 44px, so place a margin on our view
     margin-top: 44px;
+    position: absolute;
+    right: 0px;
+    left: 0px;
 }
 
 .searchList {

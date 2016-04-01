@@ -1,17 +1,25 @@
 <ion-view
 view-title="Index"
-class = "fixedSearch">
+class = "view-backdrop">
 
+  <div class="item item-input-inset fixedSearch" ng-hide="!navHovering">
+    <label class="item-input-wrapper">
+      <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
+    </label>
+    <button class="button button-small" ng-click="search(query)">
+      Search
+    </button>
+  </div>
+
+  <ion-content on-scroll="searchHover()">
     <div class="item item-input-inset">
       <label class="item-input-wrapper">
-        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query)">
+        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="$parent.query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
       </label>
       <button class="button button-small" ng-click="search(query)">
         Search
       </button>
     </div>
-
-  <ion-content>
     <ion-list
     class = "serachList">
         <div class="list">

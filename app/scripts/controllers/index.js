@@ -1,6 +1,6 @@
 angular.module('starter')
 .controller('IndexCtrl', function($scope,
-    $location, Page, loadingSpinner, Notifications) {
+    $location, Page, loadingSpinner, Notifications, $ionicScrollDelegate) {
 
     $scope.searchResults = [];
 
@@ -11,7 +11,19 @@ angular.module('starter')
         $location.path($scope.temp);
     }
 
-    $scope.search = function(query){
+    $scope.searchHover = function(){
+      var scrollPos = $ionicScrollDelegate.getScrollPosition().top;
+      if(scrollPos > 44){
+        $scope.navHovering = true;
+      } else {
+        $scope.navHovering = false;
+      }
+      $scope.$apply();
+    }
+
+    $scope.search = function(query, $event){
+
+        if($event) $event.target.blur();
 
         $scope.searched = true;
 
