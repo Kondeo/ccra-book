@@ -32,7 +32,7 @@ class = "fixedSearch">
         </div>
         <div ng-if="query && searched && searchResults.length < 1" class="center" style="text-align:center">
 
-            Your query returned no results. Please try with a more general term.
+            Your query returned no results. Please try with a more <q ng-if="query.length <= 3">descriptive</q><q ng-if="query.length > 3">general</q> search.
 
         </div>
 

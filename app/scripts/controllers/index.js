@@ -15,6 +15,8 @@ angular.module('starter')
 
         $scope.searched = true;
 
+        if(query.length <= 3) return;
+
         //Create our payload
         var payload = {
             query: query,
@@ -43,21 +45,10 @@ angular.module('starter')
                     break;
                 }
 
-                var skippedWords = [
-                  "if",
-                  "of",
-                  "and",
-                  "or",
-                  "as",
-                  "am",
-                  "be",
-                  "on"
-                ]
-
                 //This holds the paragraph
                 var bigFind = "";
                 for(var j=0;j<startIndexes.length;j++){
-                    if(skippedWords.indexOf(results[i].highlight.content[0].substring(startIndexes[j] + 6, endIndexes[j])) >= 0) {console.log("asdf"); continue};
+                    //if(skippedWords.indexOf(results[i].highlight.content[0].substring(startIndexes[j] + 6, endIndexes[j])) >= 0) {console.log("asdf"); continue};
                     var start = startIndexes[j] - 75;
                     var relatives = findRelatives(j, 75, endIndexes, startIndexes, endIndexes[j], 0);
                     j = j + relatives.skip;
@@ -91,13 +82,38 @@ angular.module('starter')
     }
 
     function remove_tags(html) {
-     var html = html.replace(/<mark>/g,"||mark||");
-     var html = html.replace(/<\/mark>/g,"||/mark||");
-     var tmp = document.createElement("DIV");
-     tmp.innerHTML = html;
-     html = tmp.textContent||tmp.innerText;
-     html = html.replace(/\|\|\/mark\|\|/g,"</mark>");
-     return html.replace(/\|\|mark\|\|/g,"<mark>");
+      //Replace <mark> tags
+      var html = html.replace(/<mark>/g,"||mark||");
+      html = html.replace(/<\/mark>/g,"||/mark||");
+      //Replace <strong> tags (only first occurance)
+      html = html.replace(/<strong>/,"||strong||");
+      html = html.replace(/<\/strong>/,"||/strong||");
+      //Strip the tags
+      var tmp = document.createElement("DIV");
+      tmp.innerHTML = html;
+      html = tmp.textContent||tmp.innerText;
+      //Replace back <mark> tags
+      html = html.replace(/\|\|\/mark\|\|/g,"</mark>");
+      html = html.replace(/\|\|mark\|\|/g,"<mark>");
+      //Replace back <strong> tags
+      html = html.replace(/\|\|\/strong\|\|/g,"</strong>");
+      html = html.replace(/\|\|strong\|\|/g,"<strong>");
+      var skippedWords = [
+        "if",
+        "of",
+        "and",
+        "or",
+        "as",
+        "am",
+        "be",
+        "on",
+        "a"
+      ]
+      for(var i=0;i<skippedWords.length;i++){
+        var re = new RegExp("<mark>" + skippedWords[i] + "</mark>","g");
+        html = html.replace(re, skippedWords[i]);
+      }
+      return html;
    }
 
    function getIndicesOf(searchStr, str, caseSensitive) {
