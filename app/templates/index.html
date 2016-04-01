@@ -1,43 +1,53 @@
 <ion-view
 view-title="Index"
-class = "fixedSearch">
+class = "search-backdrop">
 
+  <!-- Hovering search bar, pops out only when scrolled down -->
+  <div class="item item-input-inset fixedSearch" ng-hide="!navHovering">
+    <label class="item-input-wrapper">
+      <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
+    </label>
+    <button class="button button-small" ng-click="search(query)">
+      Search
+    </button>
+  </div>
+
+  <ion-content on-scroll="searchHover()">
+    <!-- Inline search bar, shows all the time, but is hidden once scrolling begins -->
     <div class="item item-input-inset">
       <label class="item-input-wrapper">
-        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query)">
+        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="$parent.query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
       </label>
       <button class="button button-small" ng-click="search(query)">
         Search
       </button>
     </div>
 
-  <ion-content>
+    <!-- Search result list -->
     <ion-list
-    class = "serachList">
-        <div class="list">
-
-        </div>
+    class = "searchList">
 
         <div ng-if="!query"
-        class="center noSearch">
-
+        class="card searchHint">
+          <div class="item item-text-wrap">
             Please type in a search above.
             Or, go to <a href="#/app/page/23">the beginning</a>.
-
+          </div>
         </div>
-        <div ng-if="query && !searched" class="center noSearch">
-
+        <div ng-if="query && !searched" class="card searchHint">
+          <div class="item item-text-wrap">
             Please tap "search" to execute your query.
-
+          </div>
         </div>
-        <div ng-if="query && searched && searchResults.length < 1" class="center" style="text-align:center">
-
-            Your query returned no results. Please try with a more general term.
-
+        <div ng-if="query && searched && searchResults.length < 1"
+          class="card searchHint" style="text-align:center">
+          <div class="item item-text-wrap">
+            Your query returned no results. Please try with a more <q ng-if="query.length <= 3">descriptive</q><q ng-if="query.length > 3">general</q> search.
+          </div>
         </div>
 
-        <div class="card" ng-if="searched && searchResults.length > 0">
-          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
+        <div class="card" ng-if="searched && searchResults.length > 0" ng-repeat="result in searchResults">
+          <div class="item item-text-wrap" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
         </div>
     </ion-list>
   </ion-content>

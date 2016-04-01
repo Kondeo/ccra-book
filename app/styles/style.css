@@ -1,6 +1,10 @@
 /* Empty. Add your own CSS if you like */
 .view-backdrop {
-  background-color: lightgray !important;
+  background-color: slategrey !important;
+}
+
+.search-backdrop {
+  background-color: teal !important;
 }
 
 .button-next-icon {
