@@ -92,7 +92,11 @@ $dark:                            #444 !default;
     margin-top: 10px;
 }
 
-.noSearch {
+.searchResult {
+    margin-bottom: 5px;
+}
+
+.searchHint {
     text-align: center;
     font-size: 16px;
 }

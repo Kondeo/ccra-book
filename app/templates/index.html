@@ -1,6 +1,6 @@
 <ion-view
 view-title="Index"
-class = "view-backdrop">
+class = "search-backdrop">
 
   <!-- Hovering search bar, pops out only when scrolled down -->
   <div class="item item-input-inset fixedSearch" ng-hide="!navHovering">
@@ -25,31 +25,29 @@ class = "view-backdrop">
 
     <!-- Search result list -->
     <ion-list
-    class = "serachList">
-        <div class="list">
-
-        </div>
+    class = "searchList">
 
         <div ng-if="!query"
-        class="center noSearch">
-
+        class="card searchHint">
+          <div class="item item-text-wrap">
             Please type in a search above.
             Or, go to <a href="#/app/page/23">the beginning</a>.
-
+          </div>
         </div>
-        <div ng-if="query && !searched" class="center noSearch">
-
+        <div ng-if="query && !searched" class="card searchHint">
+          <div class="item item-text-wrap">
             Please tap "search" to execute your query.
-
+          </div>
         </div>
-        <div ng-if="query && searched && searchResults.length < 1" class="center" style="text-align:center">
-
+        <div ng-if="query && searched && searchResults.length < 1"
+          class="card searchHint" style="text-align:center">
+          <div class="item item-text-wrap">
             Your query returned no results. Please try with a more <q ng-if="query.length <= 3">descriptive</q><q ng-if="query.length > 3">general</q> search.
-
+          </div>
         </div>
 
-        <div class="card" ng-if="searched && searchResults.length > 0">
-          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
+        <div class="card" ng-if="searched && searchResults.length > 0" ng-repeat="result in searchResults">
+          <div class="item item-text-wrap" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
         </div>
     </ion-list>
   </ion-content>
