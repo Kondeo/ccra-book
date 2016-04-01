@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "angular-hotkeys": "^1.6.0",
     "grunt-concurrent": "^1.0.0",
     "moment": "^2.11.1"
   },
   "devDependencies": {
-    "cordova": "~6.1.0",
+    "cordova": "~4.2.0",
     "elementtree": "0.1.6",
     "glob": "~7.0.3",
     "grunt": "~0.4.5",
