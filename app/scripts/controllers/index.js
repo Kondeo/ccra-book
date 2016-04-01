@@ -47,6 +47,9 @@ angular.module('starter')
 
                 //This holds the paragraph
                 var bigFind = "";
+                var titleStart = results[i].highlight.content[0].indexOf("<strong>");
+                var titleEnd = results[i].highlight.content[0].indexOf("</strong>")
+                if(titleStart > -1 && titleEnd > -1) bigFind += results[i].highlight.content[0].substring(titleStart, titleEnd + 9) + "<br />";
                 for(var j=0;j<startIndexes.length;j++){
                     //if(skippedWords.indexOf(results[i].highlight.content[0].substring(startIndexes[j] + 6, endIndexes[j])) >= 0) {console.log("asdf"); continue};
                     var start = startIndexes[j] - 75;
