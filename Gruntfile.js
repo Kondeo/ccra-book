@@ -433,7 +433,7 @@ module.exports = function (grunt) {
     grunt.registerTask(name, function () {
       this.args.unshift(name.replace('cordova:', ''));
       // Handle URL's being split up by Grunt because of `:` characters
-      if (_.contains(this.args, 'http') || _.contains(this.args, 'https')) {
+      if (_.includes(this.args, 'http') || _.includes(this.args, 'https')) {
         this.args = this.args.slice(0, -2).concat(_.last(this.args, 2).join(':'));
       }
       var done = this.async();
