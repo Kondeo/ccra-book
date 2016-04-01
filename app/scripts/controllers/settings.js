@@ -2,9 +2,9 @@ angular.module('starter')
 .controller('SettingsCtrl', function($scope, $window,
     Notifications, LoginModal) {
 
-
     $scope.saveSettings = function(){
-        localStorage.setItem("easyReading", $scope.settings.easyReading);
+        localStorage.setItem("setting_easyReading", $scope.settings.easyReading);
+        localStorage.setItem("setting_tutorial", $scope.settings.tutorial);
     }
 
     $scope.logOut = function() {

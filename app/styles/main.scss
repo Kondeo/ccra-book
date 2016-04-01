@@ -16,6 +16,13 @@ $dark:                            #444 !default;
     background: lightgrey;
 }
 
+.codeBlock {
+  background-color: #e6e6e6;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 3px;
+}
+
 
 //Edit page
 .editTextHeader {

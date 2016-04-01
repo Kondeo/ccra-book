@@ -8,8 +8,11 @@ angular.module('starter')
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
 
+  if(localStorage.getItem("setting_tutorial") === null) localStorage.setItem("setting_tutorial", true);
+
   $scope.settings = {};
-  $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
+  $scope.settings.easyReading = localStorage.getItem("setting_easyReading") === "true";
+  $scope.settings.tutorial = localStorage.getItem("setting_tutorial") === "true";
 
   //Form data for the go to page
   $scope.page = {};

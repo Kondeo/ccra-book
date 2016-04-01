@@ -14,11 +14,30 @@
       <li class="item" ng-if="!platformIOS">
         <div style="vertical-align: text-bottom">Easy Reading Page Color</div>
         <div class="onoffswitch">
-          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ng-model="settings.easyReading" ng-change="saveSettings()">
-          <label class="onoffswitch-label" for="myonoffswitch"></label>
+          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="pagecolor" ng-model="settings.easyReading" ng-change="saveSettings()">
+          <label class="onoffswitch-label" for="pagecolor"></label>
         </div>
         </div>
       </li>
+
+      <li class="item item-toggle" ng-if="platformIOS">
+        Show Tutorial on Search Page
+        <label class="toggle toggle-assertive">
+          <input type="checkbox" ng-model="settings.tutorial" ng-change="saveSettings()">
+          <div class="track">
+            <div class="handle"></div>
+          </div>
+        </label>
+      </li>
+      <li class="item" ng-if="!platformIOS">
+        <div style="vertical-align: text-bottom">Show Tutorial on Search Page</div>
+        <div class="onoffswitch">
+          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="tutorialswitch" ng-model="settings.tutorial" ng-change="saveSettings()">
+          <label class="onoffswitch-label" for="tutorialswitch"></label>
+        </div>
+        </div>
+      </li>
+
       <li class="item">
         Your platform is:
         <d ng-if="platformAndroid">Android</d>
@@ -36,8 +55,7 @@
           ng-click="logOut()">
              Log Out
           </button>
-    </div>
-
+      </div>
     </ul>
   </ion-content>
 </ion-view>
