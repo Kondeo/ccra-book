@@ -6,6 +6,11 @@ angular.module('starter')
 
     var cookie = localStorage.getItem("session_token");
 
+    $scope.setTutorial = function(val){
+      $scope.settings.tutorial = val;
+      localStorage.setItem("setting_tutorial", val);
+    }
+
     $scope.goTo = function(page){
         $scope.temp = 'app/page/' + page;
         $location.path($scope.temp);
