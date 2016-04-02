@@ -36,6 +36,8 @@ angular.module('starter')
         //This parameter is optional, thus the 'if'
         if($event) $event.target.blur();
 
+        $ionicScrollDelegate.scrollTop();
+
         $scope.searched = true;
 
         //Quit the search if too short, so as to not execute large and useless queries
