@@ -43,7 +43,7 @@ angular.module('starter')
         //Quit the search if too short, so as to not execute large and useless queries
         if(query.length <= 3) return;
 
-        query = query.replace(/\(|\)|\[|\]|\{|\}|\\|\/|~|\^/g,'\\');
+        query = query.replace(/\(|\)|\[|\]|\{|\}/g,'\\');
 
         //Create our payload
         var payload = {
