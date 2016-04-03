@@ -1,6 +1,6 @@
 angular.module('starter')
 .controller('IndexCtrl', function($scope,
-    $location, Page, loadingSpinner, Notifications, $ionicScrollDelegate) {
+    $location, $timeout, Page, loadingSpinner, Notifications, $ionicScrollDelegate) {
 
     $scope.searchResults = [];
 
@@ -19,15 +19,15 @@ angular.module('starter')
     //Called every time user scrolls
     //Evaluates whether searchbar should pop out
     $scope.searchHover = function(){
-      //Get current position of scrolling window from Ionic
-      var scrollPos = $ionicScrollDelegate.getScrollPosition().top;
-      if(scrollPos > 44){
-        $scope.navHovering = true;
-      } else {
-        $scope.navHovering = false;
-      }
-      //Onscroll directive does not call scope apply, so we must call it ourselves
-      $scope.$apply();
+      $timeout(function(){
+        //Get current position of scrolling window from Ionic
+        var scrollPos = $ionicScrollDelegate.getScrollPosition().top;
+        if(scrollPos > 44){
+          $scope.navHovering = true;
+        } else {
+          $scope.navHovering = false;
+        }
+      });
     }
 
     //Called upon searchbar submission
