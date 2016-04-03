@@ -67,7 +67,11 @@ class = "search-backdrop">
               It does this based on a few factors some of which include frequency, order and placement.<br />
               For some searches, this may not be what you want.<br />
               If you know a phrase you are looking for, you can surround your search term in quotes, like the following:<br />
-              <div class="codeBlock">"notice of availability"</div>
+              <div class="codeBlock">"notice of availability"</div><br />
+              This also enables you to search literally for special characters listed below.<br />
+              If you'd like to search for a code section like "1985.3(g)", just search the following<br />
+              <div class="codeBlock">"1985.3(g)"</div><br />
+              (The inherent problem with the search above without "" is that it contains parenthesis)
               <br /><br />
 
               <strong>OR and AND</strong><br />
@@ -81,12 +85,40 @@ class = "search-backdrop">
               <div class="codeBlock">availability AND notice</div>
               <br /><br />
 
-              <strong>Combining advanced search tips</strong><br />
+              <strong>Combining Advanced Search Syntax</strong><br />
               The search engine is capable of combining the tips above. You can do things like this:
               <div class="codeBlock">"notice of availability" OR "notice of appeal"</div><br />
               and<br />
               <div class="codeBlock">"notice of availability" AND "notice of appeal"</div><br />
               (which returns no results because it is too specific)
+              <br /><br />
+
+              <strong>Even More Syntax</strong><br />
+              There are tons of other syntax items you can use.<br />
+              Feel free to play around with any of the below.<br /><br />
+
+              Parenthesis group items.<br />
+              <div class="codeBlock">(notice OR availability) AND deposition</div><br />
+              <br />
+
+              Exclude terms from results with -, include terms with +<br />
+              <div class="codeBlock">notice of +availability -deposition</div><br />
+              In the above, "notice of" is optional, "availability" MUST be present. <br />
+              "deposition" MUST not be in a result.<br />
+              <br />
+
+              Boost term relevance with ^#, like ^2 and ^3<br />
+              <div class="codeBlock">notice^2 of availability^3 deposition</div><br />
+              In the above, results with "availability" will be ranked highest.<br />
+              Notice is ranked second highest. Deposition is unimportant in comparison.<br />
+              <br />
+
+              Allow literal searches to have terms inbetween<br />
+              <div class="codeBlock">"notice of availability"</div> will NOT match "notice of the availability".<br />
+              You can allow terms to occur between items in your literal search.<br />
+              To do this, put ~# at the end of your quotes, where # is the fuzziness.<br />
+              <div class="codeBlock">"notice of availability"~3</div><br />
+              In the above, the engine will match results with a calculated distance of 3.
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 angular.module('starter')
 .controller('IndexCtrl', function($scope,
-    $location, Page, loadingSpinner, Notifications, $ionicScrollDelegate) {
+    $location, $timeout, Page, loadingSpinner, Notifications, $ionicScrollDelegate) {
 
     $scope.searchResults = [];
 
@@ -19,15 +19,15 @@ angular.module('starter')
     //Called every time user scrolls
     //Evaluates whether searchbar should pop out
     $scope.searchHover = function(){
-      //Get current position of scrolling window from Ionic
-      var scrollPos = $ionicScrollDelegate.getScrollPosition().top;
-      if(scrollPos > 44){
-        $scope.navHovering = true;
-      } else {
-        $scope.navHovering = false;
-      }
-      //Onscroll directive does not call scope apply, so we must call it ourselves
-      $scope.$apply();
+      $timeout(function(){
+        //Get current position of scrolling window from Ionic
+        var scrollPos = $ionicScrollDelegate.getScrollPosition().top;
+        if(scrollPos > 44){
+          $scope.navHovering = true;
+        } else {
+          $scope.navHovering = false;
+        }
+      });
     }
 
     //Called upon searchbar submission
@@ -42,6 +42,14 @@ angular.module('starter')
 
         //Quit the search if too short, so as to not execute large and useless queries
         if(query.length <= 3) return;
+
+        //query = query.replace(/\(|\)|\[|\]|\{|\}/g,'\\');
+        //Fuzzy everything if not a literal search, or if fuzzy not manually specified
+        if(query.indexOf("\"") == -1 && query.indexOf("~") == -1){
+          query = query.replace(/\s+/g,' ').trim();
+          query = query.replace(/ /g, "~ ");
+          query = query + "~";
+        }
 
         //Create our payload
         var payload = {
@@ -102,6 +110,11 @@ angular.module('starter')
                     status: 412,
                     title: "Session Error!",
                     text: "Session not found or invalidated, please log in.",
+                },
+                {
+                    status: 500,
+                    title: "Search Engine Error!",
+                    text: "Please check your query. You may have used some special (reserved) characters in your search improperly. Please read the tutorial. Some special characters are reserved for advanced search functionality.<br /><br />If you didn't use any special characters in your search, the server may be having problems at the moment.",
                 }
             ];
 
