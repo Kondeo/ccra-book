@@ -106,7 +106,15 @@ class = "search-backdrop">
               Boost term relevance with ^#, like ^2 and ^3<br />
               <div class="codeBlock">notice^2 of availability^3 deposition</div><br />
               In the above, results with "availability" will be ranked highest.<br />
-              Notice is ranked second highest. Deposition is unimportant in comparison.
+              Notice is ranked second highest. Deposition is unimportant in comparison.<br />
+              <br />
+
+              Allow literal searches to have terms inbetween<br />
+              <div class="codeBlock">"notice of availability"</div> will NOT match "notice of the availability".<br />
+              You can allow terms to occur between items in your literal search.<br />
+              To do this, put ~# at the end of your quotes, where # is the fuzziness.<br />
+              <div class="codeBlock">"notice of availability"~3</div><br />
+              In the above, the engine will match results with a calculated distance of 3.
           </div>
         </div>
 
