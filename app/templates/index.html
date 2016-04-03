@@ -81,12 +81,32 @@ class = "search-backdrop">
               <div class="codeBlock">availability AND notice</div>
               <br /><br />
 
-              <strong>Combining advanced search tips</strong><br />
+              <strong>Combining Advanced Search Syntax</strong><br />
               The search engine is capable of combining the tips above. You can do things like this:
               <div class="codeBlock">"notice of availability" OR "notice of appeal"</div><br />
               and<br />
               <div class="codeBlock">"notice of availability" AND "notice of appeal"</div><br />
               (which returns no results because it is too specific)
+              <br /><br />
+
+              <strong>Even More Syntax</strong><br />
+              There are tons of other syntax items you can use.<br />
+              Feel free to play around with any of the below.<br /><br />
+
+              Parenthesis group items.<br />
+              <div class="codeBlock">(notice OR availability) AND deposition</div><br />
+              <br />
+
+              Exclude terms from results with -, include terms with +<br />
+              <div class="codeBlock">notice of +availability -deposition</div><br />
+              In the above, "notice of" is optional, "availability" MUST be present. <br />
+              "deposition" MUST not be in a result.<br />
+              <br />
+
+              Boost term relevance with ^#, like ^2 and ^3<br />
+              <div class="codeBlock">notice^2 of availability^3 deposition</div><br />
+              In the above, results with "availability" will be ranked highest.<br />
+              Notice is ranked second highest. Deposition is unimportant in comparison.
           </div>
         </div>
 
