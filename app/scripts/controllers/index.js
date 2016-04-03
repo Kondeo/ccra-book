@@ -43,7 +43,7 @@ angular.module('starter')
         //Quit the search if too short, so as to not execute large and useless queries
         if(query.length <= 3) return;
 
-        query = query.replace(/\(|\)|\[|\]|\{|\}|\\|\/|~|\^/g,' ');
+        query = query.replace(/\(|\)|\[|\]|\{|\}|\\|\/|~|\^/g,'\\');
 
         //Create our payload
         var payload = {
@@ -104,6 +104,11 @@ angular.module('starter')
                     status: 412,
                     title: "Session Error!",
                     text: "Session not found or invalidated, please log in.",
+                },
+                {
+                    status: 500,
+                    title: "Search Engine Error!",
+                    text: "Please check your query. You may have used some special (reserved) characters in your search. These (such as brackets or quotes) are reserved for advanced search functionality. If you didn't use any special characters in your search, the server may be having problems at the moment.",
                 }
             ];
 
