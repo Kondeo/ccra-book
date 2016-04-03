@@ -108,7 +108,7 @@ angular.module('starter')
                 {
                     status: 500,
                     title: "Search Engine Error!",
-                    text: "Please check your query. You may have used some special (reserved) characters in your search. These (such as brackets or quotes) are reserved for advanced search functionality. If you didn't use any special characters in your search, the server may be having problems at the moment.",
+                    text: "Please check your query. You may have used some special (reserved) characters in your search improperly. Please read the tutorial. Some special characters are reserved for advanced search functionality.<br /><br />If you didn't use any special characters in your search, the server may be having problems at the moment.",
                 }
             ];
 
