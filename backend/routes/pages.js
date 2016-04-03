@@ -25,7 +25,7 @@ router.get('/query/:terms', function(req, res, next) {
             "size" : 20,
             "query": {
               "query_string": {
-                query: req.params.terms + "~",
+                query: req.params.terms,
                 fuzziness: "AUTO",
                 "default_field" : "content"
               }
