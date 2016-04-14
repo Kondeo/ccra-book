@@ -10,7 +10,7 @@ angular.module('starter')
     $scope.admin = localStorage.getItem("admin");
     var cookie = localStorage.getItem("session_token");
 
-    $scope.searchResults = localStorage.getItem("search_indexes") === null ? false : JSON.parse(localStorage.getItem("search_indexes"));
+    $scope.searchResults = sessionStorage.getItem("search_indexes") === null ? false : JSON.parse(sessionStorage.getItem("search_indexes"));
     if($scope.searchResults && $scope.searchResults.indexOf(parseInt($scope.pagenum)) > -1){
       $scope.searchResult = true;
     }

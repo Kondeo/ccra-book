@@ -99,7 +99,7 @@ angular.module('starter')
 
                 results[i].highlight.content[0] = bigFind;
             }
-            localStorage.setItem("search_indexes", JSON.stringify(resultIndexes));
+            sessionStorage.setItem("search_indexes", JSON.stringify(resultIndexes));
             $scope.searchResults = results;
             results = null;
         },
