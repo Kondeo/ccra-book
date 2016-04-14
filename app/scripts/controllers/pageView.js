@@ -10,6 +10,11 @@ angular.module('starter')
     $scope.admin = localStorage.getItem("admin");
     var cookie = localStorage.getItem("session_token");
 
+    $scope.searchResults = sessionStorage.getItem("search_indexes") === null ? false : JSON.parse(sessionStorage.getItem("search_indexes"));
+    if($scope.searchResults && $scope.searchResults.indexOf(parseInt($scope.pagenum)) > -1){
+      $scope.searchResult = true;
+    }
+
     var payload = {
         number: $scope.pagenum,
         token: cookie
@@ -64,6 +69,21 @@ angular.module('starter')
             Notifications.error(response);
         }
    });
+
+   $scope.goTo = function(direction, searchResult){
+     if(searchResult){
+       if(direction == "next"){
+         $state.go('app.single', {"page": $scope.searchResults[$scope.searchResults.indexOf(parseInt($scope.pagenum)) + 1]});
+       } else {
+         console.log("back")
+         $state.go('app.single', {"page": $scope.searchResults[$scope.searchResults.indexOf(parseInt($scope.pagenum)) - 1]});
+       }
+     }
+   }
+
+   $scope.toInt = function(myInt){
+     return parseInt(myInt);
+   }
 
     $scope.goToNext = function(){
 

@@ -12,8 +12,8 @@ angular.module('starter')
     }
 
     $scope.goTo = function(page){
-        $scope.temp = 'app/page/' + page;
-        $location.path($scope.temp);
+        var temp = 'app/page/' + page;
+        $location.path(temp);
     }
 
     //Called every time user scrolls
@@ -67,7 +67,9 @@ angular.module('starter')
             //Non-Commented Julian Code
 
             var results = response.hits.hits;
+            var resultIndexes = [];
             for(var i=0;i<results.length;i++){
+                resultIndexes.push(results[i]._source.number);
                 results[i].highlight.content[0] = remove_tags(results[i].highlight.content[0]);
                 var startTag = "<mark>";
                 var endTag = "</mark>";
@@ -97,6 +99,7 @@ angular.module('starter')
 
                 results[i].highlight.content[0] = bigFind;
             }
+            sessionStorage.setItem("search_indexes", JSON.stringify(resultIndexes));
             $scope.searchResults = results;
             results = null;
         },
