@@ -1,6 +1,7 @@
 angular.module('starter')
 .service('Notifications', function($ionicPopup, $ionicModal,
-    loadingSpinner, $ionicHistory, $state) {
+    loadingSpinner, $ionicHistory, $state,
+    LoginModal) {
 
     //Show an alert to the user
     function showAlert(alertTitle, alertText, callback) {
@@ -72,6 +73,9 @@ angular.module('starter')
 
                    //Show an alert
                    showAlert("Session Error", "Session not found or invalidated, please log in.");
+
+                   //Show the login Modal
+                   LoginModal.show();
                }
                else if(response.status == 402) {
                    //402 Error
@@ -89,8 +93,11 @@ angular.module('starter')
                else if (response.status == 404) {
                  //404 error
 
-                 //Delete the token
-                 localStorage.removeItem("session_token");
+                 //Show alert
+                 showAlert("Not Found", "We had a problem with our servers, please try again later. If this continues, please contact our development team.");
+               }
+               else if (response.status == -1) {
+                 //No Internet Connection
 
                  //Show alert
                  showAlert("No Connection", "Internet Connection is required to use this app. Please connect to the internet with your device, and restart the app.");

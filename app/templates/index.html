@@ -1,43 +1,129 @@
 <ion-view
 view-title="Index"
-class = "fixedSearch">
+class = "search-backdrop">
 
+  <!-- Hovering search bar, pops out only when scrolled down -->
+  <div class="item item-input-inset fixedSearch" ng-hide="!navHovering">
+    <label class="item-input-wrapper">
+      <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
+    </label>
+    <button class="button button-small" ng-click="search(query)">
+      Search
+    </button>
+  </div>
+
+  <ion-content on-scroll="searchHover()">
+    <!-- Inline search bar, shows all the time, but is hidden once scrolling begins -->
     <div class="item item-input-inset">
       <label class="item-input-wrapper">
-        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="query" ng-keyup="$event.keyCode == 13 && search(query)">
+        <input class="searchInput" type="text" placeholder="Enter a search term..." ng-model="$parent.query" ng-keyup="$event.keyCode == 13 && search(query, $event)">
       </label>
       <button class="button button-small" ng-click="search(query)">
         Search
       </button>
     </div>
 
-  <ion-content>
+    <!-- Search result list -->
     <ion-list
-    class = "serachList">
-        <div class="list">
-
-        </div>
+    class = "searchList">
 
         <div ng-if="!query"
-        class="center noSearch">
-
+        class="card searchHint">
+          <div class="item item-text-wrap">
             Please type in a search above.
             Or, go to <a href="#/app/page/23">the beginning</a>.
-
+          </div>
         </div>
-        <div ng-if="query && !searched" class="center noSearch">
-
+        <div ng-if="query && !searched" class="card searchHint">
+          <div class="item item-text-wrap">
             Please tap "search" to execute your query.
-
+          </div>
         </div>
-        <div ng-if="query && searched && searchResults.length < 1" class="center" style="text-align:center">
-
-            Your query returned no results. Please try with a more general term.
-
+        <div ng-if="query && searched && searchResults.length < 1"
+          class="card searchHint" style="text-align:center">
+          <div class="item item-text-wrap">
+            Your query returned no results. Please try with a more <q ng-if="query.length <= 3">descriptive</q><q ng-if="query.length > 3">general</q> search.
+          </div>
         </div>
 
-        <div class="card" ng-if="searched && searchResults.length > 0">
-          <div class="item item-text-wrap" ng-repeat="result in searchResults" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
+        <div ng-if="!query && searchResults.length < 1 && settings.tutorial"
+        class="card searchHint">
+          <div class="item item-text-wrap">
+
+              <strong>Welcome to the California Court Reporters Association E-Compendium.</strong><br />
+              Having this version of the compendium means you can search with our advanced search algorithms, <br />
+              as well as receive realtime updates to your compendium as you use it.
+              <br /><br /><br />
+              <a href="" ng-click="setTutorial(false)">Hide this intro</a><br />
+              (You can re-enable this from the settings)
+              <br /><br /><br />
+
+              <strong>Search Tips</strong><br />
+              Below are a few tips for using the search.
+              <br /><br />
+
+              <strong>Literal vs. Fuzzy</strong><br />
+              The search algorithm does it's best to decide what you want.<br />
+              It does this based on a few factors some of which include frequency, order and placement.<br />
+              For some searches, this may not be what you want.<br />
+              If you know a phrase you are looking for, you can surround your search term in quotes, like the following:<br />
+              <div class="codeBlock">"notice of availability"</div><br />
+              This also enables you to search literally for special characters listed below.<br />
+              If you'd like to search for a code section like "1985.3(g)", just search the following<br />
+              <div class="codeBlock">"1985.3(g)"</div><br />
+              (The inherent problem with the search above without "" is that it contains parenthesis)
+              <br /><br />
+
+              <strong>OR and AND</strong><br />
+              When searching, the algorithm picks words specified in your search.<br />
+              It will do it's best to deliver the entire query as it is written in the search box.<br />
+              Sometimes, you may want two words in your search to be equally scored in the search results.<br />
+              This can be done using two tokens: AND, OR.<br />
+              Use the terms like this:<br />
+              <div class="codeBlock">availability OR notice</div><br />
+              or<br />
+              <div class="codeBlock">availability AND notice</div>
+              <br /><br />
+
+              <strong>Combining Advanced Search Syntax</strong><br />
+              The search engine is capable of combining the tips above. You can do things like this:
+              <div class="codeBlock">"notice of availability" OR "notice of appeal"</div><br />
+              and<br />
+              <div class="codeBlock">"notice of availability" AND "notice of appeal"</div><br />
+              (which returns no results because it is too specific)
+              <br /><br />
+
+              <strong>Even More Syntax</strong><br />
+              There are tons of other syntax items you can use.<br />
+              Feel free to play around with any of the below.<br /><br />
+
+              Parenthesis group items.<br />
+              <div class="codeBlock">(notice OR availability) AND deposition</div><br />
+              <br />
+
+              Exclude terms from results with -, include terms with +<br />
+              <div class="codeBlock">notice of +availability -deposition</div><br />
+              In the above, "notice of" is optional, "availability" MUST be present. <br />
+              "deposition" MUST not be in a result.<br />
+              <br />
+
+              Boost term relevance with ^#, like ^2 and ^3<br />
+              <div class="codeBlock">notice^2 of availability^3 deposition</div><br />
+              In the above, results with "availability" will be ranked highest.<br />
+              Notice is ranked second highest. Deposition is unimportant in comparison.<br />
+              <br />
+
+              Allow literal searches to have terms inbetween<br />
+              <div class="codeBlock">"notice of availability"</div> will NOT match "notice of the availability".<br />
+              You can allow terms to occur between items in your literal search.<br />
+              To do this, put ~# at the end of your quotes, where # is the fuzziness.<br />
+              <div class="codeBlock">"notice of availability"~3</div><br />
+              In the above, the engine will match results with a calculated distance of 3.
+          </div>
+        </div>
+
+        <div class="card" ng-if="searched && searchResults.length > 0" ng-repeat="result in searchResults">
+          <div class="item item-text-wrap" ng-click="goTo(result._source.number)" ng-bind-html="result.highlight.content[0]"></div>
         </div>
     </ion-list>
   </ion-content>

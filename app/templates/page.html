@@ -5,6 +5,10 @@
           <div class="book-content" ng-bind-html="trustedHtml"></div>
       </div>
       <div class="item tabs tabs-secondary tabs-icon-left">
+        <a class="tab-item" ng-click="goTo('prev', true)" ng-if="searchResult && searchResults.indexOf(toInt(pagenum)) - 1 >= 0">
+          <i class="icon ion-chevron-left button-back-icon"></i>
+          Previous Result
+        </a>
         <a class="tab-item" ng-click="goToPrev()">
           <i class="icon ion-chevron-left button-back-icon"></i>
           Back
@@ -12,6 +16,11 @@
         <a class="tab-item"
         ng-click="goToNext()">
           Next
+          <i class="icon ion-chevron-right button-next-icon"></i>
+        </a>
+        <a class="tab-item"
+        ng-click="goTo('next', true)" ng-if="searchResult && (searchResults.length > searchResults.indexOf(toInt(pagenum)) + 1)">
+          Next Result
           <i class="icon ion-chevron-right button-next-icon"></i>
         </a>
       </div>

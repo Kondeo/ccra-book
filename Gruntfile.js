@@ -28,6 +28,9 @@ module.exports = function (grunt) {
       dist: 'www'
     },
 
+    //Our app version
+    pkg: grunt.file.readJSON("package.json"),
+
     // Environment Variables for Angular App
     // This creates an Angular Module that can be injected via ENV
     // Add any desired constants to the ENV objects below.
@@ -43,23 +46,26 @@ module.exports = function (grunt) {
         constants: {
           CONST: {
             "apiBase": "http://srv1.kondeo.com:3003/",
-            "stripePK": "pk_test_u1eALgznI2RRoPFEN8e1q9s9"
+            "stripePK": "pk_test_u1eALgznI2RRoPFEN8e1q9s9",
+            "version": "<%= pkg.version %>"
           }
         }
       },
       production: {
         constants: {
           CONST: {
-            "apiBase": "http://ccra1.kondeo.com:3000/",
-            "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE"
+            "apiBase": "https://ccra1.kondeo.com:3000/",
+            "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE",
+            "version": "<%= pkg.version %>"
           }
         }
       },
       default: {
         constants: {
           CONST: {
-            "apiBase": "http://srv1.kondeo.com:3003/",
-            "stripePK": "pk_test_u1eALgznI2RRoPFEN8e1q9s9"
+            "apiBase": "https://ccra1.kondeo.com:3000/",
+            "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE",
+            "version": "<%= pkg.version %>"
           }
         }
       }
@@ -427,7 +433,7 @@ module.exports = function (grunt) {
     grunt.registerTask(name, function () {
       this.args.unshift(name.replace('cordova:', ''));
       // Handle URL's being split up by Grunt because of `:` characters
-      if (_.contains(this.args, 'http') || _.contains(this.args, 'https')) {
+      if (_.includes(this.args, 'http') || _.includes(this.args, 'https')) {
         this.args = this.args.slice(0, -2).concat(_.last(this.args, 2).join(':'));
       }
       var done = this.async();

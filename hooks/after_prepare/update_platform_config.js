@@ -78,6 +78,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
+var indexBy = require('lodash.indexby');
 var et = require('elementtree');
 var plist = require('plist');
 
@@ -170,7 +171,7 @@ var platformConfig = (function(){
         getConfigFilesByTargetAndParent: function (platform) {
             var configFileData = this.getConfigXml().findall('platform[@name=\'' + platform + '\']/config-file');
 
-            return  _.indexBy(configFileData, function(item) {
+            return  indexBy(configFileData, function(item) {
                 var parent = item.attrib.parent;
                 //if parent attribute is undefined /* or */, set parent to top level elementree selector
                 if(!parent || parent === '/*' || parent === '*/') {

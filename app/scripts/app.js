@@ -8,23 +8,13 @@ angular.module('starter',
 'config',
 'ngResource',
 'cfp.hotkeys',
+'ngCordova',
 'ui.tinymce'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
-  });
-})
+.config(function($stateProvider,
+    $urlRouterProvider, $httpProvider) {
 
-.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+  //Add our states to the state provider
   $stateProvider
 
   .state('app', {
@@ -98,5 +88,80 @@ angular.module('starter',
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/index');
+
+
+  //Our http interceptor
+  //Going to pass our version to our backend
+  $httpProvider.interceptors.push(function($q, CONST) {
+
+      //First we need to get the app version
+      var appVersion = CONST.version;
+
+
+      return {
+
+       'request': function(config) {
+
+           //Need to check we are making aget or post request
+           //Since that is what this will support, since they
+           //Require seperate fields,
+           //And if We are making a backend request
+           if((config.method == "GET" ||
+           config.method == "POST") &&
+           config.url.indexOf(CONST.apiBase) > -1) {
+
+               //Add the version to the params
+               //Need to add it to different objects depending
+               //if it is a get or post request
+               if(config.method == "GET") {
+
+                   //Add it to the params
+                   if(config.params) config.params.version = appVersion;
+                   else {
+                       config.params = {
+                           version: appVersion
+                       };
+                   }
+               }
+               else {
+
+                   //Add it to the request data
+                   if(config.data) config.data.version = appVersion;
+                   else {
+                       config.data = {
+                           version: appVersion
+                       };
+                   }
+               }
+
+               //Now send the request
+               return config;
+           }
+           else {
+
+               //Send the request
+               return config;
+           }
+        }
+
+      };
+
+    });
+
+})
+
+.run(function($ionicPlatform) {
+
+  $ionicPlatform.ready(function() {
+    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    // for form inputs)
+    if (window.cordova && window.cordova.plugins.Keyboard) {
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    }
+    if (window.StatusBar) {
+      // org.apache.cordova.statusbar required
+      StatusBar.styleDefault();
+    }
+  });
 
 });

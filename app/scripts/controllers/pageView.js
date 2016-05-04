@@ -2,12 +2,18 @@ angular.module('starter')
 .controller('PageCtrl', function($scope, $stateParams,
     Page, $location, $http, $sce, $state,
     $ionicHistory, $ionicScrollDelegate,
-    loadingSpinner, Notifications) {
+    loadingSpinner, Notifications,
+    LoginModal) {
 
     //Get page number and session, and admin
     $scope.pagenum = $stateParams.page;
     $scope.admin = localStorage.getItem("admin");
     var cookie = localStorage.getItem("session_token");
+
+    $scope.searchResults = sessionStorage.getItem("search_indexes") === null ? false : JSON.parse(sessionStorage.getItem("search_indexes"));
+    if($scope.searchResults && $scope.searchResults.indexOf(parseInt($scope.pagenum)) > -1){
+      $scope.searchResult = true;
+    }
 
     var payload = {
         number: $scope.pagenum,
@@ -36,9 +42,48 @@ angular.module('starter')
     //Errors
     function(response) {
 
-        //Handle the error with notifications
-        Notifications.show(response);
+        //Var handlers, handle 412 as a login because it means the session_token
+        //there is not session_token
+        if(!localStorage.getItem("session_token") ||
+        localStorage.getItem("session_token") == "") {
+
+            var handlers = [
+                {
+                    status: 412,
+                    title: "Session Error!",
+                    text: "Session not found or invalidated, please log in.",
+                    callback: function() {
+
+                        //Pull up the login modal
+                        LoginModal.show();
+                    }
+                }
+            ];
+
+            //Handle the error with notifications
+            Notifications.error(response, handlers);
+        }
+        else {
+
+            //Handle the error with notifications
+            Notifications.error(response);
+        }
    });
+
+   $scope.goTo = function(direction, searchResult){
+     if(searchResult){
+       if(direction == "next"){
+         $state.go('app.single', {"page": $scope.searchResults[$scope.searchResults.indexOf(parseInt($scope.pagenum)) + 1]});
+       } else {
+         console.log("back")
+         $state.go('app.single', {"page": $scope.searchResults[$scope.searchResults.indexOf(parseInt($scope.pagenum)) - 1]});
+       }
+     }
+   }
+
+   $scope.toInt = function(myInt){
+     return parseInt(myInt);
+   }
 
     $scope.goToNext = function(){
 
