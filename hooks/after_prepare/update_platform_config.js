@@ -78,7 +78,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
-var indexBy = require('lodash.indexby');
+var indexBy = _.keyBy;
 var et = require('elementtree');
 var plist = require('plist');
 
