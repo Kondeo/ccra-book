@@ -13,12 +13,16 @@
   },
   "CLIENT": {
     "IOS": {
-      "SUB": false,
-      "ONLINE_ONLY_NOTICE": false
+      "SUBSCRIBE_PAGE": false,
+      "SUBSCRIBE_ONLINE_TEXT": false
     },
     "ANDROID": {
-      "SUB": true,
-      "ONLINE_ONLY_NOTICE": false
+      "SUBSCRIBE_PAGE": false,
+      "SUBSCRIBE_ONLINE_TEXT": false
+    },
+    "WEB": {
+      "SUBSCRIBE_PAGE": true,
+      "SUBSCRIBE_ONLINE_TEXT": false
     }
   }
 }

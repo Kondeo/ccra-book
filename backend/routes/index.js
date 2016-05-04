@@ -15,7 +15,7 @@ router.get('/client', function(req, res, next) {
   //CLIENT OUT OF DATE
   if(req.query.build < CONST.VERSION.LAST_COMPATIBLE){ res.status(426).json(CONST.CLIENT) }
   //CLIENT BEING DEPRICATED SOON
-  else if(req.query.build <= CONST.VERSION.DEPRICATED){ res.status(101).json(CONST.CLIENT) }
+  else if(req.query.build <= CONST.VERSION.DEPRICATED){ res.status(449).json(CONST.CLIENT) }
   //CLIENT VERSION OK
   else { res.status(200).json(CONST.CLIENT) }
 });

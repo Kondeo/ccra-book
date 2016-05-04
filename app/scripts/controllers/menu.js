@@ -2,11 +2,50 @@ angular.module('starter')
 .controller('AppCtrl', function($scope, $ionicModal, $ionicPopup,
     $ionicPlatform, $timeout, $location, $state,
     $window, $ionicHistory, User, loadingSpinner,
-    Notifications) {
+    Notifications, Config) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
   $scope.platformAndroid = ionic.Platform.isAndroid();
+
+  $scope.clientConfig;
+  $scope.setConfig = function(config){
+    var client = "WEB";
+    if($scope.platformIOS) client = "IOS";
+    if($scope.platformAndroid) client = "ANDROID";
+    $scope.clientConfig = config[client];
+  }
+
+  //Start loading
+  loadingSpinner.startLoading();
+  Config.get(function(data){
+    //Stop loading
+    loadingSpinner.stopLoading();
+    $scope.setConfig(data)
+  }, function(error){
+    //Our custom Error Handler
+    var handlers = [
+        {
+            status: 426,
+            title: "APPLICATION UNSUPPORTED",
+            text: "Your application version is no longer supported. There will likely be bugs and crashes. Please update to the newest version in the App Store.",
+            callback: function(response) {
+              $scope.setConfig(response.data)
+            }
+        },
+        {
+            status: 449,
+            title: "Please Update",
+            text: "You are running an old version of this app. Please update to the newest version in the App Store, or you may start experiencing bugs.",
+            callback: function(response) {
+              $scope.setConfig(response.data)
+            }
+        }
+    ]
+
+    //Send to the notification handler
+    Notifications.error(error, handlers);
+  });
 
   $scope.settings = {};
   $scope.settings.easyReading = localStorage.getItem("easyReading") === "true";
