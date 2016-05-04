@@ -3,7 +3,6 @@ angular.module('starter')
     $ionicPlatform, $timeout, $location, $state,
     $window, $ionicHistory, User, loadingSpinner,
     Notifications, Config, LoginModal) {
-    Notifications, LoginModal) {
 
   //Platform detection
   $scope.platformIOS = ionic.Platform.isIOS() || ionic.Platform.isIPad();
