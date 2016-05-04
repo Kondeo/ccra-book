@@ -47,12 +47,22 @@
     </form>
 
     <div class = "register"
-    ng-if="!loggedIn()">
+    ng-if="!loggedIn() && clientConfig.SUBSCRIBE_PAGE">
         Or you can <a href="#/app/register" ng-click = "loginModal.hide()">register for a subcription</a>
     </div>
 
     <div class = "register"
-    ng-if="loggedIn()">
+    ng-if="!loggedIn() && clientConfig.SUBSCRIBE_ONLINE_TEXT && !clientConfig.SUBSCRIBE_PAGE">
+        To register, please go online to ccracodes.com on your computer.
+    </div>
+
+    <div class = "register"
+    ng-if="!clientConfig.SUBSCRIBE_ONLINE_TEXT && !clientConfig.SUBSCRIBE_PAGE">
+        Use your CCRA credentials.
+    </div>
+
+    <div class = "register"
+    ng-if="loggedIn() && clientConfig.SUBSCRIBE_PAGE">
         Or you can <a href="#/app/register" ng-click = "loginModal.hide()">manage your subcription</a>
     </div>
   </ion-content>

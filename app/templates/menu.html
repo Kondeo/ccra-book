@@ -42,11 +42,11 @@
         <img src="images/icon_auth.png" class="menuIcon">Switch Account
         </ion-item>
         <ion-item menu-close href="#/app/register"
-        ng-if = "!loggedIn()">
+        ng-if = "!loggedIn() && clientConfig.SUBSCRIBE_PAGE">
         <img src="images/icon_payment.png" class="menuIcon">Sign Up
         </ion-item>
         <ion-item menu-close href="#/app/register"
-        ng-if = "loggedIn()">
+        ng-if = "loggedIn() && clientConfig.SUBSCRIBE_PAGE">
         <img src="images/icon_payment.png" class="menuIcon">Manage Subscription
         </ion-item>
         <ion-item menu-close href="#/app/settings">
