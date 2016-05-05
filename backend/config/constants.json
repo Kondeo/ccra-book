@@ -1,9 +1,28 @@
 {
-    "SUBSCRIPTION_PRICE": {
-        "NEW": 1000,
-        "RENEW": 700
+  "VERSION": {
+    "NUMBER": 1000,
+    "DEPRICATED": 999,
+    "LAST_COMPATIBLE": 998
+  },
+  "SUBSCRIPTION_PRICE": {
+    "NEW": 1000,
+    "RENEW": 700
+  },
+  "SERVER": {
+    "URL": "https://dev.kondeo.com"
+  },
+  "CLIENT": {
+    "IOS": {
+      "SUBSCRIBE_PAGE": false,
+      "SUBSCRIBE_ONLINE_TEXT": false
     },
-    "SERVER": {
-        "URL": "https://dev.kondeo.com"
+    "ANDROID": {
+      "SUBSCRIBE_PAGE": false,
+      "SUBSCRIBE_ONLINE_TEXT": false
+    },
+    "WEB": {
+      "SUBSCRIBE_PAGE": true,
+      "SUBSCRIBE_ONLINE_TEXT": false
     }
+  }
 }

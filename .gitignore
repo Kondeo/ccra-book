@@ -14,3 +14,4 @@ plugins
 !backend/**
 
 app/scripts/configuration.js
+app/scripts/const.js

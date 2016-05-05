@@ -55,7 +55,7 @@ angular.module('starter')
                         status = response.status;
 
                         //Create the alert
-                        if(handlers[i].callback) showAlert(handlers[i].title, handlers[i].text, handlers[i].callback());
+                        if(handlers[i].callback) showAlert(handlers[i].title, handlers[i].text, handlers[i].callback(response));
                         else showAlert(handlers[i].title, handlers[i].text);
                     }
                 }
