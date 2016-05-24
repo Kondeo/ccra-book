@@ -30,8 +30,12 @@ class = "search-backdrop">
         <div ng-if="!query"
         class="card searchHint">
           <div class="item item-text-wrap">
+            <strong>Welcome to the California Court Reporters Association E-Compendium.</strong><br />
+            Having this version of the compendium means you can search with our advanced search algorithms, <br />
+            as well as receive realtime updates to your compendium as you use it.
+            <br /><br /><br />
             Please type in a search above.
-            Or, go to <a href="#/app/page/23">the beginning</a>.
+            Or, go to <a href="#/app/page/2">the beginning</a>.
           </div>
         </div>
         <div ng-if="query && !searched" class="card searchHint">
@@ -49,12 +53,7 @@ class = "search-backdrop">
         <div ng-if="!query && searchResults.length < 1 && settings.tutorial"
         class="card searchHint">
           <div class="item item-text-wrap">
-
-              <strong>Welcome to the California Court Reporters Association E-Compendium.</strong><br />
-              Having this version of the compendium means you can search with our advanced search algorithms, <br />
-              as well as receive realtime updates to your compendium as you use it.
-              <br /><br /><br />
-              <a href="" ng-click="setTutorial(false)">Hide this intro</a><br />
+              <a href="" ng-click="setTutorial(false)">Hide this tutorial</a><br />
               (You can re-enable this from the settings)
               <br /><br /><br />
 
