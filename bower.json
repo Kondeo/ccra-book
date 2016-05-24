@@ -1,6 +1,6 @@
 {
   "name": "CCRAECompendium",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "dependencies": {
     "angular-animate": "1.5.3",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.6.0",
