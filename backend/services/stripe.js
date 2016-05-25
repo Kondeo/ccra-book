@@ -48,3 +48,10 @@ exports.createCustomer = function(card, plan, email, success, fail){
       }
     });
 };
+
+exports.unsubscribe = function(subscriptionId, success, fail){
+    stripe.subscriptions.del(subscriptionId, function(err, confirmation) {
+      if(err) fail(err);
+      else success(confirmation);
+    });
+};

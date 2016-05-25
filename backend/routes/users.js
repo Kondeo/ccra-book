@@ -152,7 +152,7 @@ router.post('/card/add', function(req, res, next) {
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()
     })
-    .select('password salt subscription')
+    .select('password salt subscription subscriptionId')
     .exec(function(err, user) {
         if (err) {
             res.status(500).json({
@@ -161,6 +161,10 @@ router.post('/card/add', function(req, res, next) {
         } else if (!user) {
             res.status(401).json({
                 msg: "Wrong email!"
+            });
+        } else if(subscriptionId){
+            res.status(400).json({
+                msg: "Already has active subscription"
             });
         } else {
             //Hash the requested password and salt
@@ -235,7 +239,7 @@ router.post('/card/cancel', function(req, res, next) {
 
         //Find a user with the username requested. Select salt and password
         User.findById(accountId)
-        .select('subscription')
+        .select('subscription subscriptionId')
         .exec(function(err, user) {
             if (err) {
                 res.status(500).json({
@@ -246,16 +250,11 @@ router.post('/card/cancel', function(req, res, next) {
                     msg: "Wrong email!"
                 });
             } else {
-                StripeService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.RENEW, function(charge){
+                StripeService.unsubscribe(user.subscriptionId, function(confirmation){
 
                     var updatedUser = {};
 
-                    var origSub = moment(user.subscription);
-                    var today = moment();
-
-                    var newSub = moment.max(origSub, today).add(1, 'y');
-
-                    updatedUser.subscription = newSub.toDate();
+                    updatedUser.subscriptionId = false;
 
                     var setUser = {
                         $set: updatedUser
@@ -272,18 +271,11 @@ router.post('/card/cancel', function(req, res, next) {
                         }
                     });
 
-                    SessionService.generateSession(user._id, "user", function(token){
-                        //All good, give the user their token
-                        res.status(200).json({
-                            token: token,
-                            subscription: newSub.toDate()
-                        });
-                    }, function(err){
-                        res.status(err.status).json(err);
-                    });
+                    //All good, give the user their token
+                    res.status(200);
                 }, function(err){
-                    res.status(412).json({
-                        msg: "Card was declined!"
+                    res.status(500).json({
+                        msg: "Could not unsubscribe user!"
                     });
                 });
             }
@@ -297,7 +289,7 @@ router.post('/card/cancel', function(req, res, next) {
 router.get('/self/:token', function(req, res, next) {
     SessionService.validateSession(req.params.token, "user", function(accountId) {
         User.findById(accountId)
-        .select('name email subscription admin')
+        .select('name email subscription subscriptionId admin')
         .exec(function(err, user) {
             if (err) {
                 res.status(500).json({
