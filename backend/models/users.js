@@ -26,6 +26,13 @@ var User = new mongoose.Schema({
         type: Date,
         default: null
     },
+    autoPay: {
+        type: Boolean,
+        default: false
+    },
+    subscriptionId: {
+        type: String
+    },
     admin: {
         type: Boolean,
         default: false

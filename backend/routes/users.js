@@ -40,13 +40,17 @@ router.post('/register', function(req, res) {
                     msg: "Email taken!"
                 });
             } else {
-                StripeService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.NEW, function(charge){
+                var plan = "test_plan";
+                if(true){
+                  //Decide if they are a member
+                }
+                StripeService.createCustomer(req.body.cardToken, plan, (req.body.email.toLowerCase()).trim(), function(customer){
                     //Create a random salt
                     var salt = crypto.randomBytes(128).toString('base64');
                     //Create a unique hash from the provided password and salt
                     var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
                     //Create a new user with the assembled information
-                    var subscriptionDate = moment().add(1, 'y');
+                    var subscriptionDate = moment().add(1, 'month');
                     var newUser = new User({
                         email: (req.body.email.toLowerCase()).trim(),
                         password: hash,
@@ -135,7 +139,7 @@ router.post('/login', function(req, res, next) {
     });
 });
 
-router.post('/renew', function(req, res, next) {
+router.post('/card/add', function(req, res, next) {
     if(!(req.body.cardToken &&
         req.body.email &&
         req.body.password)){
@@ -164,6 +168,84 @@ router.post('/renew', function(req, res, next) {
             //Compare to stored hash
             if (hash == user.password) {
 
+                var plan = "test_plan";
+                if(true){
+                  //Decide if they are a member
+                }
+
+                StripeService.createCustomer(req.body.cardToken, plan, (req.body.email.toLowerCase()).trim(), function(customer){
+
+                    var updatedUser = {};
+
+                    var origSub = moment(user.subscription);
+                    var today = moment();
+
+                    var newSub = moment.max(origSub, today).add(1, 'month');
+
+                    updatedUser.subscription = newSub.toDate();
+
+                    var setUser = {
+                        $set: updatedUser
+                    }
+
+                    User.update({
+                        _id: user._id
+                    }, setUser)
+                    .exec(function(err, user) {
+                        if (err) {
+                            console.log({
+                                msg: "Could not update user"
+                            });
+                        }
+                    });
+
+                    SessionService.generateSession(user._id, "user", function(token){
+                        //All good, give the user their token
+                        res.status(200).json({
+                            token: token,
+                            subscription: newSub.toDate()
+                        });
+                    }, function(err){
+                        res.status(err.status).json(err);
+                    });
+                }, function(err){
+                    res.status(412).json({
+                        msg: "Card was declined!"
+                    });
+                });
+            } else {
+                res.status(401).json({
+                    msg: "Password is incorrect!"
+                });
+            }
+        }
+    });
+});
+
+router.post('/card/cancel', function(req, res, next) {
+    if(!(req.body.cardToken &&
+        req.body.email &&
+        req.body.password)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
+    SessionService.validateSession(req.params.token, "user", function(accountId) {
+
+        //Find a user with the username requested. Select salt and password
+        User.findById(accountId)
+        .select('subscription')
+        .exec(function(err, user) {
+            if (err) {
+                res.status(500).json({
+                    msg: "Couldn't search the database for user!"
+                });
+            } else if (!user) {
+                res.status(401).json({
+                    msg: "Wrong email!"
+                });
+            } else {
                 StripeService.charge(req.body.cardToken, CONST.SUBSCRIPTION_PRICE.RENEW, function(charge){
 
                     var updatedUser = {};
@@ -204,12 +286,11 @@ router.post('/renew', function(req, res, next) {
                         msg: "Card was declined!"
                     });
                 });
-            } else {
-                res.status(401).json({
-                    msg: "Password is incorrect!"
-                });
             }
-        }
+        });
+
+    }, function(err){
+        res.status(err.status).json(err);
     });
 });
 

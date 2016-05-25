@@ -24,3 +24,27 @@ exports.charge = function(card, amount, success, fail) {
         }
     });
 };
+
+exports.createCustomer = function(card, plan, email, success, fail){
+    stripe.customers.create({
+      source: card,
+      plan: plan,
+      email: email
+    }, function(err, customer) {
+      console.log(err)
+      if (err && err.type === 'StripeCardError') {
+          fail({
+              msg: "Card was declined!"
+          });
+      } else if (err) {
+          console.log("Stripe charge error");
+          console.log(err);
+          fail({
+              msg: "Charge could not be completed!"
+          });
+      } else {
+        console.log(customer)
+          success(customer);
+      }
+    });
+};
