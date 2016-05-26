@@ -451,7 +451,7 @@ angular.module('starter')
                         $state.go('app.index');
 
                         //Alert them of success!
-                        Notifications.show("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
+                        Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
 
                     },
                     //Errors
@@ -578,7 +578,7 @@ angular.module('starter')
                     $state.go('app.index');
 
                     //Alert them of success!
-                    Notifications.show("Success!", "You have successfully registered! Your account is valid for a year (valid unitl: " + moment(data.subscription).format("MMM Do, YYYY") + "), and can be extended. Enjoy!");
+                    Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
 
                 },
                 //Errors
