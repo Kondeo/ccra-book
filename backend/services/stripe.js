@@ -49,9 +49,26 @@ exports.createCustomer = function(card, plan, email, success, fail){
     });
 };
 
+exports.subscribe = function(stripeId, plan, success, fail){
+    stripe.subscriptions.create({
+      customer: stripeId,
+      plan: plan
+    }, function(err, subscription) {
+        if(err) fail(err);
+        else success(subscription);
+    });
+};
+
 exports.unsubscribe = function(subscriptionId, success, fail){
     stripe.subscriptions.del(subscriptionId, function(err, confirmation) {
       if(err) fail(err);
       else success(confirmation);
     });
+};
+
+exports.verifyEvent = function(eventId, success, fail){
+  stripe.events.retrieve(eventId, function(err, event) {
+    if(err) fail(err);
+    else success(event);
+  });
 };

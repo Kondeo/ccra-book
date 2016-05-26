@@ -29,6 +29,9 @@ var User = new mongoose.Schema({
     subscriptionId: {
         type: String
     },
+    stripeId: {
+        type: String
+    },
     admin: {
         type: Boolean,
         default: false
