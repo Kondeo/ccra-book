@@ -184,6 +184,8 @@ router.post('/sub/add', function(req, res, next) {
             //Compare to stored hash
             if (hash == user.password) {
 
+                var isMember = false;
+
                 var plan = "standard";
                 if(req.body.memberUsername || req.body.memberPassword){
                     checkMembership(req.body.memberUsername, req.body.memberPassword, clearSubs);
@@ -191,22 +193,38 @@ router.post('/sub/add', function(req, res, next) {
                     clearSubs(false);
                 }
 
-                function clearSubs(isMember){
+                function clearSubs(membership){
+                  isMember = membership;
                   if(isMember) plan = "member";
                   if(user.subscriptionId){
-                    StripeService.unsubscribe(user.subscriptionId, stripeSub, function(){
+                    StripeService.unsubscribe(user.subscriptionId, getStripeId, function(){
                         res.status(500).json({
                             msg: "Could not unsubscribe from old subscription!"
                         });
                     });
                   } else {
-                    newSub(isMember);
+                    getStripeId();
                   }
                 }
 
-                function newSub(isMember){
-                    StripeService.updateCard(user.stripeId, req.body.cardToken, function(customer){
-                        StripeService.subscribe(user.stripeId, plan, function(subscription){
+                function getStripeId(){
+                    if(!user.stripeId){
+                        StripeService.createCustomer(null, null, (req.body.email.toLowerCase()).trim(), function(customer){
+                          console.log(customer)
+                            newSub(customer.id);
+                        }, function(err){
+                            res.status(402).json({
+                                msg: "Card was declined!"
+                            });
+                        });
+                    } else {
+                        newSub(user.stripeId);
+                    }
+                }
+
+                function newSub(stripeId){
+                    StripeService.updateCard(stripeId, req.body.cardToken, function(customer){
+                        StripeService.subscribe(stripeId, plan, function(subscription){
 
                             var updatedUser = {};
 
@@ -218,6 +236,7 @@ router.post('/sub/add', function(req, res, next) {
                             updatedUser.subscription = newSub.toDate();
                             updatedUser.subscriptionId = subscription.id;
                             updatedUser.memberPrice = isMember;
+                            if(!user.stripeId) updatedUser.stripeId = stripeId;
 
                             var setUser = {
                                 $set: updatedUser
@@ -251,6 +270,7 @@ router.post('/sub/add', function(req, res, next) {
                             });
                         });
                     }, function(err){
+                      console.log(err)
                         res.status(402).json({
                             msg: "Card was declined!"
                         });

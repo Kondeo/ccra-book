@@ -26,12 +26,12 @@ exports.charge = function(card, amount, success, fail) {
 };
 
 exports.createCustomer = function(card, plan, email, success, fail){
-    stripe.customers.create({
-      source: card,
-      plan: plan,
+    var payload = {
       email: email
-    }, function(err, customer) {
-      console.log(err)
+    }
+    if (plan != null) payload.plan = plan;
+    if (card != null) payload.source = card;
+    stripe.customers.create(payload, function(err, customer) {
       if (err && err.type === 'StripeCardError') {
           fail({
               msg: "Card was declined!"
@@ -43,7 +43,6 @@ exports.createCustomer = function(card, plan, email, success, fail){
               msg: "Charge could not be completed!"
           });
       } else {
-        console.log(customer)
           success(customer);
       }
     });
