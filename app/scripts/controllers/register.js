@@ -102,6 +102,7 @@ angular.module('starter')
     $scope.initPage();
 
     $scope.updatePrices = function(){
+        $scope.isMember = $scope.registerData.ccraMember;
         if(!$scope.registerData.ccraMember) {
           //Set the text
           $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";

@@ -4,6 +4,7 @@ var express = require('express'),
     moment = require('moment'),
     crypto = require('crypto'),
     CONST = require('../config/constants.json'),
+    keys = require('../config/keys.json'),
     MailService = require('../services/mailgun.js'),
     StripeService = require('../services/stripe.js'),
     SessionService = require('../services/sessions.js'),
@@ -40,47 +41,55 @@ router.post('/register', function(req, res) {
                     msg: "Email taken!"
                 });
             } else {
-                var plan = "test_plan";
-                if(true){
-                  //Decide if they are a member
+                var plan = "standard";
+                if(req.body.memberUsername || req.body.memberPassword){
+                    checkMembership(req.body.memberUsername, req.body.memberPassword, finalizeReg);
+                } else {
+                    finalizeReg(false);
                 }
-                StripeService.createCustomer(req.body.cardToken, plan, (req.body.email.toLowerCase()).trim(), function(customer){
-                    //Create a random salt
-                    var salt = crypto.randomBytes(128).toString('base64');
-                    //Create a unique hash from the provided password and salt
-                    var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
-                    //Create a new user with the assembled information
-                    var subscriptionDate = moment().add(1, 'month');
-                    var newUser = new User({
-                        email: (req.body.email.toLowerCase()).trim(),
-                        password: hash,
-                        salt: salt,
-                        subscription: subscriptionDate.toDate(),
-                        subscriptionId: customer.subscriptions.data[0].id,
-                        stripeId: customer.id
-                    }).save(function(err, newUser) {
-                        if (err) {
-                          console.log("Error saving user to DB!");
-                          res.status(500).json({
-                              msg: "Error saving user to DB!"
-                          });
-                        } else {
-                            SessionService.generateSession(newUser._id, "user", function(token){
-                                //All good, give the user their token
-                                res.status(201).json({
-                                    token: token,
-                                    subscription: subscriptionDate.toDate()
+
+                function finalizeReg(isMember){
+                    if(isMember) plan = "member";
+
+                    StripeService.createCustomer(req.body.cardToken, plan, (req.body.email.toLowerCase()).trim(), function(customer){
+                        //Create a random salt
+                        var salt = crypto.randomBytes(128).toString('base64');
+                        //Create a unique hash from the provided password and salt
+                        var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
+                        //Create a new user with the assembled information
+                        var subscriptionDate = moment().add(1, 'month');
+                        var newUser = new User({
+                            email: (req.body.email.toLowerCase()).trim(),
+                            password: hash,
+                            salt: salt,
+                            subscription: subscriptionDate.toDate(),
+                            subscriptionId: customer.subscriptions.data[0].id,
+                            stripeId: customer.id,
+                            isMember: isMember
+                        }).save(function(err, newUser) {
+                            if (err) {
+                              console.log("Error saving user to DB!");
+                              res.status(500).json({
+                                  msg: "Error saving user to DB!"
+                              });
+                            } else {
+                                SessionService.generateSession(newUser._id, "user", function(token){
+                                    //All good, give the user their token
+                                    res.status(201).json({
+                                        token: token,
+                                        subscription: subscriptionDate.toDate()
+                                    });
+                                }, function(err){
+                                    res.status(err.status).json(err);
                                 });
-                            }, function(err){
-                                res.status(err.status).json(err);
-                            });
-                        }
+                            }
+                        });
+                    }, function(err){
+                        res.status(402).json({
+                            msg: "Card was declined!"
+                        });
                     });
-                }, function(err){
-                    res.status(402).json({
-                        msg: "Card was declined!"
-                    });
-                });
+                }
             }
           });
     }
@@ -175,22 +184,27 @@ router.post('/sub/add', function(req, res, next) {
             //Compare to stored hash
             if (hash == user.password) {
 
-                var plan = "test_plan";
-                if(true){
-                  //Decide if they are a member
-                }
-
-                if(user.subscriptionId){
-                  StripeService.unsubscribe(user.subscriptionId, stripeSub, function(){
-                      res.status(500).json({
-                          msg: "Could not unsubscribe from old subscription!"
-                      });
-                  });
+                var plan = "standard";
+                if(req.body.memberUsername || req.body.memberPassword){
+                    checkMembership(req.body.memberUsername, req.body.memberPassword, clearSubs);
                 } else {
-                  stripeSub();
+                    clearSubs(false);
                 }
 
-                function stripeSub(){
+                function clearSubs(isMember){
+                  if(isMember) plan = "member";
+                  if(user.subscriptionId){
+                    StripeService.unsubscribe(user.subscriptionId, stripeSub, function(){
+                        res.status(500).json({
+                            msg: "Could not unsubscribe from old subscription!"
+                        });
+                    });
+                  } else {
+                    newSub(isMember);
+                  }
+                }
+
+                function newSub(isMember){
                     StripeService.subscribe(user.stripeId, plan, function(subscription){
 
                         var updatedUser = {};
@@ -202,6 +216,7 @@ router.post('/sub/add', function(req, res, next) {
 
                         updatedUser.subscription = newSub.toDate();
                         updatedUser.subscriptionId = subscription.id;
+                        updatedUser.memberPrice = isMember;
 
                         var setUser = {
                             $set: updatedUser
@@ -269,7 +284,7 @@ router.post('/sub/cancel', function(req, res, next) {
                 StripeService.unsubscribe(user.subscriptionId, function(confirmation){
 
                     var setUser = {
-                        $unset: {subscriptionId: 1 }
+                        $unset: {subscriptionId: 1, memberPrice: 1 }
                     }
 
                     User.update({
@@ -301,7 +316,7 @@ router.post('/sub/cancel', function(req, res, next) {
 router.get('/self/:token', function(req, res, next) {
     SessionService.validateSession(req.params.token, "user", function(accountId) {
         User.findById(accountId)
-        .select('name email subscription subscriptionId admin')
+        .select('name email subscription subscriptionId memberPrice admin')
         .exec(function(err, user) {
             if (err) {
                 res.status(500).json({
@@ -405,5 +420,38 @@ router.post('/forgot', function(req, res, next) {
         });
     }
 });
+
+function checkMembership(username, password, callback){
+  var membership = false;
+
+  var request = require('request');
+
+  // Set the headers
+  var headers = {
+      'User-Agent':       'Super Agent/0.0.1',
+      'Content-Type':     'application/x-www-form-urlencoded',
+      'Authorization':    keys.memberClicks.apiKey,
+      'Accept':           'application/json'
+  }
+
+  // Configure the request
+  var options = {
+      url: 'https://ccra.memberclicks.net/services/auth',
+      method: 'POST',
+      headers: headers,
+      qs: {'username': username, 'password': password, 'apiKey': keys.memberClicks.apiKey}
+  }
+
+  // Start the request
+  request(options, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+          // Print out the response body
+          var data = JSON.parse(body);
+          callback(data.active);
+      } else {
+          callback(false);
+      }
+  });
+}
 
 module.exports = router;
