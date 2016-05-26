@@ -15,10 +15,16 @@ angular.module('starter')
                 isArray: false
             },
 
-            renew: {
+            resub: {
                 method: 'POST',
-                params: { Id: 'renew' },
-                isArray: false
+                isArray: false,
+                url: CONST.apiBase + 'users/sub/add'
+            },
+
+            cancel: {
+                method: 'POST',
+                isArray: false,
+                url: CONST.apiBase + 'users/sub/cancel'
             },
 
             get: {

@@ -46,6 +46,8 @@ angular.module('starter')
 
             User.get(payload, function(data) {
 
+                $scope.autoPay = data.subscriptionId || false;
+
                 //Stop loading
                 loadingSpinner.stopLoading();
 
@@ -512,7 +514,7 @@ angular.module('starter')
                 }
 
                 //Submitting Now!
-                User.renew(payload, function(data) {
+                User.resub(payload, function(data) {
 
                     //Stop loading
                     loadingSpinner.stopLoading();

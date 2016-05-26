@@ -1,6 +1,6 @@
 <ion-view view-title="Subscription">
 <ion-content>
-    <form name = "registerForm" ng-init="subType = 'new'">
+    <form name = "registerForm" ng-init="subType = 'new'" ng-show="!autoPay">
 
         <!-- Placing two fake auth fields to
         stop chrome autofill -->
@@ -182,5 +182,18 @@
         </label>
       </div>
     </form>
+
+    <div class="card">
+      <div class="item item-text-wrap">
+        <p class="center">You are currently subscribed, and are being charged monthly at the CCRA member price of ${{price/100}}.</p>
+        <p class="center">Your current subscription is paid until {{subscription}} and is auto-renewing.</p><br /><br />
+
+        <button class="button button-full button-assertive">
+          Cancel Subscription
+        </button>
+        <p class="center hint">If you cancel your subscription, you will still keep your remaining subscription time.<br />
+        You may use this button to change credit card information if needed.</p>
+      </div>
+    </div>
 </ion-content>
 </ion-view>
