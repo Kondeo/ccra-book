@@ -43,7 +43,9 @@ router.post('/register', function(req, res) {
             } else {
                 var plan = "standard";
                 if(req.body.memberUsername || req.body.memberPassword){
-                    checkMembership(req.body.memberUsername, req.body.memberPassword, finalizeReg);
+                    checkMembership(req.body.memberUsername, req.body.memberPassword, finalizeReg, function(err){
+                        res.status(err.status).send(err.msg);
+                    });
                 } else {
                     finalizeReg(false);
                 }
@@ -188,7 +190,9 @@ router.post('/sub/add', function(req, res, next) {
 
                 var plan = "standard";
                 if(req.body.memberUsername || req.body.memberPassword){
-                    checkMembership(req.body.memberUsername, req.body.memberPassword, clearSubs);
+                    checkMembership(req.body.memberUsername, req.body.memberPassword, clearSubs, function(err){
+                        res.status(err.status).send(err.msg);
+                    });
                 } else {
                     clearSubs(false);
                 }
@@ -447,7 +451,7 @@ router.post('/forgot', function(req, res, next) {
     }
 });
 
-function checkMembership(username, password, callback){
+function checkMembership(username, password, success, fail){
   var membership = false;
 
   var request = require('request');
@@ -473,9 +477,19 @@ function checkMembership(username, password, callback){
       if (!error && response.statusCode == 200) {
           // Print out the response body
           var data = JSON.parse(body);
-          callback(data.active);
+          if(data.active){
+            success();
+          } else {
+            fail({
+              status: 424,
+              msg: "CCRA Membership no longer active."
+            });
+          }
       } else {
-          callback(false);
+          fail({
+            status: 417,
+            msg: "CCRA Membership credentials incorrect."
+          });
       }
   });
 }

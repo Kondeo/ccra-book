@@ -85,6 +85,8 @@ angular.module('starter')
         loadingSpinner.startLoading();
 
         Price.get(payload, function(response) {
+            loadingSpinner.stopLoading();
+
             //Set the price
             $scope.prices = response;
 
@@ -480,6 +482,16 @@ angular.module('starter')
                                 }
                             },
                             {
+                                status: 424,
+                                title: "Membership Inactive",
+                                text: "The membership for the information you provided is no longer active. Please renew your CCRA membership, or subscribe without membership.",
+                                callback: function() {
+
+                                    //Display alert, and show card errors
+                                    $scope.memberError = true;
+                                }
+                            },
+                            {
                                 status: 417,
                                 title: "Membership Username/Password Incorrect",
                                 text: "Please check your membership information.",
@@ -605,6 +617,26 @@ angular.module('starter')
 
                                 //Display alert, and show card errors
                                 $scope.cardError = true;
+                            }
+                        },
+                        {
+                            status: 424,
+                            title: "Membership Inactive",
+                            text: "The membership for the information you provided is no longer active. Please renew your CCRA membership, or subscribe without membership.",
+                            callback: function() {
+
+                                //Display alert, and show card errors
+                                $scope.memberError = true;
+                            }
+                        },
+                        {
+                            status: 417,
+                            title: "Membership Username/Password Incorrect",
+                            text: "Please check your membership information.",
+                            callback: function() {
+
+                                //Display alert, and show card errors
+                                $scope.memberError = true;
                             }
                         }
                     ];
