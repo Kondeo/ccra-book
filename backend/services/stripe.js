@@ -49,6 +49,15 @@ exports.createCustomer = function(card, plan, email, success, fail){
     });
 };
 
+exports.updateCard = function(stripeId, card, success, fail){
+    stripe.customers.update(stripeId, {
+        source: card
+    }, function(err, customer){
+        if(err) fail(err);
+        else success(customer);
+    });
+};
+
 exports.subscribe = function(stripeId, plan, success, fail){
     stripe.subscriptions.create({
       customer: stripeId,

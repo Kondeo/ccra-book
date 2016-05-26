@@ -205,47 +205,53 @@ router.post('/sub/add', function(req, res, next) {
                 }
 
                 function newSub(isMember){
-                    StripeService.subscribe(user.stripeId, plan, function(subscription){
+                    StripeService.updateCard(user.stripeId, req.body.cardToken, function(customer){
+                        StripeService.subscribe(user.stripeId, plan, function(subscription){
 
-                        var updatedUser = {};
+                            var updatedUser = {};
 
-                        var origSub = moment(user.subscription);
-                        var today = moment();
+                            var origSub = moment(user.subscription);
+                            var today = moment();
 
-                        var newSub = moment.max(origSub, today).add(1, 'month');
+                            var newSub = moment.max(origSub, today).add(1, 'month');
 
-                        updatedUser.subscription = newSub.toDate();
-                        updatedUser.subscriptionId = subscription.id;
-                        updatedUser.memberPrice = isMember;
+                            updatedUser.subscription = newSub.toDate();
+                            updatedUser.subscriptionId = subscription.id;
+                            updatedUser.memberPrice = isMember;
 
-                        var setUser = {
-                            $set: updatedUser
-                        }
-
-                        User.update({
-                            _id: user._id
-                        }, setUser)
-                        .exec(function(err, user) {
-                            if (err) {
-                                console.log({
-                                    msg: "Could not update user"
-                                });
+                            var setUser = {
+                                $set: updatedUser
                             }
-                        });
 
-                        SessionService.generateSession(user._id, "user", function(token){
-                            //All good, give the user their token
-                            res.status(200).json({
-                                token: token,
-                                subscription: newSub.toDate()
+                            User.update({
+                                _id: user._id
+                            }, setUser)
+                            .exec(function(err, user) {
+                                if (err) {
+                                    console.log({
+                                        msg: "Could not update user"
+                                    });
+                                }
+                            });
+
+                            SessionService.generateSession(user._id, "user", function(token){
+                                //All good, give the user their token
+                                res.status(200).json({
+                                    token: token,
+                                    subscription: newSub.toDate()
+                                });
+                            }, function(err){
+                                res.status(err.status).json(err);
                             });
                         }, function(err){
-                            res.status(err.status).json(err);
+                            console.log("card declined")
+                            console.log(err)
+                            res.status(402).json({
+                                msg: "Card was declined!"
+                            });
                         });
                     }, function(err){
-                        console.log("card declined")
-                        console.log(err)
-                        res.status(412).json({
+                        res.status(402).json({
                             msg: "Card was declined!"
                         });
                     });
