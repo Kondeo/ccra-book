@@ -154,7 +154,7 @@ router.post('/sub/add', function(req, res, next) {
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()
     })
-    .select('password salt subscription subscriptionId')
+    .select('password salt subscription subscriptionId stripeId')
     .exec(function(err, user) {
         if (err) {
             res.status(500).json({
@@ -164,7 +164,8 @@ router.post('/sub/add', function(req, res, next) {
             res.status(401).json({
                 msg: "Wrong email!"
             });
-        } else if(subscriptionId){
+        } else if(user.subscriptionId){
+            console.log("User already has active sub")
             res.status(400).json({
                 msg: "Already has active subscription"
             });
@@ -179,11 +180,15 @@ router.post('/sub/add', function(req, res, next) {
                   //Decide if they are a member
                 }
 
-                if(user.subscriptionId) StripeService.unsubscribe(user.subscriptionId, stripeSub, function(){
-                    res.status(500).json({
-                        msg: "Could not unsubscribe from old subscription!"
-                    });
-                });
+                if(user.subscriptionId){
+                  StripeService.unsubscribe(user.subscriptionId, stripeSub, function(){
+                      res.status(500).json({
+                          msg: "Could not unsubscribe from old subscription!"
+                      });
+                  });
+                } else {
+                  stripeSub();
+                }
 
                 function stripeSub(){
                     StripeService.subscribe(user.stripeId, plan, function(subscription){
@@ -222,6 +227,8 @@ router.post('/sub/add', function(req, res, next) {
                             res.status(err.status).json(err);
                         });
                     }, function(err){
+                        console.log("card declined")
+                        console.log(err)
                         res.status(412).json({
                             msg: "Card was declined!"
                         });
@@ -237,15 +244,13 @@ router.post('/sub/add', function(req, res, next) {
 });
 
 router.post('/sub/cancel', function(req, res, next) {
-    if(!(req.body.cardToken &&
-        req.body.email &&
-        req.body.password)){
+    if(!(req.body.token)){
         return res.status(412).json({
             msg: "Route requisites not met."
         });
     }
 
-    SessionService.validateSession(req.params.token, "user", function(accountId) {
+    SessionService.validateSession(req.body.token, "user", function(accountId) {
 
         //Find a user with the username requested. Select salt and password
         User.findById(accountId)
@@ -262,12 +267,8 @@ router.post('/sub/cancel', function(req, res, next) {
             } else {
                 StripeService.unsubscribe(user.subscriptionId, function(confirmation){
 
-                    var updatedUser = {};
-
-                    updatedUser.subscriptionId = false;
-
                     var setUser = {
-                        $set: updatedUser
+                        $unset: {subscriptionId: 1 }
                     }
 
                     User.update({
@@ -282,7 +283,7 @@ router.post('/sub/cancel', function(req, res, next) {
                     });
 
                     //All good, give the user their token
-                    res.status(200);
+                    res.status(200).send("ok");
                 }, function(err){
                     res.status(500).json({
                         msg: "Could not unsubscribe user!"

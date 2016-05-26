@@ -346,6 +346,25 @@ angular.module('starter')
         $ionicHistory.goBack();
     }
 
+    $scope.unsubscribe = function() {
+        //Start loading
+        loadingSpinner.startLoading();
+        
+        User.cancel({
+          token: localStorage.getItem("session_token")
+        }, function(){
+            //Stop loading
+            loadingSpinner.stopLoading();
+
+            //User is no longer subscribed to autopay, so change interface
+            $scope.autoPay = false;
+        }, function(){
+            //Stop loading
+            loadingSpinner.stopLoading();
+            Notifications.show("Error!", "Something went wrong. Please reload the app.");
+        });
+    }
+
     //Create the user
     $scope.registerUser = function() {
 
