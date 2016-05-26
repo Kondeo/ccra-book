@@ -75,7 +75,7 @@
           required>
         </label>
 
-        <ion-checkbox ng-model="registerData.ccraMember" ng-click="updatePrices()">I am a CCRA member</ion-checkbox>
+        <ion-checkbox ng-model="registerData.ccraMember" ng-click="updatePrices();setMember();">I am a CCRA member</ion-checkbox>
         <div class="ccraMembership">
           <label class="item item-input" ng-if="registerData.ccraMember">
             <span class="input-label"

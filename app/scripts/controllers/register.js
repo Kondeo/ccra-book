@@ -22,6 +22,8 @@ angular.module('starter')
     //If we are then fill the subscription information
     $scope.initPage = function() {
 
+        loadingSpinner.stopLoading();
+
         if(localStorage.getItem("admin")) {
 
             //inform them of their admin powers
@@ -47,8 +49,7 @@ angular.module('starter')
             };
 
             User.get(payload, function(data) {
-
-                $scope.autoPay = data.subscriptionId || false;
+                $scope.autoPay = data.subscriptionId;
 
                 //Stop loading
                 loadingSpinner.stopLoading();
@@ -101,10 +102,19 @@ angular.module('starter')
         })
 
     }
-    $scope.initPage();
+
+    if(!$scope.loggedIn()){
+      loadingSpinner.startLoading();
+      $timeout(function(){
+        loadingSpinner.stopLoading();
+        $scope.initPage();
+      }, 250);
+    } else {
+      $scope.initPage();
+    }
+
 
     $scope.updatePrices = function(){
-        $scope.isMember = $scope.registerData.ccraMember;
         if(!$scope.registerData.ccraMember) {
           //Set the text
           $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
@@ -112,6 +122,10 @@ angular.module('starter')
           //Set the text
           $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
         }
+    }
+
+    $scope.setMember = function(){
+        $scope.isMember = $scope.registerData.ccraMember;
     }
 
     //Functions for the Form
