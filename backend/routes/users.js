@@ -478,7 +478,7 @@ function checkMembership(username, password, success, fail){
           // Print out the response body
           var data = JSON.parse(body);
           if(data.active){
-            success();
+            success(true);
           } else {
             fail({
               status: 424,
