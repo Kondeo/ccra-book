@@ -54,7 +54,7 @@ module.exports = function (grunt) {
       production: {
         constants: {
           CONST: {
-            "apiBase": "https://ccra1.kondeo.com:3000/",
+            "apiBase": "https://ccracodes.com:3000/",
             "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE",
             "version": "<%= pkg.version %>"
           }
@@ -63,7 +63,7 @@ module.exports = function (grunt) {
       default: {
         constants: {
           CONST: {
-            "apiBase": "https://ccra1.kondeo.com:3000/",
+            "apiBase": "https://ccracodes.com:3000/",
             "stripePK": "pk_live_zgdVMyeOlyq0g7vQuRliqEDE",
             "version": "<%= pkg.version %>"
           }
