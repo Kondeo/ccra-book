@@ -5,8 +5,8 @@
     "LAST_COMPATIBLE": 998
   },
   "SUBSCRIPTION_PRICE": {
-    "NEW": 1000,
-    "RENEW": 700
+    "STANDARD": 999,
+    "MEMBER": 499
   },
   "SERVER": {
     "URL": "https://dev.kondeo.com"

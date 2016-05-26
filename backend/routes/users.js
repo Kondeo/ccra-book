@@ -201,6 +201,7 @@ router.post('/sub/add', function(req, res, next) {
                         var newSub = moment.max(origSub, today).add(1, 'month');
 
                         updatedUser.subscription = newSub.toDate();
+                        updatedUser.subscriptionId = subscription.id;
 
                         var setUser = {
                             $set: updatedUser

@@ -16,6 +16,8 @@ angular.module('starter')
     //If our card is validated
     $scope.cardValidated = false;
 
+    $scope.isMember = false;
+
     //Check if we are logged in,
     //If we are then fill the subscription information
     $scope.initPage = function() {
@@ -51,6 +53,8 @@ angular.module('starter')
                 //Stop loading
                 loadingSpinner.stopLoading();
 
+                $scope.isMember = data.memberPrice;
+
                 //Auto fill their email for them
                 $scope.registerData.email = data.email;
 
@@ -71,8 +75,7 @@ angular.module('starter')
         }
 
         //Lastly, get the price
-        $scope.price;
-        $scope.priceText = "Getting Prices...";
+        $scope.prices;
 
         var payload = {
 
@@ -82,28 +85,11 @@ angular.module('starter')
         loadingSpinner.startLoading();
 
         Price.get(payload, function(response) {
+            //Set the price
+            $scope.prices = response;
 
-            //Stop loading
-            loadingSpinner.stopLoading();
-
-            //Check if we should get the price of a new user
-            //or extension
-            if($scope.loggedIn()) {
-
-                //Set the price
-                $scope.price = response.RENEW;
-
-                //Set the text
-                $scope.priceText = "Extend Subscription for 1 Year - $" + ($scope.price / 100);
-            }
-            else {
-
-                //Set the price
-                $scope.price = response.NEW;
-
-                //Set the text
-                $scope.priceText = "Create Subscription - $" + ($scope.price / 100);
-            }
+            //Set the text
+            $scope.updatePrices();
         },
         //errors
         function(response) {
@@ -114,6 +100,16 @@ angular.module('starter')
 
     }
     $scope.initPage();
+
+    $scope.updatePrices = function(){
+        if(!$scope.registerData.ccraMember) {
+          //Set the text
+          $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
+        } else {
+          //Set the text
+          $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
+        }
+    }
 
     //Functions for the Form
 
@@ -349,7 +345,7 @@ angular.module('starter')
     $scope.unsubscribe = function() {
         //Start loading
         loadingSpinner.startLoading();
-        
+
         User.cancel({
           token: localStorage.getItem("session_token")
         }, function(){
@@ -421,6 +417,11 @@ angular.module('starter')
                         password: $scope.registerData.password
                     }
 
+                    if($scope.registerData.ccraMember){
+                        payload.memberUsername = $scope.registerData.memberUsername;
+                        payload.memberPassword = $scope.registerData.memberPassword;
+                    }
+
                     //Submitting Now!
                     User.register(payload, function(data) {
 
@@ -439,6 +440,8 @@ angular.module('starter')
                         localStorage.setItem("subscriptionDate", data.subscription);
                         sessionStorage.setItem("weekAlerted", false);
                         sessionStorage.setItem("monthAlerted", false);
+
+                        $scope.autoPay = true;
 
                         //Move them back to the index, no history
                         $ionicHistory.nextViewOptions({
@@ -473,6 +476,16 @@ angular.module('starter')
 
                                     //Display alert, and show card errors
                                     $scope.cardError = true;
+                                }
+                            },
+                            {
+                                status: 417,
+                                title: "Membership Username/Password Incorrect",
+                                text: "Please check your membership information.",
+                                callback: function() {
+
+                                    //Display alert, and show card errors
+                                    $scope.memberError = true;
                                 }
                             }
                         ]
@@ -532,6 +545,11 @@ angular.module('starter')
                     password: $scope.registerData.password
                 }
 
+                if($scope.registerData.ccraMember){
+                    payload.memberUsername = $scope.registerData.memberUsername;
+                    payload.memberPassword = $scope.registerData.memberPassword;
+                }
+
                 //Submitting Now!
                 User.resub(payload, function(data) {
 
@@ -549,6 +567,8 @@ angular.module('starter')
                     localStorage.setItem("subscriptionDate", data.subscription);
                     sessionStorage.setItem("weekAlerted", false);
                     sessionStorage.setItem("monthAlerted", false);
+
+                    $scope.autoPay = true;
 
                     //Move them back to the index, no history
                     $ionicHistory.nextViewOptions({
