@@ -148,9 +148,9 @@ angular.module('starter')
 
                         //Alert the user their subscription is Ending
                         //inform user there subscription is ending
-                        Notifications.show("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
-                         moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
-                         ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
+                        // Notifications.show("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+                        //  moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
+                        //  ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
 
                          //Set the alerted to true
                          //Save their subscription Date
