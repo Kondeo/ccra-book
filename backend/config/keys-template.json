@@ -10,5 +10,8 @@
         "apiKey": "",
         "domain": "kondeo.com",
         "alias": "support@kondeo.com"
+    },
+    "memberClicks": {
+        "apiKey": ""
     }
 }

@@ -25,6 +25,7 @@ var users = require('./models/users');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var pages = require('./routes/pages');
+var stripeHooks = require('./routes/stripeHooks');
 
 var app = express();
 
@@ -46,6 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/pages', pages);
+app.use('/stripe', stripeHooks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,6 +1,6 @@
 <ion-view view-title="Subscription">
 <ion-content>
-    <form name = "registerForm" ng-init="subType = 'new'">
+    <form name = "registerForm" ng-init="subType = 'new'" ng-show="!autoPay">
 
         <!-- Placing two fake auth fields to
         stop chrome autofill -->
@@ -36,8 +36,10 @@
 
       <div class="list subTypeSel">
 
-        <div class="item item-divider" ng-if="loggedIn()">
-            Your current subscription is valid until: {{subscription}}
+        <div class="item item-divider center" ng-if="loggedIn()">
+            Your current subscription is valid until:<br />
+            {{subscription}}<br />
+            But is NOT being autorenewed.
         </div>
 
         <label class="item item-input">
@@ -72,6 +74,29 @@
           placeholder="Secure Password"
           required>
         </label>
+
+        <ion-checkbox ng-model="registerData.ccraMember" ng-click="updatePrices();setMember();">I am a CCRA member</ion-checkbox>
+        <div class="ccraMembership">
+          <label class="item item-input" ng-if="registerData.ccraMember">
+            <span class="input-label"
+            ng-class="{'errorFormText': memberError}">
+            Membership Username</span>
+            <input type="text" ng-model="registerData.memberUsername"
+            placeholder="Username for your CCRA Membership"
+            autocomplete="off"  autocorrect="off"
+            autocapitalize="none" spellcheck="false"
+            required>
+          </label>
+          <label class="item item-input" ng-if="registerData.ccraMember">
+            <span class="input-label"
+            ng-class="{'errorFormText': memberError}">
+            Membership Password</span>
+            <input type="password"
+            ng-model="registerData.memberPassword"
+            placeholder="Password for your CCRA Membership"
+            required>
+          </label>
+        </div>
 
         <!-- Credit Card Number -->
         <label class="item item-input">
@@ -161,7 +186,7 @@
 
         <!-- Register Subscription for the app -->
         <label class="item">
-          <button class="button button-block button-positive"
+          <button class="button button-block button-positive button-subscribe"
           type="submit" ng-if = "!loggedIn()"
           ng-disabled = "!registerForm.$valid ||
           registerData.password != registerData.confirmPassword ||
@@ -170,17 +195,27 @@
           ng-click="registerUser()">{{priceText}}</button>
 
         <!-- Update Information for the user -->
-          <button class="button button-block button-positive"
+          <button class="button button-block button-positive button-subscribe"
           type="submit" ng-if = "loggedIn()"
           ng-disabled = "!registerForm.$valid ||
           !cardValidated ||
           loading.isLoading()"
           ng-click="updateUser()">{{priceText}}</button>
-
-          <button class="button button-block button-stable"
-          ng-click = "goToPrev()">Cancel</button>
         </label>
       </div>
     </form>
+
+    <div class="card" ng-show="autoPay">
+      <div class="item item-text-wrap">
+        <p class="center">You are currently subscribed, and are being charged <b ng-if="!isMember">${{prices.STANDARD/100}}</b><b ng-if="isMember">${{prices.MEMBER/100}}</b> monthly<b ng-if="isMember"> (CCRA Member Price)</b>.</p>
+        <p class="center">Your current subscription is paid until {{subscription}} and is auto-renewing.</p><br /><br />
+
+        <button class="button button-full button-assertive" ng-click="unsubscribe()">
+          Cancel Subscription
+        </button>
+        <p class="center hint">If you cancel your subscription, you will still keep your remaining subscription time.<br />
+        You may use this button to change credit card information if needed.</p>
+      </div>
+    </div>
 </ion-content>
 </ion-view>

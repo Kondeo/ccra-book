@@ -1,6 +1,6 @@
 {
   "name": "CCRAECompendium",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "dependencies": {
     "moment": "^2.11.1"
@@ -64,6 +64,9 @@
     }
   ],
   "cordovaPlatforms": [
-    "android"
+    {
+      "platform": "android",
+      "locator": "browser"
+    }
   ]
 }

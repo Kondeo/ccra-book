@@ -23,28 +23,36 @@ angular.module('starter')
     loadingSpinner.stopLoading();
     $scope.setConfig(data)
   }, function(error){
-    //Our custom Error Handler
-    var handlers = [
-        {
-            status: 426,
-            title: "APPLICATION UNSUPPORTED",
-            text: "Your application version is no longer supported. There will likely be bugs and crashes. Please update to the newest version in the App Store.",
-            callback: function(response) {
-              $scope.setConfig(response.data)
-            }
-        },
-        {
-            status: 449,
-            title: "Please Update",
-            text: "You are running an old version of this app. Please update to the newest version in the App Store, or you may start experiencing bugs.",
-            callback: function(response) {
-              $scope.setConfig(response.data)
-            }
-        }
-    ]
+    //Check if alert for versioning has already been sprung
+    if(sessionStorage.getItem("versionAlerted")){
+      loadingSpinner.stopLoading();
+      $scope.setConfig(error.data)
+    } else {
+      //Alert the user to their version and mark as alerted
+      sessionStorage.setItem("versionAlerted", true);
+      //Our custom Error Handler
+      var handlers = [
+          {
+              status: 426,
+              title: "APPLICATION UNSUPPORTED",
+              text: "Your application version is no longer supported. There will likely be bugs and crashes. Please update to the newest version in the App Store.",
+              callback: function(response) {
+                $scope.setConfig(response.data)
+              }
+          },
+          {
+              status: 449,
+              title: "Please Update",
+              text: "You are running an old version of this app. Please update to the newest version in the App Store, or you may start experiencing bugs.",
+              callback: function(response) {
+                $scope.setConfig(response.data)
+              }
+          }
+      ]
 
-    //Send to the notification handler
-    Notifications.error(error, handlers);
+      //Send to the notification handler
+      Notifications.error(error, handlers);
+    }
   });
 
   $scope.settings = {};
@@ -148,9 +156,9 @@ angular.module('starter')
 
                         //Alert the user their subscription is Ending
                         //inform user there subscription is ending
-                        Notifications.show("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
-                         moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
-                         ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
+                        // Notifications.show("Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+                        //  moment(subDate.subscription).format("dddd, MMMM Do YYYY") +
+                        //  ". Please visit the menu, and select (Manage Subscription) to extend your subscription.");
 
                          //Set the alerted to true
                          //Save their subscription Date

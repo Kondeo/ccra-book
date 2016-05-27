@@ -19,8 +19,9 @@
     "mongoosastic": "^3.6.0",
     "mongoose": "^4.2.5",
     "morgan": "~1.6.1",
+    "request": "^2.72.0",
     "semver": "^5.1.0",
     "serve-favicon": "~2.3.0",
-    "stripe": "^4.2.0"
+    "stripe": "^4.6.0"
   }
 }
