@@ -110,7 +110,7 @@ router.post('/login', function(req, res, next) {
     User.findOne({
         email: (req.body.email.toLowerCase()).trim()
     })
-    .select('password salt subscription admin')
+    .select('password salt subscription subscriptionId admin')
     .exec(function(err, user) {
         if (err) {
             res.status(500).json({
@@ -133,7 +133,8 @@ router.post('/login', function(req, res, next) {
                         res.status(200).json({
                             token: token,
                             subscription: user.subscription,
-                            admin: user.admin
+                            admin: user.admin,
+                            subscriptionId: user.subscriptionId
                         });
                     }, function(err){
                         res.status(err.status).json(err);

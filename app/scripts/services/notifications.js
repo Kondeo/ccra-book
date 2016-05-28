@@ -72,7 +72,7 @@ angular.module('starter')
                    localStorage.removeItem("session_token");
 
                    //Show an alert
-                   showAlert("Session Error", "Session not found or invalidated, please log in.");
+                   showAlert("Sign In Required", "For security purposes, please sign in again.");
 
                    //Show the login Modal
                    LoginModal.show();
@@ -88,13 +88,13 @@ angular.module('starter')
                    $state.go('app.register');
 
                    //Show alert
-                   Notifications.show("Subscription Ended", "Please extend your subscription to continue using this app.");
+                   Notifications.show("Subscription Ended", "To continue using the app, you will need to add a subscription.");
                }
                else if (response.status == 404) {
                  //404 error
 
                  //Show alert
-                 showAlert("Not Found", "We had a problem with our servers, please try again later. If this continues, please contact our development team.");
+                 showAlert("Not Found", "We had a problem with our servers, please try again in a few minutes. If this continues, please contact our development team.");
                }
                else if (response.status == -1) {
                  //No Internet Connection
