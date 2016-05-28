@@ -24,15 +24,16 @@ router.post('/register', function(req, res) {
         });
     }
 
+    var cleanEmail = (req.body.email.toLowerCase()).trim();
     var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
-    if (!emailRegex.test(req.body.email)) {
+    if (!emailRegex.test(cleanEmail)) {
         res.status(412).json({
           msg: "Email is not valid!"
         });
     } else {
         //Check if a user with that username already exists
         User.findOne({
-            email: (req.body.email.toLowerCase()).trim()
+            email: cleanEmail
           })
           .select('_id')
           .exec(function(err, user) {
@@ -61,7 +62,7 @@ router.post('/register', function(req, res) {
                         //Create a new user with the assembled information
                         var subscriptionDate = moment().add(1, 'month');
                         var newUser = new User({
-                            email: (req.body.email.toLowerCase()).trim(),
+                            email: cleanEmail,
                             password: hash,
                             salt: salt,
                             subscription: subscriptionDate.toDate(),
