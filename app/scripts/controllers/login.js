@@ -43,12 +43,12 @@ angular.module('starter')
 
         //Inform the user
         //Show an alert
-        if(!data.admin && moment().add(1, 'M').isAfter(moment(data.subscription))) {
+        if(!data.admin && moment().add(6, 'd').isAfter(moment(data.subscription)) && !data.subscriptionId) {
 
             //inform user there subscription is ending
-            Notifications.show("Login Success, Subscription Ending Soon!", "Please notice that your subscription shall be ending: " +
+            Notifications.show("Not Subscribed to AutoRenew!", "You don't have an active card in your subscription settings. Please notice that your current subscription shall be ending: " +
              moment(data.subscription).format("dddd, MMMM Do YYYY") +
-             ". Please visit the menu, and select (Manage Subscription) to extend your subscription. The Page will now reload...", function() {
+             ". Please visit the menu, and select (Manage Subscription) to add a card.", function() {
 
                 //They have been alerted
                 //Flip the variable depending if we are withing weeks
@@ -68,7 +68,7 @@ angular.module('starter')
         else {
 
             //Show normal login alert
-            Notifications.show("Login Success!", "The Page will now reload...");
+            Notifications.show("Login Successful", "The Page will now reload...");
 
             //Wait a slight second to show the message
             $timeout(function () {
@@ -78,7 +78,7 @@ angular.module('starter')
 
                 //Reload the page
                 $window.location.reload(true);
-            }, 250);
+            }, 200);
         }
     },
     //Errors
