@@ -402,10 +402,12 @@ angular.module('starter')
             //Create finalized card number
             var cardNumber = $scope.registerData.ccNumber;
 
+            var cardCvv = document.getElementById("cardCvv");
+
             //Send card info to stripe for tokenization
             Stripe.card.createToken({
                 "number": $scope.registerData.ccNumber,
-                "cvc": $scope.registerData.cvv,
+                "cvc": cardCvv.value,
                 "exp_month": $scope.registerData.expireM,
                 "exp_year": $scope.registerData.expireY
             }, function(status, response) {
