@@ -419,7 +419,7 @@ angular.module('starter')
                     //Stop loading
                     loadingSpinner.stopLoading();
 
-                    Notifications.show("Card Error", "Please check your card information.");
+                    Notifications.show("Card Could Not Be Verified", "Please check your card information.");
 
                 } else {
 
@@ -556,17 +556,19 @@ angular.module('starter')
         //Create finalized card number
         var cardNumber = $scope.registerData.ccNumber;
 
+        var cardCvv = document.getElementById("cardCvv");
+
         //Send card info to stripe for tokenization
         Stripe.card.createToken({
             "number": $scope.registerData.ccNumber,
-            "cvc": $scope.registerData.cvv,
+            "cvc": cardCvv.value,
             "exp_month": $scope.registerData.expireM,
             "exp_year": $scope.registerData.expireY
         }, function(status, response) {
             if (response.error) {
 
                 //Show an error for the card
-                Notifications.show("Card Error", "Please check your card information.");
+                Notifications.show("Card Could Not Be Verified", "Please check your card information.");
 
                 //Display alert
                 $scope.cardError = true;
