@@ -479,8 +479,18 @@ angular.module('starter')
                         var handlers = [
                             {
                                 status: 406,
-                                title: "Email Taken",
-                                text: "Sorry, that email has been taken. Please enter another email!",
+                                title: "Email Unsupported",
+                                text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
+                                callback: function() {
+
+                                    //Ng class red email text
+                                    $scope.emailError = true;
+                                }
+                            },
+                            {
+                                status: 409,
+                                title: "Email Already Registered",
+                                text: "Sorry, that email has already been registered to an account. Please enter another email, or use the existing account!",
                                 callback: function() {
 
                                     //Ng class red email text
@@ -489,8 +499,8 @@ angular.module('starter')
                             },
                             {
                                 status: 402,
-                                title: "Card was declined",
-                                text: "Please check your card information.",
+                                title: "Card Declined by Stripe",
+                                text: "We could not properly charge your card. Please check your card information.",
                                 callback: function() {
 
                                     //Display alert, and show card errors
@@ -509,8 +519,8 @@ angular.module('starter')
                             },
                             {
                                 status: 417,
-                                title: "Membership Username/Password Incorrect",
-                                text: "Please check your membership information.",
+                                title: "Membership Username or Password Incorrect",
+                                text: "Please check your CCRA membership credentials. If you are not a CCRA member, please uncheck 'I am a CCRA member'.",
                                 callback: function() {
 
                                     //Display alert, and show card errors
@@ -616,8 +626,8 @@ angular.module('starter')
                     var handlers = [
                         {
                             status: 401,
-                            title: "Authentication Error",
-                            text: "Please check your email and password.",
+                            title: "Incorrect Email or Password",
+                            text: "Please check your email and password. You need to use the same email and password you signed up with.",
                             callback: function() {
 
                                 //show red ng class text
@@ -627,8 +637,8 @@ angular.module('starter')
                         },
                         {
                             status: 402,
-                            title: "Card was declined",
-                            text: "Please check your card information.",
+                            title: "Card Declined by Stripe",
+                            text: "We could not properly charge your card. Please check your card information.",
                             callback: function() {
 
                                 //Display alert, and show card errors
@@ -647,8 +657,8 @@ angular.module('starter')
                         },
                         {
                             status: 417,
-                            title: "Membership Username/Password Incorrect",
-                            text: "Please check your membership information.",
+                            title: "Membership Username or Password Incorrect",
+                            text: "Please check your CCRA membership credentials. If you are not a CCRA member, please uncheck 'I am a CCRA member'.",
                             callback: function() {
 
                                 //Display alert, and show card errors
