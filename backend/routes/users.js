@@ -27,7 +27,7 @@ router.post('/register', function(req, res) {
     var cleanEmail = (req.body.email.toLowerCase()).trim();
     var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
     if (!emailRegex.test(cleanEmail)) {
-        res.status(412).json({
+        res.status(406).json({
           msg: "Email is not valid!"
         });
     } else {
@@ -38,7 +38,7 @@ router.post('/register', function(req, res) {
           .select('_id')
           .exec(function(err, user) {
             if (user) {
-                res.status(406).json({
+                res.status(409).json({
                     msg: "Email taken!"
                 });
             } else {
@@ -52,7 +52,10 @@ router.post('/register', function(req, res) {
                 }
 
                 function finalizeReg(isMember){
-                    if(isMember) plan = "member";
+                    if(isMember) {
+                      plan = "member";
+                      isMember = true;
+                    };
 
                     StripeService.createCustomer(req.body.cardToken, plan, (req.body.email.toLowerCase()).trim(), function(customer){
                         //Create a random salt
@@ -201,7 +204,10 @@ router.post('/sub/add', function(req, res, next) {
 
                 function clearSubs(membership){
                   isMember = membership;
-                  if(isMember) plan = "member";
+                  if(isMember) {
+                    plan = "member";
+                    isMember = true;
+                  }
                   if(user.subscriptionId){
                     StripeService.unsubscribe(user.subscriptionId, getStripeId, function(){
                         res.status(500).json({
@@ -216,7 +222,6 @@ router.post('/sub/add', function(req, res, next) {
                 function getStripeId(){
                     if(!user.stripeId){
                         StripeService.createCustomer(null, null, (req.body.email.toLowerCase()).trim(), function(customer){
-                          console.log(customer)
                             newSub(customer.id);
                         }, function(err){
                             res.status(402).json({
@@ -371,7 +376,7 @@ router.get('/self/:token', function(req, res, next) {
 router.put('/self/:token', function(req, res, next) {
     var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
     if (req.body.email && !emailRegex.test(req.body.email)) {
-        res.status(412).json({
+        res.status(406).json({
             msg: "Email is not valid!"
         });
     } else {
@@ -415,7 +420,7 @@ router.post('/forgot', function(req, res, next) {
     //Find a user with the username requested. Select salt and password
     var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
     if (!emailRegex.test(req.body.email)) {
-        res.status(412).json({
+        res.status(406).json({
             msg: "Email is not valid!"
         });
     } else {

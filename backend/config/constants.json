@@ -1,7 +1,7 @@
 {
   "VERSION": {
-    "NUMBER": "0.1.7",
-    "DEPRICATED": "0.1.6",
+    "NUMBER": "0.1.8",
+    "DEPRICATED": "0.1.7",
     "LAST_COMPATIBLE": "0.1.7"
   },
   "SUBSCRIPTION_PRICE": {
