@@ -32,6 +32,10 @@ var User = new mongoose.Schema({
     stripeId: {
         type: String
     },
+    stripeInit: {
+        type: Boolean,
+        default: false
+    },
     memberPrice: {
         type: Boolean,
         default: false
