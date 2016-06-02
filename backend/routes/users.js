@@ -71,7 +71,7 @@ router.post('/register', function(req, res) {
                             subscription: subscriptionDate.toDate(),
                             subscriptionId: customer.subscriptions.data[0].id,
                             stripeId: customer.id,
-                            isMember: isMember
+                            memberPrice: isMember
                         }).save(function(err, newUser) {
                             if (err) {
                               console.log("Error saving user to DB!");
