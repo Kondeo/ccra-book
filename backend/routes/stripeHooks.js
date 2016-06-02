@@ -81,7 +81,7 @@ function cancelUser(stripeId, subscriptionId){
             console.log("User already unsubscribed manually")
         } else {
             var setUser = {
-                $unset: {subscriptionId: 1, memberPrice: 1 }
+                $unset: {subscriptionId: 1, memberPrice: 1, stripeInit: 1 }
             }
 
             User.update({
