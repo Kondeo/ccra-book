@@ -106,16 +106,14 @@
           registerForm.ccNumber.$touched &&
           !validCC)}">
           Credit Card Number</span>
-          <input
-              type="tel"
-              id="ccNumber"
-              name="ccNumber"
+          <input type="text"
               ng-model="registerData.ccNumber"
               placeholder="XXXX-XXXX-XXXX-XXXX"
-              ng-focus="ccUnStar()"
-              ng-blur = "ccStar()"
-              ng-keydown="numbersOnly($event);maxLength($event, 19)"
-              ng-keyup="formatCC($event)">
+              ng-keyup="validateCardNumber()"
+              cc-number
+              cc-format
+              cc-type="cardType"
+              ng-required="true" />
         </label>
         <label class="item item-input">
           <span class="input-label"
