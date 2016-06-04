@@ -9,7 +9,8 @@ angular.module('starter',
 'ngResource',
 'cfp.hotkeys',
 'ngCordova',
-'ui.tinymce'])
+'ui.tinymce',
+'credit-cards'])
 
 .config(function($stateProvider,
     $urlRouterProvider, $httpProvider) {

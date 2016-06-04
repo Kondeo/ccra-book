@@ -2,7 +2,7 @@ angular.module('starter')
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
     $timeout, Page, User, $state,
     loadingSpinner, Price,
-    Notifications, CONST) {
+    Notifications, CONST, creditcards) {
 
     //SET OUR STRIPE KEY HERE
     Stripe.setPublishableKey(CONST.stripePK);
@@ -266,9 +266,8 @@ angular.module('starter')
     /**
      * Validates form CC. Checks Stripe for validity, determines card type and sets card icon.
      */
-    $scope.validateCardNumber = function(event) {
-        //Concatante the credit card number together
-        var cardNumber = event.target.value.replace(/-/g, '');
+    $scope.validateCardNumber = function() {
+        var cardNumber = $scope.registerData.ccNumber;
 
         //Check if the credit card number is US valid
         if(Stripe.card.validateCardNumber(cardNumber) && (cardNumber.length == 13 || cardNumber.length == 15 || cardNumber.length == 16)) {
