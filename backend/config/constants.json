@@ -24,5 +24,21 @@
       "SUBSCRIBE_PAGE": true,
       "SUBSCRIBE_ONLINE_TEXT": false
     }
+  },
+  "CLIENTVER": {
+    "0.1.9": {
+      "IOS": {
+        "SUBSCRIBE_PAGE": false,
+        "SUBSCRIBE_ONLINE_TEXT": false
+      },
+      "ANDROID": {
+        "SUBSCRIBE_PAGE": false,
+        "SUBSCRIBE_ONLINE_TEXT": false
+      },
+      "WEB": {
+        "SUBSCRIBE_PAGE": true,
+        "SUBSCRIBE_ONLINE_TEXT": false
+      }
+    },
   }
 }
