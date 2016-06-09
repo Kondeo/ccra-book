@@ -13,12 +13,29 @@ router.get('/prices', function(req, res, next) {
 });
 
 router.get('/client', function(req, res, next) {
+  var status = 200;
   //CLIENT OUT OF DATE - Semver client version is less than last compat
-  if(semver.lt(req.query.version, CONST.VERSION.LAST_COMPATIBLE)){ res.status(426).json(CONST.CLIENT) }
+  if(semver.lt(req.query.version, CONST.VERSION.LAST_COMPATIBLE)){
+    status = 426;
+  }
   //CLIENT BEING DEPRICATED SOON - Semver client version is less than or equal to DEPRICATED
-  else if(semver.lte(req.query.version, CONST.VERSION.DEPRICATED)){ res.status(449).json(CONST.CLIENT) }
+  else if(semver.lte(req.query.version, CONST.VERSION.DEPRICATED)){
+    status = 449;
+  }
   //CLIENT VERSION OK
-  else { res.status(200).json(CONST.CLIENT) }
+  else {
+    status = 200;
+  }
+  sendClient(req.query.version, status, res);
 });
+
+function sendClient(version, status, res){
+  var custClient = CONST.CLIENTVER[version];
+  if(custClient){
+    res.status(status).json(custClient);
+  } else {
+    res.status(status).json(CONST.CLIENT);
+  }
+}
 
 module.exports = router;
