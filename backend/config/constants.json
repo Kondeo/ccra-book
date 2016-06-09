@@ -13,11 +13,11 @@
   },
   "CLIENT": {
     "IOS": {
-      "SUBSCRIBE_PAGE": false,
+      "SUBSCRIBE_PAGE": true,
       "SUBSCRIBE_ONLINE_TEXT": false
     },
     "ANDROID": {
-      "SUBSCRIBE_PAGE": false,
+      "SUBSCRIBE_PAGE": true,
       "SUBSCRIBE_ONLINE_TEXT": false
     },
     "WEB": {
@@ -32,13 +32,13 @@
         "SUBSCRIBE_ONLINE_TEXT": false
       },
       "ANDROID": {
-        "SUBSCRIBE_PAGE": false,
+        "SUBSCRIBE_PAGE": true,
         "SUBSCRIBE_ONLINE_TEXT": false
       },
       "WEB": {
         "SUBSCRIBE_PAGE": true,
         "SUBSCRIBE_ONLINE_TEXT": false
       }
-    },
+    }
   }
 }

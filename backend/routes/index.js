@@ -26,13 +26,13 @@ router.get('/client', function(req, res, next) {
   else {
     status = 200;
   }
-  sendClient(req.query.version, status);
+  sendClient(req.query.version, status, res);
 });
 
-function sendClient(version, status){
-  var custClient = CONST.CLIENTVER.indexOf(version);
-  if(custClient > -1){
-    res.status(status).json(CONST.CLIENTVER[custClient]);
+function sendClient(version, status, res){
+  var custClient = CONST.CLIENTVER[version];
+  if(custClient){
+    res.status(status).json(custClient);
   } else {
     res.status(status).json(CONST.CLIENT);
   }
