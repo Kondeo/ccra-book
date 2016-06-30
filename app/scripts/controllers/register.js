@@ -116,7 +116,7 @@ angular.module('starter')
 
     $scope.updatePrices = function(){
         if($scope.registerData.promoReg){
-            $scope.priceText = "Redeem Subscription Valid for 1 Year";
+            $scope.priceText = "Redeem Subscription";
         } else if(!$scope.registerData.ccraMember) {
           //Set the text
           $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
