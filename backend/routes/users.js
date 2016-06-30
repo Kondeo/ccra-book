@@ -101,6 +101,138 @@ router.post('/register', function(req, res) {
     }
 });
 
+router.post('/register/redeem', function(req, res) {
+    if(!(req.body.promoCode &&
+        req.body.email &&
+        req.body.password)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
+    var cleanEmail = (req.body.email.toLowerCase()).trim();
+    var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
+    if (!emailRegex.test(cleanEmail)) {
+        res.status(406).json({
+          msg: "Email is not valid!"
+        });
+    } else {
+        //Check if a user with that username already exists
+        User.findOne({
+            email: cleanEmail
+          })
+          .select('_id')
+          .exec(function(err, user) {
+            if (user) {
+
+            } else {
+
+                //Create a random salt
+                var salt = crypto.randomBytes(128).toString('base64');
+                //Create a unique hash from the provided password and salt
+                var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
+                //Create a new user with the assembled information
+                var subscriptionDate = moment().add(1, 'year');
+                var newUser = new User({
+                    email: cleanEmail,
+                    password: hash,
+                    salt: salt,
+                    subscription: subscriptionDate.toDate()
+                }).save(function(err, newUser) {
+                    if (err) {
+                      console.log("Error saving user to DB!");
+                      res.status(500).json({
+                          msg: "Error saving user to DB!"
+                      });
+                    } else {
+                        SessionService.generateSession(newUser._id, "user", function(token){
+                            //All good, give the user their token
+                            res.status(201).json({
+                                token: token,
+                                subscription: subscriptionDate.toDate()
+                            });
+                        }, function(err){
+                            res.status(err.status).json(err);
+                        });
+                    }
+                });
+            }
+          });
+    }
+});
+
+router.post('/sub/redeem', function(req, res) {
+    if(!(req.body.promoCode &&
+        req.body.email &&
+        req.body.password)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
+    var cleanEmail = (req.body.email.toLowerCase()).trim();
+    var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
+    if (!emailRegex.test(cleanEmail)) {
+        res.status(406).json({
+          msg: "Email is not valid!"
+        });
+    } else {
+        //Check if a user with that username already exists
+        User.findOne({
+            email: cleanEmail
+          })
+          .select('_id')
+          .exec(function(err, user) {
+            if (!user) {
+                res.status(401).json({
+                    msg: "Wrong email!"
+                });
+            } else {
+
+                //Create a random salt
+                var salt = crypto.randomBytes(128).toString('base64');
+                //Create a unique hash from the provided password and salt
+                var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
+                //Create a new user with the assembled information
+
+                var updatedUser = {};
+
+                var origSub = moment(user.subscription);
+                var today = moment();
+
+                var newSub = moment.max(origSub, today).add(1, 'year');
+
+                updatedUser.subscription = newSub.toDate();
+
+                var setUser = {
+                    $set: updatedUser
+                }
+
+                User.update({
+                    _id: user._id
+                }, setUser)
+                .exec(function(err, user) {
+                    if (err) {
+                        console.log({
+                            msg: "Could not update user"
+                        });
+                    }
+                });
+
+                SessionService.generateSession(user._id, "user", function(token){
+                    //All good, give the user their token
+                    res.status(201).json({
+                        token: token,
+                        subscription: newSub.toDate()
+                    });
+                }, function(err){
+                    res.status(err.status).json(err);
+                });
+            }
+          });
+    }
+});
+
 router.post('/login', function(req, res, next) {
     if(!(req.body.email &&
         req.body.password)){
