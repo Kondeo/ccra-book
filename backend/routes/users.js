@@ -8,7 +8,8 @@ var express = require('express'),
     MailService = require('../services/mailgun.js'),
     StripeService = require('../services/stripe.js'),
     SessionService = require('../services/sessions.js'),
-    User = mongoose.model('User');
+    User = mongoose.model('User'),
+    PromoCode = mongoose.model('PromoCode');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -590,6 +591,45 @@ router.post('/forgot', function(req, res, next) {
     }
 });
 
+router.post('/generatePromos', function(req, res) {
+    if(!(req.body.count &&
+        req.body.token)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
+    validateUser(req, res, checkAdmin);
+
+    function checkAdmin(user){
+        if(!user.admin){
+            res.status(401).json({
+                msg: "Not an admin!"
+            });
+        } else {
+            generatePromoCodes();
+        }
+    }
+
+    function generatePromoCodes(){
+        var error = false;
+        var codes = [];
+        for(var i=0;i<req.body.count;i++){
+            var code = crypto.randomBytes(4).toString('hex');
+            codes.push(code);
+            new PromoCode({
+                promoCode: code
+            }).save(function(err) {
+                if (err) {
+                  console.log("PROMO CODE SAVE ERROR")
+                  error = true;
+                }
+            });
+        }
+        res.status(200).json(codes);
+    }
+});
+
 function checkMembership(username, password, success, fail){
   var membership = false;
 
@@ -631,6 +671,34 @@ function checkMembership(username, password, success, fail){
           });
       }
   });
+}
+
+function validateUser(req, res, success){
+    var token = req.query.token || req.body.token;
+    SessionService.validateSession(token, "user", function(accountId) {
+        User.findById(accountId)
+        .select('name email subscription admin')
+        .exec(function(err, user) {
+            if (err) {
+                res.status(500).json({
+                    msg: "Couldn't search the database for user!"
+                });
+            } else if (!user) {
+                res.status(401).json({
+                    msg: "User not found, user table out of sync with session table!"
+                });
+            } else if(moment(user.subscription).isBefore(moment()) && !user.admin){
+                res.status(402).json({
+                    msg: "Subscription expired!",
+                    subscription: user.subscription
+                });
+            } else {
+                success(user);
+            }
+        });
+    }, function(err){
+        res.status(err.status).json(err);
+    });
 }
 
 module.exports = router;
