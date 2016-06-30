@@ -104,7 +104,7 @@ router.post('/register', function(req, res) {
                               msg: "PromoCode Invalid!"
                           });
                       } else {
-                          promoCode.remove().exec();
+                          promoCode.remove();
 
                           //Create a new user with the assembled information
                           var subscriptionDate = moment().add(1, 'year');
