@@ -29,6 +29,13 @@
     margin-top: 25px;
 }
 
+.promo-codes {
+    padding: 50px;
+    width: 100%;
+    resize: none;
+
+}
+
 /* Android On/Off Switch */
 .onoffswitch {
     position: absolute; width: 55px; right: 11px; top: calc(50% - 10px);
