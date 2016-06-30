@@ -107,7 +107,7 @@ router.post('/register', function(req, res) {
                           promoCode.remove();
 
                           //Create a new user with the assembled information
-                          var subscriptionDate = moment().add(1, 'year');
+                          var subscriptionDate = moment().add(6, 'm');
                           var newUser = new User({
                               email: cleanEmail,
                               password: hash,
@@ -250,7 +250,7 @@ router.post('/sub/add', function(req, res, next) {
                             var origSub = moment(user.subscription);
                             var today = moment();
 
-                            var newSub = moment.max(origSub, today).add(1, 'year');
+                            var newSub = moment.max(origSub, today).add(6, 'm');
 
                             updatedUser.subscription = newSub.toDate();
 
