@@ -50,7 +50,7 @@
         <img src="images/icon_payment.png" class="menuIcon">Manage Subscription
         </ion-item>
         <ion-item menu-close href="#/app/codes"
-        ng-if = "loggedIn() && clientConfig.SUBSCRIBE_PAGE">
+        ng-if = "loggedIn() && isAdmin && clientConfig.SUBSCRIBE_PAGE">
         <img src="images/icon_payment.png" class="menuIcon">Manage Promo Codes
         </ion-item>
         <ion-item menu-close href="#/app/settings">
