@@ -33,19 +33,6 @@ angular.module('starter')
                 url: CONST.apiBase + 'users/self/:token'
             },
 
-            registerPromo: {
-                method: 'POST',
-                isArray: false,
-                url: CONST.apiBase + 'users/register/redeem'
-
-            },
-
-            renewPromo: {
-              method: "POST",
-              isArray: false,
-              url: CONST.apiBase + 'users/sub/redeem'
-            },
-
             obtainPromoSet: {
               method: "POST",
               isArray: true,
