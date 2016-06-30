@@ -1,10 +1,10 @@
 angular.module('starter')
-.controller('CodesCtrl', function($scope, User) {
+.controller('CodesCtrl', function($scope, User, Notifications) {
 
   //Initializing token variable
   $scope.token = localStorage.getItem("session_token");
-  //$scope.tokenNum = 0;
 
+  //Obtain Generarted Promo Codes from Server
   $scope.getPromoCodes = function(){
     var payload = {
       "token": $scope.token,
@@ -19,15 +19,20 @@ angular.module('starter')
         }
         $scope.promoCodes = codes;
       }, function(err){
-
+        switch(err.status){
+          case 401:
+            Notifications.show("Error", "You are not an administrator.");
+            break;
+          default:
+            Notifications.show("Error Connecting to Server", "You encountered a problem with your connection.");
+        }
       });
   }
 
+  //Selects all generated codes
   $scope.selectAll = function(){
-    console.log("bo");
     setTimeout(function(){
       document.getElementById("promo-area").select();
-
     }, 10);
   }
 });
