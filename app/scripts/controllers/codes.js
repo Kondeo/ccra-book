@@ -6,7 +6,7 @@ angular.module('starter')
 
   //Obtain Generarted Promo Codes from Server
   $scope.getPromoCodes = function(){
-    if($scope.tokenDate && $scope.tokenNum){
+    if($scope.tokenNum && $scope.tokenDate && moment($scope.tokenDate).isAfter(moment())){
         var payload = {
           "token": $scope.token,
           "count": $scope.tokenNum,
@@ -30,7 +30,7 @@ angular.module('starter')
             }
           });
     } else {
-        Notifications.show("Error", "You need to specify a valid number and a valid date.");
+        Notifications.show("Error", "You need to specify a valid number and a valid date. Date must be after today.");
     }
   }
 
