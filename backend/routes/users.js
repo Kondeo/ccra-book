@@ -99,7 +99,8 @@ router.post('/register', function(req, res) {
                     PromoCode.findOne({
                         promoCode: req.body.promoCode
                     }).exec(function(err, promoCode) {
-                      if (!promoCode) {
+                      if (!promoCode || moment(promoCode.validTo).isSameOrBefore(moment(), "day")) {
+                          if(promoCode) promoCode.remove();
                           res.status(402).json({
                               msg: "PromoCode Invalid!"
                           });
@@ -107,7 +108,7 @@ router.post('/register', function(req, res) {
                           promoCode.remove();
 
                           //Create a new user with the assembled information
-                          var subscriptionDate = moment().add(6, 'months');
+                          var subscriptionDate = moment(promoCode.validTo);
                           var newUser = new User({
                               email: cleanEmail,
                               password: hash,
@@ -239,7 +240,8 @@ router.post('/sub/add', function(req, res, next) {
                     PromoCode.findOne({
                         promoCode: req.body.promoCode
                     }).exec(function(err, promoCode) {
-                        if (!promoCode) {
+                        if (!promoCode  || moment(promoCode.validTo).isSameOrBefore(moment(), "day")) {
+                            if(promoCode) promoCode.remove();
                             res.status(402).json({
                                 msg: "PromoCode Invalid!"
                             });
@@ -247,10 +249,7 @@ router.post('/sub/add', function(req, res, next) {
                             promoCode.remove();
                             var updatedUser = {};
 
-                            var origSub = moment(user.subscription);
-                            var today = moment();
-
-                            var newSub = moment.max(origSub, today).add(6, 'months');
+                            var newSub = moment(promoCode.validTo);
 
                             updatedUser.subscription = newSub.toDate();
 
@@ -578,7 +577,8 @@ router.post('/generatePromos', function(req, res) {
             var code = crypto.randomBytes(4).toString('hex');
             codes.push(code);
             new PromoCode({
-                promoCode: code
+                promoCode: code,
+                validTo: req.body.date || moment().add(6, 'months')
             }).save(function(err) {
                 if (err) {
                   console.log("PROMO CODE SAVE ERROR")
