@@ -1,8 +1,12 @@
 <ion-view view-title="Manage Promo Codes">
 <ion-content>
   <label class="item item-input">
-    <span class="input-label">Generate Promo Codes</span>
-    <input type="number" ng-model="$parent.tokenNum" placeholder="Enter the Number of Desired Promo Codes">
+    <span class="input-label">Generate Promo Codes:</span>
+    <input type="number" ng-model="$parent.tokenNum" placeholder="Enter the Number of Desired Promo Codes"/>
+  </label>
+  <label class="item item-input">
+      <span class="input-label">That redeem a subscription valid until:</span>
+      <input type="date" ng-model="$parent.tokenDate"/>
   </label>
   <button class="button button-full button-positive" ng-click="getPromoCodes()">
      Generate Promo Codes

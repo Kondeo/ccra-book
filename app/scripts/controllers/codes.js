@@ -6,27 +6,32 @@ angular.module('starter')
 
   //Obtain Generarted Promo Codes from Server
   $scope.getPromoCodes = function(){
-    var payload = {
-      "token": $scope.token,
-      "count": $scope.tokenNum
+    if($scope.tokenDate && $scope.tokenNum){
+        var payload = {
+          "token": $scope.token,
+          "count": $scope.tokenNum,
+          "date": $scope.tokenDate
+        }
+        User.obtainPromoSet(payload,
+          function(response){
+            $scope.promoArray = response;
+            var codes = "";
+            for(i =0; i<response.length; i++){
+              codes += response[i] + "\n";
+            }
+            $scope.promoCodes = codes;
+          }, function(err){
+            switch(err.status){
+              case 401:
+                Notifications.show("Error", "You are not an administrator.");
+                break;
+              default:
+                Notifications.show("Error Connecting to Server", "You encountered a problem with your connection.");
+            }
+          });
+    } else {
+        Notifications.show("Error", "You need to specify a valid number and a valid date.");
     }
-    User.obtainPromoSet(payload,
-      function(response){
-        $scope.promoArray = response;
-        var codes = "";
-        for(i =0; i<response.length; i++){
-          codes += response[i] + "\n";
-        }
-        $scope.promoCodes = codes;
-      }, function(err){
-        switch(err.status){
-          case 401:
-            Notifications.show("Error", "You are not an administrator.");
-            break;
-          default:
-            Notifications.show("Error Connecting to Server", "You encountered a problem with your connection.");
-        }
-      });
   }
 
   //Selects all generated codes
