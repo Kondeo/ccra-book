@@ -4,6 +4,9 @@ var PromoCode = new mongoose.Schema({
         type: String,
         require: "Please provide the token"
     },
+    validTo: {
+        type: Date
+    },
     created: {
         type: Date,
         default: Date.now
