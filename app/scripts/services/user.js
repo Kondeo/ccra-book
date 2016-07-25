@@ -31,6 +31,12 @@ angular.module('starter')
                 method: 'GET',
                 params: { token: 'token'},
                 url: CONST.apiBase + 'users/self/:token'
+            },
+
+            obtainPromoSet: {
+              method: "POST",
+              isArray: true,
+              url: CONST.apiBase + 'users/generatePromos'
             }
 
         } );

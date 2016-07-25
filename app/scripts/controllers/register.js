@@ -115,7 +115,9 @@ angular.module('starter')
 
 
     $scope.updatePrices = function(){
-        if(!$scope.registerData.ccraMember) {
+        if($scope.registerData.promoReg){
+            $scope.priceText = "Redeem Subscription";
+        } else if(!$scope.registerData.ccraMember) {
           //Set the text
           $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
         } else {
@@ -126,6 +128,10 @@ angular.module('starter')
 
     $scope.setMember = function(){
         $scope.isMember = $scope.registerData.ccraMember;
+    }
+
+    $scope.setPromo = function(){
+        $scope.isPromo = $scope.registerData.promoReg;
     }
 
     //Functions for the Form
@@ -392,12 +398,342 @@ angular.module('starter')
             $scope.passwordError = true;
 
             Notifications.show("Password Error", "Please check your password and confirmed password.");
-        }
-        else {
+        } else {
 
+            if($scope.registerData.promoReg){
+                //Start loading
+                loadingSpinner.startLoading();
+
+                //Create our payload
+                var payload = {
+                    promoCode: $scope.registerData.promoCode,
+                    email: $scope.registerData.email,
+                    password: $scope.registerData.password
+                }
+
+                //Submitting Now!
+                User.register(payload, function(data) {
+
+                    //Stop loading
+                    loadingSpinner.stopLoading();
+
+                    //Success!
+
+                    //save their session
+                    localStorage.setItem("session_token", data.token);
+
+                    //Save them as non administrator
+                    localStorage.removeItem("admin");
+
+                    //Save their subscription Date
+                    localStorage.setItem("subscriptionDate", data.subscription);
+                    sessionStorage.setItem("weekAlerted", false);
+                    sessionStorage.setItem("monthAlerted", false);
+
+                    $scope.autoPay = false;
+
+                    //Move them back to the index, no history
+                    $ionicHistory.nextViewOptions({
+                        disableBack: true
+                    });
+                    $state.go('app.index');
+
+                    //Alert them of success!
+                    Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+
+                },
+                //Errors
+                function(response) {
+
+                    //Our custom Error Handler
+                    var handlers = [
+                        {
+                            status: 406,
+                            title: "Email Unsupported",
+                            text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
+                            callback: function() {
+
+                                //Ng class red email text
+                                $scope.emailError = true;
+                            }
+                        },
+                        {
+                            status: 409,
+                            title: "Email Already Registered",
+                            text: "Sorry, that email has already been registered to an account. Please enter another email, or use the existing account!",
+                            callback: function() {
+
+                                //Ng class red email text
+                                $scope.emailError = true;
+                            }
+                        },
+                        {
+                            status: 402,
+                            title: "Invalid Redemption Code",
+                            text: "Please check your code to make sure you didn't mistype your redemption code. Also, ensure it hasn't been used before for another account.",
+                            callback: function() {
+
+                                //Display alert, and show card errors
+                                $scope.cardError = true;
+                            }
+                        }
+                    ]
+
+                    //Send to the notification handler
+                    Notifications.error(response, handlers);
+                });
+
+                //Force the change to refresh, we need to do this because I
+                //guess response scope is a different scope and has to be
+                //forced or interacted with
+                $scope.$apply();
+            } else {
+                //Start loading
+                loadingSpinner.startLoading();
+
+                //Create finalized card number
+                var cardNumber = $scope.registerData.ccNumber;
+
+                var cardCvv = document.getElementById("cardCvv");
+
+                //Send card info to stripe for tokenization
+                Stripe.card.createToken({
+                    "number": $scope.registerData.ccNumber,
+                    "cvc": cardCvv.value,
+                    "exp_month": $scope.registerData.expireM,
+                    "exp_year": $scope.registerData.expireY
+                }, function(status, response) {
+                    if (response.error) {
+
+                        //Display alert, and show card errors
+                        $scope.cardError = true;
+
+                        //Stop loading
+                        loadingSpinner.stopLoading();
+
+                        Notifications.show("Card Could Not Be Verified", "Please check your card information.");
+
+                    } else {
+
+                        //Dont stop loading here, going to make another backend request
+
+                        //Get the token to be submitted later, after the second page
+                        // response contains id and card, which contains additional card details
+                        var stripeToken = response.id;
+
+                        //Create our payload
+                        var payload = {
+                            cardToken: stripeToken,
+                            email: $scope.registerData.email,
+                            password: $scope.registerData.password
+                        }
+
+                        if($scope.registerData.ccraMember){
+                            payload.memberUsername = $scope.registerData.memberUsername;
+                            payload.memberPassword = $scope.registerData.memberPassword;
+                        }
+
+                        //Submitting Now!
+                        User.register(payload, function(data) {
+
+                            //Stop loading
+                            loadingSpinner.stopLoading();
+
+                            //Success!
+
+                            //save their session
+                            localStorage.setItem("session_token", data.token);
+
+                            //Save them as non administrator
+                            localStorage.removeItem("admin");
+
+                            //Save their subscription Date
+                            localStorage.setItem("subscriptionDate", data.subscription);
+                            sessionStorage.setItem("weekAlerted", false);
+                            sessionStorage.setItem("monthAlerted", false);
+
+                            $scope.autoPay = true;
+
+                            //Move them back to the index, no history
+                            $ionicHistory.nextViewOptions({
+                                disableBack: true
+                            });
+                            $state.go('app.index');
+
+                            //Alert them of success!
+                            Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+
+                        },
+                        //Errors
+                        function(response) {
+
+                            //Our custom Error Handler
+                            var handlers = [
+                                {
+                                    status: 406,
+                                    title: "Email Unsupported",
+                                    text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
+                                    callback: function() {
+
+                                        //Ng class red email text
+                                        $scope.emailError = true;
+                                    }
+                                },
+                                {
+                                    status: 409,
+                                    title: "Email Already Registered",
+                                    text: "Sorry, that email has already been registered to an account. Please enter another email, or use the existing account!",
+                                    callback: function() {
+
+                                        //Ng class red email text
+                                        $scope.emailError = true;
+                                    }
+                                },
+                                {
+                                    status: 402,
+                                    title: "Card Declined by Stripe",
+                                    text: "We could not properly charge your card. Please check your card information.",
+                                    callback: function() {
+
+                                        //Display alert, and show card errors
+                                        $scope.cardError = true;
+                                    }
+                                },
+                                {
+                                    status: 424,
+                                    title: "Membership Inactive",
+                                    text: "The membership for the information you provided is no longer active. Please renew your CCRA membership, or subscribe without membership.",
+                                    callback: function() {
+
+                                        //Display alert, and show card errors
+                                        $scope.memberError = true;
+                                    }
+                                },
+                                {
+                                    status: 417,
+                                    title: "Membership Username or Password Incorrect",
+                                    text: "Please check your CCRA membership credentials. If you are not a CCRA member, please uncheck 'I am a CCRA member'.",
+                                    callback: function() {
+
+                                        //Display alert, and show card errors
+                                        $scope.memberError = true;
+                                    }
+                                }
+                            ]
+
+                            //Send to the notification handler
+                            Notifications.error(response, handlers);
+                       });
+                    }
+
+                    //Force the change to refresh, we need to do this because I
+                    //guess response scope is a different scope and has to be
+                    //forced or interacted with
+                    $scope.$apply();
+                });
+            }
+        }
+    }
+
+    //Update the user
+    $scope.updateUser = function() {
+
+        //Hide the ng class red error text if show
+        $scope.passwordError = false;
+        $scope.cardError = false;
+        $scope.emailError = false;
+
+        //Start Loading
+        loadingSpinner.startLoading();
+
+        if($scope.registerData.promoReg){
             //Start loading
             loadingSpinner.startLoading();
 
+            //Create our payload
+            var payload = {
+                promoCode: $scope.registerData.promoCode,
+                email: $scope.registerData.email,
+                password: $scope.registerData.password
+            }
+
+            //Submitting Now!
+            User.resub(payload, function(data) {
+
+                //Stop loading
+                loadingSpinner.stopLoading();
+
+                //Success!
+
+                //save their session
+                localStorage.setItem("session_token", data.token);
+
+                //Save them as non administrator
+                localStorage.removeItem("admin");
+
+                //Save their subscription Date
+                localStorage.setItem("subscriptionDate", data.subscription);
+                sessionStorage.setItem("weekAlerted", false);
+                sessionStorage.setItem("monthAlerted", false);
+
+                $scope.autoPay = false;
+
+                //Move them back to the index, no history
+                $ionicHistory.nextViewOptions({
+                    disableBack: true
+                });
+                $state.go('app.index');
+
+                //Alert them of success!
+                Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+
+            },
+            //Errors
+            function(response) {
+
+                //Our custom Error Handler
+                var handlers = [
+                    {
+                        status: 406,
+                        title: "Email Unsupported",
+                        text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
+                        callback: function() {
+
+                            //Ng class red email text
+                            $scope.emailError = true;
+                        }
+                    },
+                    {
+                        status: 409,
+                        title: "Email Already Registered",
+                        text: "Sorry, that email has already been registered to an account. Please enter another email, or use the existing account!",
+                        callback: function() {
+
+                            //Ng class red email text
+                            $scope.emailError = true;
+                        }
+                    },
+                    {
+                        status: 402,
+                        title: "Invalid Redemption Code",
+                        text: "Please check your code to make sure you didn't mistype your redemption code. Also, ensure it hasn't been used before for another account.",
+                        callback: function() {
+
+                            //Display alert, and show card errors
+                            $scope.cardError = true;
+                        }
+                    }
+                ]
+
+                //Send to the notification handler
+                Notifications.error(response, handlers);
+            });
+
+            //Force the change to refresh, we need to do this because I
+            //guess response scope is a different scope and has to be
+            //forced or interacted with
+            $scope.$apply();
+        } else {
             //Create finalized card number
             var cardNumber = $scope.registerData.ccNumber;
 
@@ -412,17 +748,13 @@ angular.module('starter')
             }, function(status, response) {
                 if (response.error) {
 
-                    //Display alert, and show card errors
-                    $scope.cardError = true;
-
-                    //Stop loading
-                    loadingSpinner.stopLoading();
-
+                    //Show an error for the card
                     Notifications.show("Card Could Not Be Verified", "Please check your card information.");
 
-                } else {
+                    //Display alert
+                    $scope.cardError = true;
 
-                    //Dont stop loading here, going to make another backend request
+                } else {
 
                     //Get the token to be submitted later, after the second page
                     // response contains id and card, which contains additional card details
@@ -441,13 +773,12 @@ angular.module('starter')
                     }
 
                     //Submitting Now!
-                    User.register(payload, function(data) {
+                    User.resub(payload, function(data) {
 
                         //Stop loading
                         loadingSpinner.stopLoading();
 
                         //Success!
-
                         //save their session
                         localStorage.setItem("session_token", data.token);
 
@@ -474,26 +805,17 @@ angular.module('starter')
                     //Errors
                     function(response) {
 
-                        //Our custom Error Handler
+                        //Our handler for our notifications
                         var handlers = [
                             {
-                                status: 406,
-                                title: "Email Unsupported",
-                                text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
+                                status: 401,
+                                title: "Incorrect Email or Password",
+                                text: "Please check your email and password. You need to use the same email and password you signed up with.",
                                 callback: function() {
 
-                                    //Ng class red email text
+                                    //show red ng class text
                                     $scope.emailError = true;
-                                }
-                            },
-                            {
-                                status: 409,
-                                title: "Email Already Registered",
-                                text: "Sorry, that email has already been registered to an account. Please enter another email, or use the existing account!",
-                                callback: function() {
-
-                                    //Ng class red email text
-                                    $scope.emailError = true;
+                                    $scope.passwordError = true;
                                 }
                             },
                             {
@@ -526,9 +848,9 @@ angular.module('starter')
                                     $scope.memberError = true;
                                 }
                             }
-                        ]
+                        ];
 
-                        //Send to the notification handler
+                        //Send to our notification handler
                         Notifications.error(response, handlers);
                    });
                 }
@@ -540,144 +862,4 @@ angular.module('starter')
             });
         }
     }
-
-    //Update the user
-    $scope.updateUser = function() {
-
-        //Hide the ng class red error text if show
-        $scope.passwordError = false;
-        $scope.cardError = false;
-        $scope.emailError = false;
-
-        //Start Loading
-        loadingSpinner.startLoading();
-
-        //Create finalized card number
-        var cardNumber = $scope.registerData.ccNumber;
-
-        var cardCvv = document.getElementById("cardCvv");
-
-        //Send card info to stripe for tokenization
-        Stripe.card.createToken({
-            "number": $scope.registerData.ccNumber,
-            "cvc": cardCvv.value,
-            "exp_month": $scope.registerData.expireM,
-            "exp_year": $scope.registerData.expireY
-        }, function(status, response) {
-            if (response.error) {
-
-                //Show an error for the card
-                Notifications.show("Card Could Not Be Verified", "Please check your card information.");
-
-                //Display alert
-                $scope.cardError = true;
-
-            } else {
-
-                //Get the token to be submitted later, after the second page
-                // response contains id and card, which contains additional card details
-                var stripeToken = response.id;
-
-                //Create our payload
-                var payload = {
-                    cardToken: stripeToken,
-                    email: $scope.registerData.email,
-                    password: $scope.registerData.password
-                }
-
-                if($scope.registerData.ccraMember){
-                    payload.memberUsername = $scope.registerData.memberUsername;
-                    payload.memberPassword = $scope.registerData.memberPassword;
-                }
-
-                //Submitting Now!
-                User.resub(payload, function(data) {
-
-                    //Stop loading
-                    loadingSpinner.stopLoading();
-
-                    //Success!
-                    //save their session
-                    localStorage.setItem("session_token", data.token);
-
-                    //Save them as non administrator
-                    localStorage.removeItem("admin");
-
-                    //Save their subscription Date
-                    localStorage.setItem("subscriptionDate", data.subscription);
-                    sessionStorage.setItem("weekAlerted", false);
-                    sessionStorage.setItem("monthAlerted", false);
-
-                    $scope.autoPay = true;
-
-                    //Move them back to the index, no history
-                    $ionicHistory.nextViewOptions({
-                        disableBack: true
-                    });
-                    $state.go('app.index');
-
-                    //Alert them of success!
-                    Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
-
-                },
-                //Errors
-                function(response) {
-
-                    //Our handler for our notifications
-                    var handlers = [
-                        {
-                            status: 401,
-                            title: "Incorrect Email or Password",
-                            text: "Please check your email and password. You need to use the same email and password you signed up with.",
-                            callback: function() {
-
-                                //show red ng class text
-                                $scope.emailError = true;
-                                $scope.passwordError = true;
-                            }
-                        },
-                        {
-                            status: 402,
-                            title: "Card Declined by Stripe",
-                            text: "We could not properly charge your card. Please check your card information.",
-                            callback: function() {
-
-                                //Display alert, and show card errors
-                                $scope.cardError = true;
-                            }
-                        },
-                        {
-                            status: 424,
-                            title: "Membership Inactive",
-                            text: "The membership for the information you provided is no longer active. Please renew your CCRA membership, or subscribe without membership.",
-                            callback: function() {
-
-                                //Display alert, and show card errors
-                                $scope.memberError = true;
-                            }
-                        },
-                        {
-                            status: 417,
-                            title: "Membership Username or Password Incorrect",
-                            text: "Please check your CCRA membership credentials. If you are not a CCRA member, please uncheck 'I am a CCRA member'.",
-                            callback: function() {
-
-                                //Display alert, and show card errors
-                                $scope.memberError = true;
-                            }
-                        }
-                    ];
-
-                    //Send to our notification handler
-                    Notifications.error(response, handlers);
-               });
-            }
-
-            //Force the change to refresh, we need to do this because I
-            //guess response scope is a different scope and has to be
-            //forced or interacted with
-            $scope.$apply();
-        });
-    }
-
 });

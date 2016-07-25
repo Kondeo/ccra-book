@@ -1,6 +1,6 @@
 {
   "VERSION": {
-    "NUMBER": "0.1.9",
+    "NUMBER": "0.1.10",
     "DEPRICATED": "0.1.7",
     "LAST_COMPATIBLE": "0.1.7"
   },
@@ -26,19 +26,5 @@
     }
   },
   "CLIENTVER": {
-    "0.1.9": {
-      "IOS": {
-        "SUBSCRIBE_PAGE": false,
-        "SUBSCRIBE_ONLINE_TEXT": false
-      },
-      "ANDROID": {
-        "SUBSCRIBE_PAGE": true,
-        "SUBSCRIBE_ONLINE_TEXT": false
-      },
-      "WEB": {
-        "SUBSCRIBE_PAGE": true,
-        "SUBSCRIBE_ONLINE_TEXT": false
-      }
-    }
   }
 }

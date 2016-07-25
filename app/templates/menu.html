@@ -49,6 +49,10 @@
         ng-if = "loggedIn() && clientConfig.SUBSCRIBE_PAGE">
         <img src="images/icon_payment.png" class="menuIcon">Manage Subscription
         </ion-item>
+        <ion-item menu-close href="#/app/codes"
+        ng-if = "loggedIn() && isAdmin && clientConfig.SUBSCRIBE_PAGE">
+        <img src="images/icon_payment.png" class="menuIcon">Generate Codes
+        </ion-item>
         <ion-item menu-close href="#/app/settings">
         <img src="images/icon_settings.png" class="menuIcon">Application Settings
         </ion-item>

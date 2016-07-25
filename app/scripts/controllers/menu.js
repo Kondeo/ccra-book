@@ -64,6 +64,8 @@ angular.module('starter')
   $scope.settings.easyReading = localStorage.getItem("setting_easyReading") === "true";
   $scope.settings.tutorial = localStorage.getItem("setting_tutorial") === "true";
 
+  $scope.isAdmin = localStorage.getItem("admin");
+
   //Form data for the go to page
   $scope.page = {};
 

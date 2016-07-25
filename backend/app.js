@@ -20,6 +20,7 @@ var db = require('./models/db');
 var pages = require('./models/pages');
 var sessions = require('./models/sessions');
 var users = require('./models/users');
+var promoCodes = require('./models/promoCodes');
 
 //Routes
 var routes = require('./routes/index');

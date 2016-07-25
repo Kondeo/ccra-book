@@ -8,7 +8,8 @@ var express = require('express'),
     MailService = require('../services/mailgun.js'),
     StripeService = require('../services/stripe.js'),
     SessionService = require('../services/sessions.js'),
-    User = mongoose.model('User');
+    User = mongoose.model('User'),
+    PromoCode = mongoose.model('PromoCode');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -16,7 +17,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/register', function(req, res) {
-    if(!(req.body.cardToken &&
+    if(!((req.body.cardToken || req.body.promoCode) &&
         req.body.email &&
         req.body.password)){
         return res.status(412).json({
@@ -42,26 +43,31 @@ router.post('/register', function(req, res) {
                     msg: "Email taken!"
                 });
             } else {
-                var plan = "standard";
-                if(req.body.memberUsername || req.body.memberPassword){
-                    checkMembership(req.body.memberUsername, req.body.memberPassword, finalizeReg, function(err){
-                        res.status(err.status).send(err.msg);
-                    });
+                //Create a random salt
+                var salt = crypto.randomBytes(128).toString('base64');
+                //Create a unique hash from the provided password and salt
+                var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
+
+                if(req.body.promoCode){
+                    promoReg()
                 } else {
-                    finalizeReg(false);
+                    var plan = "standard";
+                    if(req.body.memberUsername || req.body.memberPassword){
+                        checkMembership(req.body.memberUsername, req.body.memberPassword, finalizePayment, function(err){
+                            res.status(err.status).send(err.msg);
+                        });
+                    } else {
+                        finalizePayment(false);
+                    }
                 }
 
-                function finalizeReg(isMember){
+                function finalizePayment(isMember){
                     if(isMember) {
                       plan = "member";
                       isMember = true;
                     };
 
                     StripeService.createCustomer(req.body.cardToken, plan, (req.body.email.toLowerCase()).trim(), function(customer){
-                        //Create a random salt
-                        var salt = crypto.randomBytes(128).toString('base64');
-                        //Create a unique hash from the provided password and salt
-                        var hash = crypto.pbkdf2Sync(req.body.password, salt, 10000, 512);
                         //Create a new user with the assembled information
                         var subscriptionDate = moment().add(1, 'month');
                         var newUser = new User({
@@ -79,21 +85,59 @@ router.post('/register', function(req, res) {
                                   msg: "Error saving user to DB!"
                               });
                             } else {
-                                SessionService.generateSession(newUser._id, "user", function(token){
-                                    //All good, give the user their token
-                                    res.status(201).json({
-                                        token: token,
-                                        subscription: subscriptionDate.toDate()
-                                    });
-                                }, function(err){
-                                    res.status(err.status).json(err);
-                                });
+                                sendToken(newUser, subscriptionDate);
                             }
                         });
                     }, function(err){
                         res.status(402).json({
                             msg: "Card was declined!"
                         });
+                    });
+                }
+
+                function promoReg(){
+                    PromoCode.findOne({
+                        promoCode: req.body.promoCode
+                    }).exec(function(err, promoCode) {
+                      if (!promoCode) {
+                          res.status(402).json({
+                              msg: "PromoCode Invalid!"
+                          });
+                      } else {
+                          promoCode.remove();
+
+                          //Create a new user with the assembled information
+                          var subscriptionDate = moment().add(6, 'months');
+                          var newUser = new User({
+                              email: cleanEmail,
+                              password: hash,
+                              salt: salt,
+                              subscription: subscriptionDate.toDate()
+                          }).save(function(err, newUser) {
+                              if (err) {
+                                console.log("Error saving user to DB!");
+                                res.status(500).json({
+                                    msg: "Error saving user to DB!"
+                                });
+                              } else {
+                                  sendToken(newUser, subscriptionDate);
+                              }
+                          });
+                      }
+                    });
+
+
+                }
+
+                function sendToken(newUser, subscriptionDate){
+                    SessionService.generateSession(newUser._id, "user", function(token){
+                        //All good, give the user their token
+                        res.status(201).json({
+                            token: token,
+                            subscription: subscriptionDate.toDate()
+                        });
+                    }, function(err){
+                        res.status(err.status).json(err);
                     });
                 }
             }
@@ -158,7 +202,7 @@ router.post('/login', function(req, res, next) {
 });
 
 router.post('/sub/add', function(req, res, next) {
-    if(!(req.body.cardToken &&
+    if(!((req.body.cardToken || req.body.promoCode) &&
         req.body.email &&
         req.body.password)){
         return res.status(412).json({
@@ -191,63 +235,24 @@ router.post('/sub/add', function(req, res, next) {
             //Compare to stored hash
             if (hash == user.password) {
 
-                var isMember = false;
-
-                var plan = "standard";
-                if(req.body.memberUsername || req.body.memberPassword){
-                    checkMembership(req.body.memberUsername, req.body.memberPassword, clearSubs, function(err){
-                        res.status(err.status).send(err.msg);
-                    });
-                } else {
-                    clearSubs(false);
-                }
-
-                function clearSubs(membership){
-                  isMember = membership;
-                  if(isMember) {
-                    plan = "member";
-                    isMember = true;
-                  }
-                  if(user.subscriptionId){
-                    StripeService.unsubscribe(user.subscriptionId, getStripeId, function(){
-                        res.status(500).json({
-                            msg: "Could not unsubscribe from old subscription!"
-                        });
-                    });
-                  } else {
-                    getStripeId();
-                  }
-                }
-
-                function getStripeId(){
-                    if(!user.stripeId){
-                        StripeService.createCustomer(null, null, (req.body.email.toLowerCase()).trim(), function(customer){
-                            newSub(customer.id);
-                        }, function(err){
+                if(req.body.promoCode){
+                    PromoCode.findOne({
+                        promoCode: req.body.promoCode
+                    }).exec(function(err, promoCode) {
+                        if (!promoCode) {
                             res.status(402).json({
-                                msg: "Card was declined!"
+                                msg: "PromoCode Invalid!"
                             });
-                        });
-                    } else {
-                        newSub(user.stripeId);
-                    }
-                }
-
-                function newSub(stripeId){
-                    StripeService.updateCard(stripeId, req.body.cardToken, function(customer){
-                        StripeService.subscribe(stripeId, plan, function(subscription){
-
+                        } else {
+                            promoCode.remove();
                             var updatedUser = {};
 
                             var origSub = moment(user.subscription);
                             var today = moment();
 
-                            var newSub = moment.max(origSub, today).add(1, 'month');
+                            var newSub = moment.max(origSub, today).add(6, 'months');
 
                             updatedUser.subscription = newSub.toDate();
-                            updatedUser.subscriptionId = subscription.id;
-                            updatedUser.memberPrice = isMember;
-                            if(!user.stripeId) updatedUser.stripeId = stripeId;
 
                             var setUser = {
                                 $set: updatedUser
@@ -273,20 +278,108 @@ router.post('/sub/add', function(req, res, next) {
                             }, function(err){
                                 res.status(err.status).json(err);
                             });
+                        }
+                    });
+                } else {
+                    var isMember = false;
+
+                    var plan = "standard";
+                    if(req.body.memberUsername || req.body.memberPassword){
+                        checkMembership(req.body.memberUsername, req.body.memberPassword, clearSubs, function(err){
+                            res.status(err.status).send(err.msg);
+                        });
+                    } else {
+                        clearSubs(false);
+                    }
+
+                    function clearSubs(membership){
+                      isMember = membership;
+                      if(isMember) {
+                        plan = "member";
+                        isMember = true;
+                      }
+                      if(user.subscriptionId){
+                        StripeService.unsubscribe(user.subscriptionId, getStripeId, function(){
+                            res.status(500).json({
+                                msg: "Could not unsubscribe from old subscription!"
+                            });
+                        });
+                      } else {
+                        getStripeId();
+                      }
+                    }
+
+                    function getStripeId(){
+                        if(!user.stripeId){
+                            StripeService.createCustomer(null, null, (req.body.email.toLowerCase()).trim(), function(customer){
+                                newSub(customer.id);
+                            }, function(err){
+                                res.status(402).json({
+                                    msg: "Card was declined!"
+                                });
+                            });
+                        } else {
+                            newSub(user.stripeId);
+                        }
+                    }
+
+                    function newSub(stripeId){
+                        StripeService.updateCard(stripeId, req.body.cardToken, function(customer){
+                            StripeService.subscribe(stripeId, plan, function(subscription){
+
+                                var updatedUser = {};
+
+                                var origSub = moment(user.subscription);
+                                var today = moment();
+
+                                var newSub = moment.max(origSub, today).add(1, 'month');
+
+                                updatedUser.subscription = newSub.toDate();
+                                updatedUser.subscriptionId = subscription.id;
+                                updatedUser.memberPrice = isMember;
+                                if(!user.stripeId) updatedUser.stripeId = stripeId;
+
+                                var setUser = {
+                                    $set: updatedUser
+                                }
+
+                                User.update({
+                                    _id: user._id
+                                }, setUser)
+                                .exec(function(err, user) {
+                                    if (err) {
+                                        console.log({
+                                            msg: "Could not update user"
+                                        });
+                                    }
+                                });
+
+                                SessionService.generateSession(user._id, "user", function(token){
+                                    //All good, give the user their token
+                                    res.status(200).json({
+                                        token: token,
+                                        subscription: newSub.toDate()
+                                    });
+                                }, function(err){
+                                    res.status(err.status).json(err);
+                                });
+                            }, function(err){
+                                console.log("card declined")
+                                console.log(err)
+                                res.status(402).json({
+                                    msg: "Card was declined!"
+                                });
+                            });
                         }, function(err){
-                            console.log("card declined")
-                            console.log(err)
+                          console.log(err)
                             res.status(402).json({
                                 msg: "Card was declined!"
                             });
                         });
-                    }, function(err){
-                      console.log(err)
-                        res.status(402).json({
-                            msg: "Card was declined!"
-                        });
-                    });
+                    }
                 }
+
+
             } else {
                 res.status(401).json({
                     msg: "Password is incorrect!"
@@ -458,6 +551,45 @@ router.post('/forgot', function(req, res, next) {
     }
 });
 
+router.post('/generatePromos', function(req, res) {
+    if(!(req.body.count &&
+        req.body.token)){
+        return res.status(412).json({
+            msg: "Route requisites not met."
+        });
+    }
+
+    validateUser(req, res, checkAdmin);
+
+    function checkAdmin(user){
+        if(!user.admin){
+            res.status(401).json({
+                msg: "Not an admin!"
+            });
+        } else {
+            generatePromoCodes();
+        }
+    }
+
+    function generatePromoCodes(){
+        var error = false;
+        var codes = [];
+        for(var i=0;i<req.body.count;i++){
+            var code = crypto.randomBytes(4).toString('hex');
+            codes.push(code);
+            new PromoCode({
+                promoCode: code
+            }).save(function(err) {
+                if (err) {
+                  console.log("PROMO CODE SAVE ERROR")
+                  error = true;
+                }
+            });
+        }
+        res.status(200).json(codes);
+    }
+});
+
 function checkMembership(username, password, success, fail){
   var membership = false;
 
@@ -499,6 +631,34 @@ function checkMembership(username, password, success, fail){
           });
       }
   });
+}
+
+function validateUser(req, res, success){
+    var token = req.query.token || req.body.token;
+    SessionService.validateSession(token, "user", function(accountId) {
+        User.findById(accountId)
+        .select('name email subscription admin')
+        .exec(function(err, user) {
+            if (err) {
+                res.status(500).json({
+                    msg: "Couldn't search the database for user!"
+                });
+            } else if (!user) {
+                res.status(401).json({
+                    msg: "User not found, user table out of sync with session table!"
+                });
+            } else if(moment(user.subscription).isBefore(moment()) && !user.admin){
+                res.status(402).json({
+                    msg: "Subscription expired!",
+                    subscription: user.subscription
+                });
+            } else {
+                success(user);
+            }
+        });
+    }, function(err){
+        res.status(err.status).json(err);
+    });
 }
 
 module.exports = router;

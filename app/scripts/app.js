@@ -78,6 +78,16 @@ angular.module('starter',
     }
   })
 
+  .state('app.codes', {
+    url: "/codes",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/codes.html",
+        controller: 'CodesCtrl'
+      }
+    }
+  })
+
   .state('app.settings', {
     url: "/settings",
     views: {

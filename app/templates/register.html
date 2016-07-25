@@ -75,9 +75,21 @@
           required>
         </label>
 
-        <ion-checkbox ng-model="registerData.ccraMember" ng-click="updatePrices();setMember();">I am a CCRA member</ion-checkbox>
+        <ion-checkbox ng-model="registerData.promoReg" ng-click="updatePrices();setMember();">I have a redemption code</ion-checkbox>
+        <label class="item item-input" ng-if="registerData.promoReg">
+          <span class="input-label"
+          ng-class="{'errorFormText': promoError}">
+          Redeem Code</span>
+          <input type="text" ng-model="registerData.promoCode"
+          placeholder="Registration Redemption Code"
+          autocomplete="off"  autocorrect="off"
+          autocapitalize="none" spellcheck="false"
+          required>
+        </label>
+
+        <ion-checkbox ng-model="registerData.ccraMember" ng-click="updatePrices();setMember();" ng-if="!registerData.promoReg">I am a CCRA member</ion-checkbox>
         <div class="ccraMembership">
-          <label class="item item-input" ng-if="registerData.ccraMember">
+          <label class="item item-input" ng-if="registerData.ccraMember && !registerData.promoReg">
             <span class="input-label"
             ng-class="{'errorFormText': memberError}">
             Membership Username</span>
@@ -87,7 +99,7 @@
             autocapitalize="none" spellcheck="false"
             required>
           </label>
-          <label class="item item-input" ng-if="registerData.ccraMember">
+          <label class="item item-input" ng-if="registerData.ccraMember && !registerData.promoReg">
             <span class="input-label"
             ng-class="{'errorFormText': memberError}">
             Membership Password</span>
@@ -99,88 +111,90 @@
         </div>
 
         <!-- Credit Card Number -->
-        <label class="item item-input">
-          <span class="input-label"
-          ng-class="{'errorFormText': cardError ||
-          (registerForm.$valid &&
-          registerForm.ccNumber.$touched &&
-          !validCC)}">
-          Credit Card Number</span>
-          <input type="text"
-              ng-model="registerData.ccNumber"
-              placeholder="XXXX-XXXX-XXXX-XXXX"
-              ng-keyup="validateCardNumber()"
-              cc-number
-              cc-format
-              cc-type="cardType"
-              ng-required="true" />
-        </label>
-        <label class="item item-input">
-          <span class="input-label"
-          ng-class="{'errorFormText': cardError}">
-          Expiration Month</span>
-          <input
-                type="number"
-                id="expireM"
-                name="expireM"
-                ng-keyup = "validateDate()"
-                ng-keydown="maxLength($event, 2)"
-                placeholder="MM"
-                size="2"
-                pattern="\d*"
-                ng-model="registerData.expireM">
-        </label>
-        <label class="item item-input">
-          <span class="input-label"
-          ng-class="{'errorFormText': cardError}">
-          Expiration Year</span>
-          <input
-                type="number"
-                id="expireY"
-                name="expireY"
-                ng-keyup = "validateDate()"
-                ng-keydown="maxLength($event, 4)"
-                placeholder="YYYY"
-                size="4"
-                pattern="\d*"
-                ng-model="registerData.expireY">
-        </label>
-        <label class="item item-input">
-          <span class="input-label"
-          ng-class="{'errorFormText': cardError ||
-          (registerForm.$valid &&
-          registerForm.cardCvv.$touched &&
-          !cvcValidated)}">
-          CVV (Located on Back of Card)</span>
-          <input
-                type="number"
-                id="cardCvv"
-                name="cardCvv"
-                ng-keyup = "validateCVC()"
-                ng-keydown="maxLength($event, 3)"
-                placeholder="CVV"
-                size="3"
-                pattern="\d*"
-                ng-model="registerData.cvv">
-        </label>
-        <label class="item item-input">
-          <span class="input-label"
-          ng-class="{'errorFormText': cardError ||
-          (registerForm.$valid &&
-          registerForm.zipCode.$touched &&
-          !zipValidated)}">
-          Zip Code</span>
-          <input
-                type="number"
-                id="userZip"
-                name="zipCode"
-                ng-change = "validateZip()"
-                ng-keydown = "maxLength($event, 5)"
-                placeholder="55555"
-                size="5"
-                pattern="\d*"
-                ng-model="registerData.zipCode">
-        </label>
+        <div ng-if="!registerData.promoReg">
+            <label class="item item-input">
+              <span class="input-label"
+              ng-class="{'errorFormText': cardError ||
+              (registerForm.$valid &&
+              registerForm.ccNumber.$touched &&
+              !validCC)}">
+              Credit Card Number</span>
+              <input type="text"
+                  ng-model="registerData.ccNumber"
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  ng-keyup="validateCardNumber()"
+                  cc-number
+                  cc-format
+                  cc-type="cardType"
+                  ng-required="true" />
+            </label>
+            <label class="item item-input">
+              <span class="input-label"
+              ng-class="{'errorFormText': cardError}">
+              Expiration Month</span>
+              <input
+                    type="number"
+                    id="expireM"
+                    name="expireM"
+                    ng-keyup = "validateDate()"
+                    ng-keydown="maxLength($event, 2)"
+                    placeholder="MM"
+                    size="2"
+                    pattern="\d*"
+                    ng-model="registerData.expireM">
+            </label>
+            <label class="item item-input">
+              <span class="input-label"
+              ng-class="{'errorFormText': cardError}">
+              Expiration Year</span>
+              <input
+                    type="number"
+                    id="expireY"
+                    name="expireY"
+                    ng-keyup = "validateDate()"
+                    ng-keydown="maxLength($event, 4)"
+                    placeholder="YYYY"
+                    size="4"
+                    pattern="\d*"
+                    ng-model="registerData.expireY">
+            </label>
+            <label class="item item-input">
+              <span class="input-label"
+              ng-class="{'errorFormText': cardError ||
+              (registerForm.$valid &&
+              registerForm.cardCvv.$touched &&
+              !cvcValidated)}">
+              CVV (Located on Back of Card)</span>
+              <input
+                    type="number"
+                    id="cardCvv"
+                    name="cardCvv"
+                    ng-keyup = "validateCVC()"
+                    ng-keydown="maxLength($event, 3)"
+                    placeholder="CVV"
+                    size="3"
+                    pattern="\d*"
+                    ng-model="registerData.cvv">
+            </label>
+            <label class="item item-input">
+              <span class="input-label"
+              ng-class="{'errorFormText': cardError ||
+              (registerForm.$valid &&
+              registerForm.zipCode.$touched &&
+              !zipValidated)}">
+              Zip Code</span>
+              <input
+                    type="number"
+                    id="userZip"
+                    name="zipCode"
+                    ng-change = "validateZip()"
+                    ng-keydown = "maxLength($event, 5)"
+                    placeholder="55555"
+                    size="5"
+                    pattern="\d*"
+                    ng-model="registerData.zipCode">
+            </label>
+        </div>
 
         <!-- Register Subscription for the app -->
         <label class="item">
@@ -188,7 +202,7 @@
           type="submit" ng-if = "!loggedIn()"
           ng-disabled = "!registerForm.$valid ||
           registerData.password != registerData.confirmPassword ||
-          !cardValidated ||
+          (!cardValidated && !registerData.promoReg) ||
           loading.isLoading()"
           ng-click="registerUser()">{{priceText}}</button>
 
@@ -196,7 +210,7 @@
           <button class="button button-block button-positive button-subscribe"
           type="submit" ng-if = "loggedIn()"
           ng-disabled = "!registerForm.$valid ||
-          !cardValidated ||
+          (!cardValidated && !registerData.promoReg) ||
           loading.isLoading()"
           ng-click="updateUser()">{{priceText}}</button>
         </label>
