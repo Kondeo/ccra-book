@@ -8,6 +8,10 @@
     "STANDARD": 999,
     "MEMBER": 499
   },
+  "SINGLE_PRICE": {
+    "STANDARD": 119.99,
+    "MEMBER": 59.99
+  },
   "SERVER": {
     "URL": "https://dev.kondeo.com"
   },
