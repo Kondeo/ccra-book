@@ -443,6 +443,10 @@ router.post('/sub/add', function(req, res, next) {
                             res.status(402).json({
                                 msg: "PromoCode Invalid!"
                             });
+                        } else if(moment(promoCode.validTo).isSameOrBefore(moment(user.subscription), "day")){
+                            res.status(418).json({
+                                msg: "PromoCode Not Useful! The user's subscription is already valid past the promo date."
+                            });
                         } else {
                             promoCode.remove();
                             var updatedUser = {};
