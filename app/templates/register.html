@@ -110,6 +110,15 @@
           </label>
         </div>
 
+        <!-- Payment Options -->
+        <div>
+          <h2 class="register-payment-header">Payment Options</h2>
+          <ion-list>
+            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-true-value="false">Billed Monthly</ion-checkbox>
+            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-false-value="false">Billed Yearly</ion-checkbox>
+            </ion-list>
+        </div>
+
         <!-- Credit Card Number -->
         <div ng-if="!registerData.promoReg">
             <label class="item item-input">

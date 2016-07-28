@@ -12,6 +12,7 @@ angular.module('starter')
 
     //Our data from the form
     $scope.registerData = {};
+    $scope.registerData.yearly = false;
 
     //If our card is validated
     $scope.cardValidated = false;
@@ -115,15 +116,21 @@ angular.module('starter')
 
 
     $scope.updatePrices = function(){
-        if($scope.registerData.promoReg){
-            $scope.priceText = "Redeem Subscription";
-        } else if(!$scope.registerData.ccraMember) {
-          //Set the text
-          $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
-        } else {
-          //Set the text
-          $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
-        }
+      if($scope.registerData.promoReg){
+          $scope.priceText = "Redeem Subscription";
+      } else if(!$scope.registerData.ccraMember && !$scope.registerData.yearly) {
+        //MONTHLY, NON MEMBER
+        $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
+      } else if(!$scope.registerData.ccraMember && $scope.registerData.yearly) {
+        //YEARLY, NON MEMBER
+        $scope.priceText = "Subscribe - $" + ($scope.prices.SINGLE_STANDARD / 100) + " Yearly";
+      } else if($scope.registerData.ccraMember && !$scope.registerData.yearly) {
+        //MONTHLY, MEMBER
+        $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
+      } else {
+        //YEARLY, MEMBER
+        $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.SINGLE_MEMBER / 100) + " Yearly";
+      }
     }
 
     $scope.setMember = function(){
