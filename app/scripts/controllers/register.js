@@ -771,7 +771,8 @@ angular.module('starter')
                     var payload = {
                         cardToken: stripeToken,
                         email: $scope.registerData.email,
-                        password: $scope.registerData.password
+                        password: $scope.registerData.password,
+                        yearly: $scope.registerData.yearly
                     }
 
                     if($scope.registerData.ccraMember){
