@@ -111,7 +111,7 @@
         </div>
 
         <!-- Payment Options -->
-        <div>
+        <div ng-if="!registerData.promoReg">
           <h2 class="register-payment-header">Payment Options</h2>
           <ion-list>
             <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-true-value="false">Billed Monthly</ion-checkbox>
