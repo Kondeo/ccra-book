@@ -568,7 +568,11 @@ angular.module('starter')
                             $state.go('app.index');
 
                             //Alert them of success!
-                            Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                            if($scope.registerData.yearly){
+                                Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                            } else{
+                                Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                            }
 
                         },
                         //Errors
@@ -692,7 +696,11 @@ angular.module('starter')
                 $state.go('app.index');
 
                 //Alert them of success!
-                Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                if($scope.registerData.yearly){
+                    Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                } else{
+                    Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                }
 
             },
             //Errors
@@ -807,7 +815,11 @@ angular.module('starter')
                         $state.go('app.index');
 
                         //Alert them of success!
-                        Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                        if($scope.registerData.yearly){
+                            Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                        } else{
+                            Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                        }
 
                     },
                     //Errors
