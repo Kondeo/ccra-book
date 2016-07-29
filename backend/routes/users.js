@@ -70,11 +70,11 @@ router.post('/register', function(req, res) {
                     }
                 }
 
-                function subYearly(isMember){
-                    var price = CONST.SINGLE_PRICE.STANDARD;
-                    if(isMember) {
-                      price = CONST.SINGLE_PRICE.MEMBER;
-                      isMember = true;
+                function subYearly(membership){
+                    var price = CONST.SUBSCRIPTION_PRICE.SINGLE_STANDARD;
+                    if(membership) {
+                      price = CONST.SUBSCRIPTION_PRICE.SINGLE_MEMBER;
+                      membership = true;
                     };
 
                     StripeService.charge(req.body.cardToken, price, function(charge){
@@ -295,10 +295,10 @@ router.post('/sub/add', function(req, res, next) {
                 }
 
                 function yearlyRenew(membership){
-                    var price = CONST.SINGLE_PRICE.STANDARD;
-                    if(isMember) {
-                      price = CONST.SINGLE_PRICE.MEMBER;
-                      isMember = true;
+                    var price = CONST.SUBSCRIPTION_PRICE.SINGLE_STANDARD;
+                    if(membership) {
+                      price = CONST.SUBSCRIPTION_PRICE.SINGLE_MEMBER;
+                      membership = true;
                     };
 
                     StripeService.charge(req.body.cardToken, price, function(charge){

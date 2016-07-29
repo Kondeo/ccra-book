@@ -6,14 +6,15 @@
   },
   "SUBSCRIPTION_PRICE": {
     "STANDARD": 999,
-    "MEMBER": 499
+    "MEMBER": 499,
+    "SINGLE_STANDARD": 11999,
+    "SINGLE_MEMBER": 5999
   },
   "SINGLE_PRICE": {
-    "STANDARD": 119.99,
-    "MEMBER": 59.99
+
   },
   "SERVER": {
-    "URL": "https://dev.kondeo.com"
+    "URL": "http://localhost:8100"
   },
   "CLIENT": {
     "IOS": {
