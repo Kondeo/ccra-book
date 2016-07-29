@@ -1,10 +1,11 @@
 var keys = require('../config/keys.json'),
-    mailgun = require('mailgun-js')({apiKey: keys.mailgun.apiKey, domain: keys.mailgun.domain});
+    mailgun = require('mailgun-js')({apiKey: keys.mailgun.apiKey, domain: keys.mailgun.domain}),
+    mailcomposer = require('mailcomposer');
 
 //Checks if a token exists, and returns the corrosponding accountId
 exports.sendMail = function(html, plain, subject, recipient, success, fail) {
     var mail = mailcomposer({
-        from: config.mailgun.alias,
+        from: keys.mailgun.alias,
         to: recipient,
         subject: subject,
         body: plain,
