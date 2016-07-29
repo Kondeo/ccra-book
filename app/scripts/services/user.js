@@ -37,6 +37,11 @@ angular.module('starter')
               method: "POST",
               isArray: true,
               url: CONST.apiBase + 'users/generatePromos'
+            },
+
+            update: {
+              method: 'PUT',
+              url: CONST.apiBase + 'users/self'
             }
 
         } );

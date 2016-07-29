@@ -2,6 +2,9 @@
 <ion-content>
     <form name = "resetForm">
       <div class="list">
+        <li class="item center">
+          <b>Set a new password below</b>
+        </li>
         <label class="item item-input">
           <span class="input-label"
           ng-class="{'errorFormText': passwordError}">
@@ -15,12 +18,11 @@
           <span class="input-label"
           ng-class="{'errorFormText': passwordError ||
           (resetForm.$valid &&
-          resetForm.confirmPassword.$touched &&
-          registerData.password != registerData.confirmPassword)}">
+          resetData.password != resetData.confirmPassword)}">
           Confirm Password</span>
           <input type="password"
           name="confirmPassword"
-          ng-model="registerData.confirmPassword"
+          ng-model="resetData.confirmPassword"
           placeholder="Password"
           required>
         </label>
@@ -29,7 +31,7 @@
           <button class="button button-block button-positive button-subscribe"
           type="submit"
           ng-disabled = "!resetForm.$valid ||
-          (!cardValidated && !registerData.promoReg) ||
+          resetData.password != resetData.confirmPassword ||
           loading.isLoading()"
           ng-click="updateUser()">Save New Password</button>
         </label>

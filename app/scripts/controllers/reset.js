@@ -1,48 +1,54 @@
 angular.module('starter')
-.controller('ResetCtrl', function($scope, $stateParams, $location, User, Notifications) {
+.controller('ResetCtrl', function($scope, $ionicHistory, $state, $location, loadingSpinner, User, Notifications) {
 
   //Initializing token variable
   $scope.token = $location.search().token;
   if($scope.token){
       localStorage.setItem("session_token", $scope.token);
   } else {
-      $location.path("index");
+      //Move them back to the index, no history
+      $ionicHistory.nextViewOptions({
+          disableBack: true
+      });
+      $state.go('app.index');
   }
 
-  //Obtain Generarted Promo Codes from Server
-  $scope.getPromoCodes = function(){
-    if($scope.tokenNum && $scope.tokenDate && moment($scope.tokenDate).isAfter(moment())){
-        var payload = {
-          "token": $scope.token,
-          "count": $scope.tokenNum,
-          "date": $scope.tokenDate
-        }
-        User.obtainPromoSet(payload,
-          function(response){
-            $scope.promoArray = response;
-            var codes = "";
-            for(i =0; i<response.length; i++){
-              codes += response[i] + "\n";
-            }
-            $scope.promoCodes = codes;
-          }, function(err){
-            switch(err.status){
-              case 401:
-                Notifications.show("Error", "You are not an administrator.");
-                break;
-              default:
-                Notifications.show("Error Connecting to Server", "You encountered a problem with your connection.");
-            }
+  $scope.resetData = {}
+
+  //Initialize our loading spinner for the button disabling
+  $scope.loading = loadingSpinner;
+
+  $scope.updateUser = function(){
+      //Start loading
+      loadingSpinner.startLoading();
+
+      var payload = {
+          password: $scope.resetData.password,
+          token: $scope.token
+      }
+      User.update(payload, function(res){
+          //Stop loading
+          loadingSpinner.stopLoading();
+
+          Notifications.show("Success", "Your new password has been saved!", function(){
+              //Move them back to the index, no history
+              $ionicHistory.nextViewOptions({
+                  disableBack: true
+              });
+              $state.go('app.index');
           });
-    } else {
-        Notifications.show("Error", "You need to specify a valid number and a valid date. Date must be after today.");
-    }
-  }
+      }, function(err){
+          //Our custom Error Handler
+          var handlers = [
+              {
+                  status: 401,
+                  title: "Something Went Wrong",
+                  text: "Please try requesting a new password reset email. Your current reset link is no longer valid."
+              }
+          ]
 
-  //Selects all generated codes
-  $scope.selectAll = function(){
-    setTimeout(function(){
-      document.getElementById("promo-area").select();
-    }, 10);
+          //Send to the notification handler
+          Notifications.error(err, handlers);
+      });
   }
 });
