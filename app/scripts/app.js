@@ -78,6 +78,17 @@ angular.module('starter',
     }
   })
 
+  .state('app.reset', {
+    url: "/reset",
+    cache: false,
+    views: {
+      'menuContent': {
+        templateUrl: "templates/reset.html",
+        controller: 'ResetCtrl'
+      }
+    }
+  })
+
   .state('app.codes', {
     url: "/codes",
     views: {
