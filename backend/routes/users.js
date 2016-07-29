@@ -568,14 +568,14 @@ router.get('/self/:token', function(req, res, next) {
 });
 
 /* Update user */
-router.put('/self/:token', function(req, res, next) {
+router.put('/self', function(req, res, next) {
     var emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/;
     if (req.body.email && !emailRegex.test(req.body.email)) {
         res.status(406).json({
             msg: "Email is not valid!"
         });
     } else {
-        SessionService.validateSession(req.params.token, "user", function(accountId) {
+        SessionService.validateSession(req.body.token, "user", function(accountId) {
             var updatedUser = {};
 
             if (req.body.email && typeof req.body.email === 'string') updatedUser.email = req.body.email;
