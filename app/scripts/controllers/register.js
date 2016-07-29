@@ -456,6 +456,16 @@ angular.module('starter')
                     //Our custom Error Handler
                     var handlers = [
                         {
+                            status: 402,
+                            title: "Invalid Redemption Code",
+                            text: "Please check your code to make sure you didn't mistype your redemption code. Also, ensure it hasn't been used before for another account.",
+                            callback: function() {
+
+                                //Display alert, and show card errors
+                                $scope.promoError = true;
+                            }
+                        },
+                        {
                             status: 406,
                             title: "Email Unsupported",
                             text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
@@ -473,16 +483,6 @@ angular.module('starter')
 
                                 //Ng class red email text
                                 $scope.emailError = true;
-                            }
-                        },
-                        {
-                            status: 402,
-                            title: "Invalid Redemption Code",
-                            text: "Please check your code to make sure you didn't mistype your redemption code. Also, ensure it hasn't been used before for another account.",
-                            callback: function() {
-
-                                //Display alert, and show card errors
-                                $scope.cardError = true;
                             }
                         }
                     ]
@@ -711,6 +711,16 @@ angular.module('starter')
                 //Our custom Error Handler
                 var handlers = [
                     {
+                        status: 402,
+                        title: "Invalid Redemption Code",
+                        text: "Please check your code to make sure you didn't mistype your redemption code. Also, ensure it hasn't been used before for another account.",
+                        callback: function() {
+
+                            //Display alert, and show card errors
+                            $scope.promoError = true;
+                        }
+                    },
+                    {
                         status: 406,
                         title: "Email Unsupported",
                         text: "Sorry, that email format isn't supported by our system. Please enter another email with a common provider!",
@@ -731,13 +741,13 @@ angular.module('starter')
                         }
                     },
                     {
-                        status: 402,
-                        title: "Invalid Redemption Code",
-                        text: "Please check your code to make sure you didn't mistype your redemption code. Also, ensure it hasn't been used before for another account.",
+                        status: 418,
+                        title: "Redemption Code Cannot Be Used",
+                        text: "The promo code you entered redeems a subscription that is less than or equal to your current subscription end date. In other words it is simply not useful for your account, although it is still valid.",
                         callback: function() {
 
                             //Display alert, and show card errors
-                            $scope.cardError = true;
+                            $scope.promoError = true;
                         }
                     }
                 ]

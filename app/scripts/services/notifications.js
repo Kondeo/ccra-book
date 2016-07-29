@@ -88,7 +88,7 @@ angular.module('starter')
                    $state.go('app.register');
 
                    //Show alert
-                   Notifications.show("Subscription Ended", "To continue using the app, you will need to add a subscription.");
+                   showAlert("Subscription Ended", "To continue using the app, you will need to extend your subscription.");
                }
                else if (response.status == 404) {
                  //404 error
