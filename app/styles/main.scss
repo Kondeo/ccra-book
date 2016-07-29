@@ -70,6 +70,11 @@ $dark:                            #444 !default;
     width: 80% !important;
 }
 
+//Register Page
+.register-payment-header {
+    text-align: center;;
+}
+
 //Make a forms text red for whatever part of the form is wrong
 .errorFormText {
     color: $assertive !important;

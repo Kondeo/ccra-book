@@ -1,6 +1,6 @@
 angular.module('starter')
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
-    $timeout, Page, User, $state,
+    $timeout, Page, User, $state, $ionicScrollDelegate,
     loadingSpinner, Price,
     Notifications, CONST, creditcards) {
 
@@ -12,6 +12,7 @@ angular.module('starter')
 
     //Our data from the form
     $scope.registerData = {};
+    $scope.registerData.yearly = false;
 
     //If our card is validated
     $scope.cardValidated = false;
@@ -115,19 +116,26 @@ angular.module('starter')
 
 
     $scope.updatePrices = function(){
-        if($scope.registerData.promoReg){
-            $scope.priceText = "Redeem Subscription";
-        } else if(!$scope.registerData.ccraMember) {
-          //Set the text
-          $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
-        } else {
-          //Set the text
-          $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
-        }
+      if($scope.registerData.promoReg){
+          $scope.priceText = "Redeem Subscription";
+      } else if(!$scope.registerData.ccraMember && !$scope.registerData.yearly) {
+        //MONTHLY, NON MEMBER
+        $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
+      } else if(!$scope.registerData.ccraMember && $scope.registerData.yearly) {
+        //YEARLY, NON MEMBER
+        $scope.priceText = "Purchase 1 Year - $" + ($scope.prices.SINGLE_STANDARD / 100) + "";
+      } else if($scope.registerData.ccraMember && !$scope.registerData.yearly) {
+        //MONTHLY, MEMBER
+        $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
+      } else {
+        //YEARLY, MEMBER
+        $scope.priceText = "Purchase 1 Year at Member Price - $" + ($scope.prices.SINGLE_MEMBER / 100) + "";
+      }
     }
 
     $scope.setMember = function(){
         $scope.isMember = $scope.registerData.ccraMember;
+        $ionicScrollDelegate.resize();
     }
 
     $scope.setPromo = function(){
@@ -525,7 +533,8 @@ angular.module('starter')
                         var payload = {
                             cardToken: stripeToken,
                             email: $scope.registerData.email,
-                            password: $scope.registerData.password
+                            password: $scope.registerData.password,
+                            yearly: $scope.registerData.yearly
                         }
 
                         if($scope.registerData.ccraMember){
@@ -561,7 +570,11 @@ angular.module('starter')
                             $state.go('app.index');
 
                             //Alert them of success!
-                            Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                            if($scope.registerData.yearly){
+                                Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                            } else{
+                                Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                            }
 
                         },
                         //Errors
@@ -685,7 +698,11 @@ angular.module('starter')
                 $state.go('app.index');
 
                 //Alert them of success!
-                Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                if($scope.registerData.yearly){
+                    Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                } else{
+                    Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                }
 
             },
             //Errors
@@ -764,7 +781,8 @@ angular.module('starter')
                     var payload = {
                         cardToken: stripeToken,
                         email: $scope.registerData.email,
-                        password: $scope.registerData.password
+                        password: $scope.registerData.password,
+                        yearly: $scope.registerData.yearly
                     }
 
                     if($scope.registerData.ccraMember){
@@ -799,7 +817,11 @@ angular.module('starter')
                         $state.go('app.index');
 
                         //Alert them of success!
-                        Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                        if($scope.registerData.yearly){
+                            Notifications.show("Success!", "You have successfully registered! Your account is valid until " + moment(data.subscription).format("MMM Do, YYYY") + ". Enjoy!");
+                        } else{
+                            Notifications.show("Success!", "You have successfully registered! Your card will be automatically billed each month to extend your subscription. Enjoy!");
+                        }
 
                     },
                     //Errors
