@@ -9,11 +9,9 @@
       </button>
     </div>
   </ion-header-bar>
-  <ion-content>
+  <ion-content ng-controller = "LoginCtrl">
 
-    <form
-    ng-controller = "LoginCtrl"
-    ng-submit="doLogin()">
+    <form ng-submit="submitAuth()">
 
         <!-- Placing two fake auth fields to
         stop chrome autofill -->
@@ -31,20 +29,40 @@
           Email</span>
           <input type="text" ng-model="loginData.email" autocomplete="off"  autocorrect="off" autocapitalize="none" spellcheck="false">
         </label>
-        <label class="item item-input">
-          <span class="input-label"
-          ng-class="{'errorFormText': authError}">
-          Password</span>
-          <input type="password" ng-model="loginData.password">
-        </label>
-        <label class="item">
-          <button class="button button-block button-positive"
-          type="submit"
-          ng-disabled="!loginData.email || !loginData.password || loading.isLoading()">
-          Log in</button>
-        </label>
+        <div ng-show="!reset">
+            <label class="item item-input">
+              <span class="input-label"
+              ng-class="{'errorFormText': authError}">
+              Password</span>
+              <input type="password" ng-model="loginData.password">
+            </label>
+            <label class="item">
+              <button class="button button-block button-positive"
+              type="submit"
+              ng-disabled="!loginData.email || !loginData.password || loading.isLoading()">
+              Log in</button>
+            </label>
+        </div>
+        <div ng-show="reset">
+            <label class="item">
+              <button class="button button-block button-positive"
+              type="submit"
+              ng-disabled="!loginData.email || loading.isLoading()">
+              Request Reset Email</button>
+            </label>
+        </div>
       </div>
     </form>
+
+    <div class = "register"
+    ng-show="!reset">
+        <a href="" ng-click="reset = true">I forgot my password</a>
+    </div>
+
+    <div class = "register"
+    ng-show="reset">
+        <a href="" ng-click="reset = false">I remember my password. I'd like to login</a>
+    </div>
 
     <div class = "register"
     ng-if="!loggedIn() && clientConfig.SUBSCRIBE_PAGE">

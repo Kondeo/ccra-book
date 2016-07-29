@@ -42,7 +42,13 @@ angular.module('starter')
             update: {
               method: 'PUT',
               url: CONST.apiBase + 'users/self'
+            },
+
+            forgot: {
+              method: 'POST',
+              url: CONST.apiBase + 'users/forgot'
             }
+
 
         } );
 

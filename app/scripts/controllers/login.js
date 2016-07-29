@@ -14,6 +14,56 @@ angular.module('starter')
     //Should we show red text
     $scope.authError = false;
 
+    //Reset interface toggle
+    $scope.reset = false;
+
+    $scope.loading = loadingSpinner;
+
+    $scope.submitAuth = function(){
+        if($scope.reset){
+            $scope.requestReset();
+        } else {
+            $scope.doLogin();
+        }
+    }
+
+    $scope.requestReset = function(){
+        loadingSpinner.startLoading();
+        var payload = {
+            email: $scope.loginData.email
+        }
+        User.forgot(payload, function(res){
+            loadingSpinner.stopLoading();
+            Notifications.show("Email Sent", "We have sent a reset link to the email you provided. Please use that to reset your account password.");
+        }, function(err){
+            //Create our handlers for errors
+            var handlers = [
+                {
+                    status: 406,
+                    title: "Email Invalid",
+                    text: "The email you entered cannot be understood. Please check your formatting.",
+                    callback: function() {
+
+                        //Show red error text
+                        $scope.authError = true;
+                    }
+                },
+                {
+                    status: 404,
+                    title: "Account Not Found",
+                    text: "We cannot find any account with that email address in our system. Please try a different email, or register a new account.",
+                    callback: function() {
+
+                        //Show red error text
+                        $scope.authError = true;
+                    }
+                }
+            ];
+
+            Notifications.error(response, handlers);
+        })
+    }
+
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
 
