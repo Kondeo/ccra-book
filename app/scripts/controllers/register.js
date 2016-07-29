@@ -1,6 +1,6 @@
 angular.module('starter')
 .controller('RegisterCtrl', function($scope, $ionicHistory, $http,
-    $timeout, Page, User, $state,
+    $timeout, Page, User, $state, $ionicScrollDelegate,
     loadingSpinner, Price,
     Notifications, CONST, creditcards) {
 
@@ -123,18 +123,19 @@ angular.module('starter')
         $scope.priceText = "Subscribe - $" + ($scope.prices.STANDARD / 100) + " AutoBilled Monthly";
       } else if(!$scope.registerData.ccraMember && $scope.registerData.yearly) {
         //YEARLY, NON MEMBER
-        $scope.priceText = "Subscribe - $" + ($scope.prices.SINGLE_STANDARD / 100) + " Yearly";
+        $scope.priceText = "Purchase 1 Year - $" + ($scope.prices.SINGLE_STANDARD / 100) + "";
       } else if($scope.registerData.ccraMember && !$scope.registerData.yearly) {
         //MONTHLY, MEMBER
         $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.MEMBER / 100) + " AutoBilled Monthly";
       } else {
         //YEARLY, MEMBER
-        $scope.priceText = "Subscribe at Member Price - $" + ($scope.prices.SINGLE_MEMBER / 100) + " Yearly";
+        $scope.priceText = "Purchase 1 Year at Member Price - $" + ($scope.prices.SINGLE_MEMBER / 100) + "";
       }
     }
 
     $scope.setMember = function(){
         $scope.isMember = $scope.registerData.ccraMember;
+        $ionicScrollDelegate.resize();
     }
 
     $scope.setPromo = function(){
