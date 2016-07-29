@@ -55,10 +55,10 @@
         <label class="item item-input">
           <span class="input-label"
           ng-class="{'errorFormText': passwordError}">
-          Password</span>
+          <div ng-if="loggedIn()">Your Password</div><div ng-if="!loggedIn()">New Password</div></span>
           <input type="password"
           ng-model="registerData.password"
-          placeholder="Secure Password"
+          placeholder="Password"
           required>
         </label>
         <label class="item item-input" ng-if="!loggedIn()">
@@ -71,7 +71,7 @@
           <input type="password"
           name="confirmPassword"
           ng-model="registerData.confirmPassword"
-          placeholder="Secure Password"
+          placeholder="Password"
           required>
         </label>
 
@@ -110,17 +110,13 @@
           </label>
         </div>
 
-        <!-- Payment Options -->
-        <div ng-if="!registerData.promoReg">
-          <h2 class="register-payment-header">Payment Options</h2>
-          <ion-list>
-            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-true-value="false">Billed Monthly</ion-checkbox>
-            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-false-value="false">Billed Yearly</ion-checkbox>
-            </ion-list>
-        </div>
-
         <!-- Credit Card Number -->
         <div ng-if="!registerData.promoReg">
+            <li class="item center">
+              <b>Payment Options</b>
+            </li>
+            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-true-value="false">Billed Monthly</ion-checkbox>
+            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-false-value="false">Billed Yearly</ion-checkbox>
             <label class="item item-input">
               <span class="input-label"
               ng-class="{'errorFormText': cardError ||
@@ -173,15 +169,15 @@
               (registerForm.$valid &&
               registerForm.cardCvv.$touched &&
               !cvcValidated)}">
-              CVV (Located on Back of Card)</span>
+              CVV (On back of card)</span>
               <input
                     type="number"
                     id="cardCvv"
                     name="cardCvv"
                     ng-keyup = "validateCVC()"
-                    ng-keydown="maxLength($event, 3)"
+                    ng-keydown="maxLength($event, 4)"
                     placeholder="CVV"
-                    size="3"
+                    size="4"
                     pattern="\d*"
                     ng-model="registerData.cvv">
             </label>
