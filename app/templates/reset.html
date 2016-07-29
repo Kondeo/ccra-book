@@ -1,0 +1,41 @@
+<ion-view view-title="Password Reset">
+<ion-content>
+    <form name = "resetForm">
+      <div class="list">
+        <li class="item center">
+          <b>Set a new password below</b>
+        </li>
+        <label class="item item-input">
+          <span class="input-label"
+          ng-class="{'errorFormText': passwordError}">
+          New Password</span>
+          <input type="password"
+          ng-model="resetData.password"
+          placeholder="New Password"
+          required>
+        </label>
+        <label class="item item-input">
+          <span class="input-label"
+          ng-class="{'errorFormText': passwordError ||
+          (resetForm.$valid &&
+          resetData.password != resetData.confirmPassword)}">
+          Confirm Password</span>
+          <input type="password"
+          name="confirmPassword"
+          ng-model="resetData.confirmPassword"
+          placeholder="Password"
+          required>
+        </label>
+
+        <!-- Update Information for the user -->
+          <button class="button button-block button-positive button-subscribe"
+          type="submit"
+          ng-disabled = "!resetForm.$valid ||
+          resetData.password != resetData.confirmPassword ||
+          loading.isLoading()"
+          ng-click="updateUser()">Save New Password</button>
+        </label>
+      </div>
+    </form>
+</ion-content>
+</ion-view>
