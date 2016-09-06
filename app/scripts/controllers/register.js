@@ -12,7 +12,7 @@ angular.module('starter')
 
     //Our data from the form
     $scope.registerData = {};
-    $scope.registerData.yearly = false;
+    $scope.registerData.yearly = true;
 
     //If our card is validated
     $scope.cardValidated = false;

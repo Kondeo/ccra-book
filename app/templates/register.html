@@ -115,8 +115,8 @@
             <li class="item center">
               <b>Payment Options</b>
             </li>
-            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-true-value="false">Billed Monthly</ion-checkbox>
-            <ion-checkbox ng-click="updatePrices()" ng-model="registerData.yearly" ng-false-value="false">Billed Yearly</ion-checkbox>
+            <ion-checkbox ng-if="false" ng-click="updatePrices()" ng-model="registerData.yearly" ng-true-value="false">Billed Monthly</ion-checkbox>
+            <ion-checkbox ng-if="false" ng-click="updatePrices()" ng-model="registerData.yearly" ng-false-value="false">Billed Yearly</ion-checkbox>
             <label class="item item-input">
               <span class="input-label"
               ng-class="{'errorFormText': cardError ||
