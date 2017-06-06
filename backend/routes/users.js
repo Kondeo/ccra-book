@@ -708,7 +708,7 @@ function _checkMembership_complete(userId, token, success, fail){
   // Configure the request
   var options = {
       url: 'https://ccra.memberclicks.net/api/v1/profile/' + userId,
-      method: 'POST',
+      method: 'GET',
       headers: headers
   }
 
@@ -718,14 +718,17 @@ function _checkMembership_complete(userId, token, success, fail){
           // Print out the response body
           var data = JSON.parse(body);
           if(data['[Member Status]'] == "Active"){
+            console.log("Success");
             success(true);
           } else {
+            console.log("Failed 3", response);
             fail({
               status: 424,
               msg: "CCRA Membership no longer active."
             });
           }
       } else {
+          console.log("Failed 2", response);
           fail({
             status: 417,
             msg: "CCRA Membership credentials incorrect."
@@ -771,6 +774,7 @@ function checkMembership(username, password, success, fail){
           _checkMembership_complete(data.userId, data.access_token, success, fail);
 
       } else {
+          console.log("Failed 1", response);
           fail({
             status: 417,
             msg: "CCRA Membership credentials incorrect."
