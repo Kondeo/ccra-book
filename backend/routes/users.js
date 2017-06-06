@@ -694,25 +694,22 @@ router.post('/generatePromos', function(req, res) {
     }
 });
 
-function checkMembership(username, password, success, fail){
-  var membership = false;
-
+function _checkMembership_complete(userId, token, success, fail){
   var request = require('request');
 
   // Set the headers
   var headers = {
       'User-Agent':       'Super Agent/0.0.1',
       'Content-Type':     'application/x-www-form-urlencoded',
-      'Authorization':    keys.memberClicks.apiKey,
+      'Authorization':    'Bearer ' + token,
       'Accept':           'application/json'
   }
 
   // Configure the request
   var options = {
-      url: 'https://ccra.memberclicks.net/services/auth',
+      url: 'https://ccra.memberclicks.net/api/v1/profile/' + userId,
       method: 'POST',
-      headers: headers,
-      qs: {'username': username, 'password': password, 'apiKey': keys.memberClicks.apiKey}
+      headers: headers
   }
 
   // Start the request
@@ -720,7 +717,7 @@ function checkMembership(username, password, success, fail){
       if (!error && response.statusCode == 200) {
           // Print out the response body
           var data = JSON.parse(body);
-          if(data.active){
+          if(data['[Member Status]'] == "Active"){
             success(true);
           } else {
             fail({
@@ -728,6 +725,51 @@ function checkMembership(username, password, success, fail){
               msg: "CCRA Membership no longer active."
             });
           }
+      } else {
+          fail({
+            status: 417,
+            msg: "CCRA Membership credentials incorrect."
+          });
+      }
+  });
+}
+
+function checkMembership(username, password, success, fail){
+  var request = require('request');
+
+  // Set the headers
+  var headers = {
+      'User-Agent':       'Super Agent/0.0.1',
+      'Content-Type':     'application/x-www-form-urlencoded',
+      'Authorization':    'Basic ' + keys.memberClicks.apiKey,
+      'Accept':           'application/json'
+  }
+
+  // Configure the request
+  var options = {
+      url: 'https://ccra.memberclicks.net/oauth/v1/token',
+      method: 'POST',
+      headers: headers,
+      form: {
+        'username': username,
+        'password': password,
+        'apiKey': keys.memberClicks.apiKey,
+        'grant_type': 'password'
+      }
+  }
+
+  // Start the request
+  request(options, function (error, response, body) {
+      var data;
+      if (body) {
+        try {
+          data = JSON.parse(body);
+        } catch(e) {}
+      }
+      if (!error && response.statusCode == 200 && data && data.userId && data.access_token) {
+
+          _checkMembership_complete(data.userId, data.access_token, success, fail);
+
       } else {
           fail({
             status: 417,
