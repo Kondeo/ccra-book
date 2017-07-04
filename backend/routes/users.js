@@ -541,6 +541,7 @@ router.get('/self/:token', function(req, res, next) {
     SessionService.validateSession(req.params.token, "user", function(accountId) {
         User.findById(accountId)
         .select('name email subscription subscriptionId memberPrice admin')
+        .lean()
         .exec(function(err, user) {
             if (err) {
                 res.status(500).json({
@@ -551,6 +552,9 @@ router.get('/self/:token', function(req, res, next) {
                     msg: "User not found, user table out of sync with session table!"
                 });
             } else {
+                if(moment().isAfter(moment(user.subscription))){
+                    user.subscription = "expired";
+                }
                 res.status(200).json(user);
             }
         });
