@@ -315,7 +315,7 @@ router.post('/sub/add', function(req, res, next) {
 
                         var setUser = {
                             $set: updatedUser,
-                            $unset: { subscriptionId: 1, memberPrice: 1, stripeInit: 1 }
+                            $unset: { subscriptionId: "", memberPrice: "", stripeInit: "" }
                         }
 
                         User.update({
@@ -516,7 +516,7 @@ router.post('/sub/cancel', function(req, res, next) {
                 StripeService.unsubscribe(user.subscriptionId, function(confirmation){
 
                     var setUser = {
-                        $unset: { subscriptionId: 1, memberPrice: 1, stripeInit: 1 }
+                        $unset: { subscriptionId: "", memberPrice: "", stripeInit: "" }
                     }
 
                     User.update({
