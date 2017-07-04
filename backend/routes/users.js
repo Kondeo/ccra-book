@@ -215,25 +215,17 @@ router.post('/login', function(req, res, next) {
 
             //Compare to stored hash
             if (hash == user.password) {
-                //Check if subscription has expired
-                if(moment(user.subscription).isAfter(moment()) || user.admin){
-                    SessionService.generateSession(user._id, "user", function(token){
-                        //All good, give the user their token
-                        res.status(200).json({
-                            token: token,
-                            subscription: user.subscription,
-                            admin: user.admin,
-                            subscriptionId: user.subscriptionId
-                        });
-                    }, function(err){
-                        res.status(err.status).json(err);
+                SessionService.generateSession(user._id, "user", function(token){
+                    //All good, give the user their token
+                    res.status(200).json({
+                        token: token,
+                        subscription: user.subscription,
+                        admin: user.admin,
+                        subscriptionId: user.subscriptionId
                     });
-                } else {
-                    res.status(402).json({
-                        msg: "Subscription expired!",
-                        subscription: user.subscription
-                    });
-                }
+                }, function(err){
+                    res.status(err.status).json(err);
+                });
             } else {
                 res.status(401).json({
                     msg: "Password is incorrect!"
